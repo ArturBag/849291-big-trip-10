@@ -587,10 +587,6 @@ const createEventDestination = () =>
 const createTripEventItem = () =>
   `<li class="trip-events__item"></li>`;
 
-const createEventEditor = () =>
-  `<form class="event  event--edit" action="#" method="post"></form>`;
-
-
 const header = document.querySelector(`.page-header`);
 const tripInfo = header.querySelector(`.trip-main__trip-info`);
 
@@ -629,17 +625,3 @@ const tripEventFirstChild = tripEventsList[0].firstElementChild;
 
 renderElement(tripEventFirstChild, createTripEventItem(), `afterend`);
 
-
-const tripEventSecondChild = document.querySelector(`.trip-events__list li:nth-child(2)`);
-
-renderElement(tripEventSecondChild, createEventEditor(), `beforeend`);
-
-const tripEventItemForm = tripEventSecondChild.querySelector(`.event`);
-
-renderElement(tripEventItemForm, createEventHeader(), `beforeend`);
-renderElement(tripEventItemForm, createEventDetails(), `beforeend`);
-
-const tripEventsItemDetails = tripEventItemForm.querySelector(`.event__details`);
-
-renderElement(tripEventsItemDetails, createEventOffers(), `beforeend`);
-renderElement(tripEventsItemDetails, createEventDestination(), `beforeend`);
