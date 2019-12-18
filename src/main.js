@@ -35,12 +35,20 @@ const tripEvents = document.querySelector(`.trip-events`);
 
 renderElement(tripEvents.children[0], createSorting(), `afterEnd`);
 
+
 const tripSort = tripEvents.querySelector(`.trip-events__trip-sort`);
 
 const eventDetailsData = generateEventDetailsData(routeData);
 
-routeData.forEach((route, routeIndex) =>
-  renderElement(tripSort, createTripDays(route, routeIndex), `afterEnd`));
+
+const tripDaysListItems = routeData.map((route, routeIndex) => {
+  return createTripDays(route, routeIndex);
+}).join(``);
+
+const tripDaysList = `<ul class="trip-days">${tripDaysListItems}</ul>`;
+
+renderElement(tripEvents, tripDaysList, `beforeend`);
+
 
 const pricesData = document.querySelectorAll(`.event__price-value`);
 calculateFullTripExpenses(pricesData);

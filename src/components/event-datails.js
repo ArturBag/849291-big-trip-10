@@ -1,18 +1,15 @@
 export const createEventDetails = (eventDetailsData) => {
   const eventData = eventDetailsData;
 
-  let imageTemplate = ``;
   const destinationDescription = eventData.description;
   const additionalOptions = eventData.options;
 
 
-  let eventOfferSelector = ``;
-
-  additionalOptions.forEach((it) => {
+  const eventOfferSelector = additionalOptions.map((it) => {
     const isOptionChecked = Math.random() > 0.5;
     additionalOptions.isChecked = isOptionChecked ? `checked` : ``;
 
-    eventOfferSelector += `<div class="event__offer-selector">
+    return `<div class="event__offer-selector">
     <input class="event__offer-checkbox  visually-hidden" id="${it.id}" type="checkbox" name="${it.name}" ${additionalOptions.isChecked}>
     <label class="event__offer-label" for="${it.id}">
       <span class="event__offer-title">${it.title}</span>
@@ -20,12 +17,11 @@ export const createEventDetails = (eventDetailsData) => {
       &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
     </label>
   </div>`;
-  });
+  }).join(``);
 
-
-  eventData.pictures.forEach((it) => {
-    imageTemplate += `<img class="event__photo" src="${it}" alt="Event photo">`;
-  });
+  const imageTemplate = eventData.pictures.map((it) => {
+    return `<img class="event__photo" src="${it}" alt="Event photo">`;
+  }).join(``);
 
 
   return `<section class="event__section  event__section--offers">

@@ -1,16 +1,12 @@
 export const createRoute = (routeData) => {
 
-  let tripDaysItems = routeData;
+  const tripDaysItems = routeData;
   let routeMarkup = ``;
-  let cities = tripDaysItems.map((it) => it.city);
-  for (const cityName of cities) {
-    routeMarkup += cityName + ` &mdash; `;
-  }
+  const cities = tripDaysItems.map((it) => it.city).join(` &mdash; `);
 
-  routeMarkup = cities.length > 2 ?
-    `${cities[0]}` + ` ... ` + `${cities[cities.length - 1]}` :
-    routeMarkup.substring(0, routeMarkup.length - 9);
-
+  routeMarkup = tripDaysItems.length > 2 ?
+    `${tripDaysItems[0].city}` + ` ... ` + `${tripDaysItems[tripDaysItems.length - 1].city}` :
+    cities;
   return `<div class="trip-info__main">
   <h1 class="trip-info__title">${routeMarkup}</h1>
 
@@ -20,12 +16,9 @@ export const createRoute = (routeData) => {
 
 export const calculateFullTripExpenses = (pricesData) => {
 
-  let totalTripRate = 0;
   const priceOutput = document.querySelector(`.trip-info__cost-value`);
-  const totalTriPrices = Array.from(pricesData).map((it) => it.textContent);
-  totalTriPrices.forEach((it) => {
-    totalTripRate = totalTripRate + parseInt(it, 10);
-  });
-  priceOutput.textContent = totalTripRate;
+  const totalTriPrices = Array.from(pricesData).map((it) => parseInt(it.textContent, 10));
+
+  priceOutput.textContent = totalTriPrices.reduce((result, currentVal) => result + currentVal);
 
 };
