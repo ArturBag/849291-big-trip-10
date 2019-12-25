@@ -1,6 +1,7 @@
 import {FILTER_ITEMS} from '../const.js';
+import {createElement} from '../utils.js';
 
-export const createFilters = () => {
+const createFilters = () => {
 
   const filterItemsData = FILTER_ITEMS;
   const filterTabs = filterItemsData.map((it) => {
@@ -13,3 +14,25 @@ export const createFilters = () => {
 
   return `<form class="trip-filters" action="#" method="get">${filterTabs}</form>`;
 };
+
+export default class Filters {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilters();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

@@ -1,22 +1,32 @@
-import {createRoute, calculateFullTripExpenses} from './components/route.js';
-import {createMenu} from './components/menu.js';
-import {createFilters} from './components/filters.js';
-import {createSorting} from './components/sorting.js';
-import {createTripEventForm} from './components/sections.js';
-import {createEventHeader} from './components/event-header.js';
-import {createEventDetailsSection} from './components/sections.js';
-import {createEventDetails} from './components/event-datails.js';
-import {createTripDays} from './components/trip-days.js';
+import {calculateFullTripExpenses} from './components/route.js';
+import Route from './components/route.js';
+import Menu from './components/menu.js';
+import Filters from './components/filters.js';
+import Sorting from './components/sorting.js';
+import EventForm from './components/event-datails.js';
+import TripDays from './components/trip-days.js';
 import {generateRoutePoints} from './mocks/route-point.js';
 import {generateEventDetailsData} from './mocks/edit-event-details.js';
+import {RenderPosition, render} from './utils.js';
 
-
-const renderElement = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
-};
 
 const ROUTES_QTY = 5;
+const renderRoutePoint = (eventDetailsData, route, routeIndex) => {
+  const eventFormComponent = new EventForm(eventDetailsData);
+  const TripDaysComponent = new TripDays(route, routeIndex);
 
+  const rollUpButton = TripDaysComponent.getElement().querySelector(`.event__rollup-btn`);
+  rollUpButton.addEventListener(`click`, () => {
+    tripDaysList.replaceChild(eventFormComponent.getElement(), TripDaysComponent.getElement());
+  });
+
+  const editForm = eventFormComponent.getElement();
+  editForm.addEventListener(`submit`, () => {
+    tripDaysList.replaceChild(TripDaysComponent.getElement(), eventFormComponent.getElement());
+  });
+
+  render(tripDaysList, TripDaysComponent.getElement(), RenderPosition.BEFOREEND);
+};
 
 const header = document.querySelector(`.page-header`);
 const tripInfo = header.querySelector(`.trip-main__trip-info`);
@@ -25,42 +35,28 @@ const tripControlHeaders = header.querySelectorAll(`.trip-main__trip-controls h2
 
 export const routeData = generateRoutePoints(ROUTES_QTY);
 
-renderElement(tripInfo, createRoute(routeData), `afterBegin`);
+render(tripInfo, new Route(routeData).getElement(), RenderPosition.AFTERBEGIN);
+render(tripControlHeaders[0], new Menu().getElement(), RenderPosition.AFTEREND);
 
-renderElement(tripControlHeaders[0], createMenu(), `afterEnd`);
-
-renderElement(tripControlHeaders[1], createFilters(), `afterEnd`);
+render(tripControlHeaders[1], new Filters().getElement(), RenderPosition.AFTEREND);
 
 const tripEvents = document.querySelector(`.trip-events`);
 
-renderElement(tripEvents.children[0], createSorting(), `afterEnd`);
-
+render(tripEvents.children[0], new Sorting().getElement(), RenderPosition.AFTEREND);
 
 const tripSort = tripEvents.querySelector(`.trip-events__trip-sort`);
 
 const eventDetailsData = generateEventDetailsData(routeData);
 
+const tripDaysList = document.createElement(`ul`);
+tripDaysList.classList.add(`trip-days`);
+render(tripSort, tripDaysList, RenderPosition.AFTEREND);
 
-const tripDaysListItems = routeData.map((route, routeIndex) => {
-  return createTripDays(route, routeIndex);
-}).join(``);
-
-const tripDaysList = `<ul class="trip-days">${tripDaysListItems}</ul>`;
-
-renderElement(tripEvents, tripDaysList, `beforeend`);
-
+routeData.map((route, routeIndex) => {
+  renderRoutePoint(eventDetailsData, route, routeIndex);
+});
 
 const pricesData = document.querySelectorAll(`.event__price-value`);
 calculateFullTripExpenses(pricesData);
 
 
-renderElement(tripSort, createTripEventForm(), `afterEnd`);
-
-const eventEdit = document.querySelector(`.event--edit`);
-
-renderElement(eventEdit, createEventHeader(), `beforeend`);
-renderElement(eventEdit, createEventDetailsSection(), `beforeend`);
-
-const eventDetails = document.querySelector(`.event__details`);
-
-renderElement(eventDetails, createEventDetails(eventDetailsData), `beforeend`);

@@ -1,5 +1,6 @@
+import {createElement} from '../utils.js';
 
-export const createTripDays = (routePointData, routeIndex) => {
+const createTripDays = (routePointData, routeIndex) => {
 
   const {type, city, price, date, options} = routePointData;
 
@@ -27,8 +28,7 @@ export const createTripDays = (routePointData, routeIndex) => {
    </li>`;
   }).join(``);
 
-  return `
-  <li class="trip-days__item  day">
+  return `<li class="trip-days__item  day">
  <div class="day__info">
  <span class="day__counter">${dayCounter}</span>
    <time class="day__date" datetime="2019-03-18">${dateInfo}</time>
@@ -68,3 +68,28 @@ export const createTripDays = (routePointData, routeIndex) => {
     </ul>
    </li>`;
 };
+
+
+export default class TripDays {
+  constructor(route, routeIndex) {
+    this._element = null;
+
+    this._route = route;
+    this._routeIndex = routeIndex;
+  }
+
+  getTemplate() {
+    return createTripDays(this._route, this._routeIndex);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

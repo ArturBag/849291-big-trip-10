@@ -1,4 +1,6 @@
-export const createRoute = (routeData) => {
+import {createElement} from '../utils.js';
+
+const createRoute = (routeData) => {
 
   const tripDaysItems = routeData;
   let routeMarkup = ``;
@@ -22,3 +24,27 @@ export const calculateFullTripExpenses = (pricesData) => {
   priceOutput.textContent = totalTriPrices.reduce((result, currentVal) => result + currentVal);
 
 };
+
+export default class Route {
+  constructor(routeData) {
+    this._element = null;
+
+    this.routeData = routeData;
+  }
+
+  getTemplate() {
+    return createRoute(this.routeData);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

@@ -1,6 +1,7 @@
 import {MENU_ITEMS} from '../const.js';
+import {createElement} from '../utils.js';
 
-export const createMenu = () => {
+const createMenu = () => {
 
   const menuItemsData = MENU_ITEMS;
 
@@ -12,3 +13,24 @@ export const createMenu = () => {
   return `<nav class="trip-controls__trip-tabs  trip-tabs">${tripTabs}</nav>`;
 };
 
+export default class Menu {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createMenu();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
