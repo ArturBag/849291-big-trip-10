@@ -1,70 +1,94 @@
+import {createElement} from '../utils.js';
 
-export const createTripDays = (routePointData, routeIndex) => {
+export default class TripDays {
+  constructor(route, routeIndex) {
+    this._element = null;
 
-  const {type, city, price, date, options} = routePointData;
+    this._route = route;
+    this._routeIndex = routeIndex;
+  }
 
-  const dayCounter = routeIndex + 1;
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
 
-  const travelType = type.travelType;
-  const iconSrc = type.icon;
-  const prefix = type.prefix;
+  removeElement() {
+    this._element = null;
+  }
 
-  const dayInfo = date.day;
-  const monthInfo = date.month.slice(0, 3).toUpperCase();
-  const dateInfo = `${dayInfo} ${monthInfo}`;
+  getTemplate() {
+    const createTripDays = (routePointData, routeIndex) => {
 
-  const startTime = date.startTime;
-  const endTime = date.endTime;
+      const {type, city, price, date, options} = routePointData;
 
-  const eventDurationTime = date.eventDurationTime;
+      const dayCounter = routeIndex + 1;
 
-  const optionsInfo = options.map((it) => {
+      const travelType = type.travelType;
+      const iconSrc = type.icon;
+      const prefix = type.prefix;
 
-    return `<li class="event__offer">
-    <span class="event__offer-title">${it.title}</span>
-    &plus;
-    &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
-   </li>`;
-  }).join(``);
+      const dayInfo = date.day;
+      const monthInfo = date.month.slice(0, 3).toUpperCase();
+      const dateInfo = `${dayInfo} ${monthInfo}`;
 
-  return `
-  <li class="trip-days__item  day">
- <div class="day__info">
- <span class="day__counter">${dayCounter}</span>
-   <time class="day__date" datetime="2019-03-18">${dateInfo}</time>
- </div>
+      const startTime = date.startTime;
+      const endTime = date.endTime;
 
-  <ul class="trip-events__list">
-    <li class="trip-events__item">
-      <div class="event">
-        <div class="event__type">
-          <img class="event__type-icon" width="42" height="42" src="${iconSrc}" alt="Event type icon">
-        </div>
-        <h3 class="event__title">${travelType} ${prefix} ${city}</h3>
+      const eventDurationTime = date.eventDurationTime;
 
-        <div class="event__schedule">
-          <p class="event__time">
-            <time class="event__start-time" datetime="2019-03-18T10:30">${startTime}</time>
-            &mdash;
-            <time class="event__end-time" datetime="2019-03-18T11:00">${endTime}</time>
-          </p>
-          <p class="event__duration">${eventDurationTime}</p>
-        </div>
+      const optionsInfo = options.map((it) => {
 
-        <p class="event__price">
-          &euro;&nbsp;<span class="event__price-value">${price}</span>
-        </p>
+        return `<li class="event__offer">
+        <span class="event__offer-title">${it.title}</span>
+        &plus;
+        &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
+       </li>`;
+      }).join(``);
 
-        <h4 class="visually-hidden">Offers:</h4>
-        <ul class="event__selected-offers">
-          ${optionsInfo}
+      return `<li class="trip-days__item  day">
+     <div class="day__info">
+     <span class="day__counter">${dayCounter}</span>
+       <time class="day__date" datetime="2019-03-18">${dateInfo}</time>
+     </div>
+
+      <ul class="trip-events__list">
+        <li class="trip-events__item">
+          <div class="event">
+            <div class="event__type">
+              <img class="event__type-icon" width="42" height="42" src="${iconSrc}" alt="Event type icon">
+            </div>
+            <h3 class="event__title">${travelType} ${prefix} ${city}</h3>
+
+            <div class="event__schedule">
+              <p class="event__time">
+                <time class="event__start-time" datetime="2019-03-18T10:30">${startTime}</time>
+                &mdash;
+                <time class="event__end-time" datetime="2019-03-18T11:00">${endTime}</time>
+              </p>
+              <p class="event__duration">${eventDurationTime}</p>
+            </div>
+
+            <p class="event__price">
+              &euro;&nbsp;<span class="event__price-value">${price}</span>
+            </p>
+
+            <h4 class="visually-hidden">Offers:</h4>
+            <ul class="event__selected-offers">
+              ${optionsInfo}
+            </ul>
+
+            <button class="event__rollup-btn" type="button">
+              <span class="visually-hidden">Open event</span>
+            </button>
+          </div>
+        </li>
         </ul>
+       </li>`;
+    };
 
-        <button class="event__rollup-btn" type="button">
-          <span class="visually-hidden">Open event</span>
-        </button>
-      </div>
-    </li>
-    </ul>
-   </li>`;
-};
+    return createTripDays(this._route, this._routeIndex);
+  }
+}
