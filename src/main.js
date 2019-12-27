@@ -1,8 +1,10 @@
+import NoRoutePoints from './components/no-route-points.js';
 import Route from './components/route.js';
 import Menu from './components/menu.js';
 import Filters from './components/filters.js';
 import Sorting from './components/sorting.js';
 import EventForm from './components/event-datails.js';
+import TripDaysList from './components/trip-days-list.js';
 import TripDays from './components/trip-days.js';
 import {generateRoutePoints} from './mocks/route-point.js';
 import {generateEventDetailsData} from './mocks/edit-event-details.js';
@@ -11,17 +13,30 @@ import {RenderPosition, render} from './utils.js';
 
 const ROUTES_QTY = 5;
 const renderRoutePoint = (eventDetailsData, route, routeIndex) => {
-  const eventFormComponent = new EventForm(eventDetailsData);
-  const tripDaysComponent = new TripDays(route, routeIndex);
 
+  const onEscKeyDown = (evt) => {
+    const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+    if (isEscKey) {
+      replaceEventFormToTripDays();
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
+  };
+
+  const replacetripDaysToEventForm = () => tripDaysList.replaceChild(eventFormComponent.getElement(), tripDaysComponent.getElement());
+  const replaceEventFormToTripDays = () => tripDaysList.replaceChild(tripDaysComponent.getElement(), eventFormComponent.getElement());
+
+  const tripDaysComponent = new TripDays(route, routeIndex);
   const rollUpButton = tripDaysComponent.getElement().querySelector(`.event__rollup-btn`);
   rollUpButton.addEventListener(`click`, () => {
-    tripDaysList.replaceChild(eventFormComponent.getElement(), tripDaysComponent.getElement());
+    replacetripDaysToEventForm();
+    document.addEventListener(`keydown`, onEscKeyDown);
   });
 
+  const eventFormComponent = new EventForm(eventDetailsData);
   const editForm = eventFormComponent.getElement();
   editForm.addEventListener(`submit`, () => {
-    tripDaysList.replaceChild(tripDaysComponent.getElement(), eventFormComponent.getElement());
+    replaceEventFormToTripDays();
+    document.removeEventListener(`keydown`, onEscKeyDown);
   });
 
   render(tripDaysList, tripDaysComponent.getElement(), RenderPosition.BEFOREEND);
@@ -41,30 +56,44 @@ render(tripControlHeaders[1], new Filters().getElement(), RenderPosition.AFTEREN
 
 const tripEvents = document.querySelector(`.trip-events`);
 
-render(tripEvents.children[0], new Sorting().getElement(), RenderPosition.AFTEREND);
-
-const tripSort = tripEvents.querySelector(`.trip-events__trip-sort`);
-
 const eventDetailsData = generateEventDetailsData(routeData);
 
-const tripDaysList = document.createElement(`ul`);
-tripDaysList.classList.add(`trip-days`);
-render(tripSort, tripDaysList, RenderPosition.AFTEREND);
+const tripDaysListComponent = new TripDaysList();
+const tripDaysList = tripDaysListComponent.getElement();
+
+const sortingComponent = new Sorting();
+const sortingList = sortingComponent.getElement();
+
+const noRoutePointsComponent = new NoRoutePoints();
+const noRoutePointsNode = noRoutePointsComponent.getElement();
+
+let isExpensesCalculated = false;
+
+if (!routeData.length) {
+  render(tripEvents, noRoutePointsNode, RenderPosition.BEFOREEND);
+  isExpensesCalculated = false;
+} else {
+  render(tripEvents.children[0], sortingList, RenderPosition.AFTEREND);
+  render(sortingList, tripDaysList, RenderPosition.AFTEREND);
+  isExpensesCalculated = true;
+}
 
 routeData.map((route, routeIndex) => {
   renderRoutePoint(eventDetailsData, route, routeIndex);
 });
 
-const pricesData = document.querySelectorAll(`.event__price-value`);
+if (isExpensesCalculated) {
+  const pricesData = document.querySelectorAll(`.event__price-value`);
 
-const calculateFullTripExpenses = (pricesInfo) => {
+  const calculateFullTripExpenses = (pricesInfo) => {
 
-  const priceOutput = document.querySelector(`.trip-info__cost-value`);
-  const totalTriPrices = Array.from(pricesInfo).map((it) => parseInt(it.textContent, 10));
+    const priceOutput = document.querySelector(`.trip-info__cost-value`);
+    const totalTriPrices = Array.from(pricesInfo).map((it) => parseInt(it.textContent, 10));
 
-  priceOutput.textContent = totalTriPrices.reduce((result, currentVal) => result + currentVal);
+    priceOutput.textContent = totalTriPrices.reduce((result, currentVal) => result + currentVal);
 
-};
+  };
 
-calculateFullTripExpenses(pricesData);
+  calculateFullTripExpenses(pricesData);
 
+}
