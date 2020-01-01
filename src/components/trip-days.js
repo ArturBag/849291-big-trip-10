@@ -1,22 +1,15 @@
-import {createElement} from '../utils.js';
+import AbstractComponent from './abstract-component.js';
 
-export default class TripDays {
+export default class TripDays extends AbstractComponent {
   constructor(route, routeIndex) {
-    this._element = null;
+    super();
 
     this._route = route;
     this._routeIndex = routeIndex;
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
   }
 
   getTemplate() {
