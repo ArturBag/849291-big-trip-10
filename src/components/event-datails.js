@@ -1,21 +1,14 @@
-import {createElement} from '../utils.js';
+import AbstractComponent from './abstract-component.js';
 
-export default class EventForm {
+export default class EventForm extends AbstractComponent {
   constructor(eventDetailsData) {
-    this._element = null;
+    super();
 
     this._eventDetailsData = eventDetailsData;
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setSubmitHandler(handler) {
+    this.getElement().addEventListener(`submit`, handler);
   }
 
   getTemplate() {
