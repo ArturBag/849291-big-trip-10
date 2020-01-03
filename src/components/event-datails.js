@@ -12,18 +12,18 @@ export default class EventForm extends AbstractComponent {
   }
 
   getTemplate() {
-    const createEventForm = (eventDetailsData) => {
-      const eventData = eventDetailsData;
 
-      const destinationDescription = eventData.description;
-      const additionalOptions = eventData.options;
+    const eventData = this._eventDetailsData;
+
+    const destinationDescription = eventData.description;
+    const additionalOptions = eventData.options;
 
 
-      const eventOfferSelector = additionalOptions.map((it) => {
-        const isOptionChecked = Math.random() > 0.5;
-        additionalOptions.isChecked = isOptionChecked ? `checked` : ``;
+    const eventOfferSelector = additionalOptions.map((it) => {
+      const isOptionChecked = Math.random() > 0.5;
+      additionalOptions.isChecked = isOptionChecked ? `checked` : ``;
 
-        return `<div class="event__offer-selector">
+      return `<div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="${it.id}" type="checkbox" name="${it.name}" ${additionalOptions.isChecked}>
         <label class="event__offer-label" for="${it.id}">
           <span class="event__offer-title">${it.title}</span>
@@ -31,13 +31,13 @@ export default class EventForm extends AbstractComponent {
           &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
         </label>
       </div>`;
-      }).join(``);
+    }).join(``);
 
-      const imageTemplate = eventData.pictures.map((it) => {
-        return `<img class="event__photo" src="${it}" alt="Event photo">`;
-      }).join(``);
+    const imageTemplate = eventData.pictures.map((it) => {
+      return `<img class="event__photo" src="${it}" alt="Event photo">`;
+    }).join(``);
 
-      return `<form class="trip-events__item  event  event--edit" action="#" method="post">
+    return `<form class="trip-events__item  event  event--edit" action="#" method="post">
       <header class="event__header">
       <div class="event__type-wrapper">
       <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -159,8 +159,6 @@ export default class EventForm extends AbstractComponent {
           </section>
           </section>
       </form>`;
-    };
 
-    return createEventForm(this._eventDetailsData);
   }
 }
