@@ -49,10 +49,18 @@ const getRandomDate = () => {
   const endTime = `${endTimeHours}:${endTimeMinutes}`;
 
   let eventDurationHours = endTimeHours - startTimeHours;
-  eventDurationHours = eventDurationHours < 0 ? 24 + eventDurationHours : eventDurationHours;
-
   let eventDurationMinutes = endTimeMinutes - startTimeMinutes;
+
+  if (eventDurationHours === 0 && eventDurationMinutes < 0) {
+    eventDurationHours = 24 - 1;
+  } else if (startTimeHours === endTimeHours && startTimeMinutes === endTimeMinutes) {
+    eventDurationHours = 24;
+
+  }
+
+  eventDurationHours = eventDurationHours < 0 ? 24 + eventDurationHours : eventDurationHours;
   eventDurationMinutes = eventDurationMinutes < 0 ? minutesQty + eventDurationMinutes : eventDurationMinutes;
+
 
   const eventDurationTime = `${eventDurationHours + `H`} ${eventDurationMinutes + `M`}`;
 
@@ -62,6 +70,8 @@ const getRandomDate = () => {
     'day': getRandomIntegerNumber(1, monthDaysQty),
     startTime,
     endTime,
+    eventDurationHours,
+    eventDurationMinutes,
     eventDurationTime
   };
 };
