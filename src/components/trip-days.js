@@ -1,54 +1,46 @@
-import {createElement} from '../utils.js';
+import AbstractComponent from './abstract-component.js';
 
-export default class TripDays {
+export default class TripDays extends AbstractComponent {
   constructor(route, routeIndex) {
-    this._element = null;
+    super();
 
     this._route = route;
     this._routeIndex = routeIndex;
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
   }
 
   getTemplate() {
-    const createTripDays = (routePointData, routeIndex) => {
 
-      const {type, city, price, date, options} = routePointData;
+    const {type, city, price, date, options} = this._route;
 
-      const dayCounter = routeIndex + 1;
+    const dayCounter = this._routeIndex + 1;
 
-      const travelType = type.travelType;
-      const iconSrc = type.icon;
-      const prefix = type.prefix;
+    const travelType = type.travelType;
+    const iconSrc = type.icon;
+    const prefix = type.prefix;
 
-      const dayInfo = date.day;
-      const monthInfo = date.month.slice(0, 3).toUpperCase();
-      const dateInfo = `${dayInfo} ${monthInfo}`;
+    const dayInfo = date.day;
+    const monthInfo = date.month.slice(0, 3).toUpperCase();
+    const dateInfo = `${dayInfo} ${monthInfo}`;
 
-      const startTime = date.startTime;
-      const endTime = date.endTime;
+    const startTime = date.startTime;
+    const endTime = date.endTime;
 
-      const eventDurationTime = date.eventDurationTime;
+    const eventDurationTime = date.eventDurationTime;
 
-      const optionsInfo = options.map((it) => {
+    const optionsInfo = options.map((it) => {
 
-        return `<li class="event__offer">
+      return `<li class="event__offer">
         <span class="event__offer-title">${it.title}</span>
         &plus;
         &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
        </li>`;
-      }).join(``);
+    }).join(``);
 
-      return `<li class="trip-days__item  day">
+    return `<li class="trip-days__item  day">
      <div class="day__info">
      <span class="day__counter">${dayCounter}</span>
        <time class="day__date" datetime="2019-03-18">${dateInfo}</time>
@@ -87,8 +79,6 @@ export default class TripDays {
         </li>
         </ul>
        </li>`;
-    };
 
-    return createTripDays(this._route, this._routeIndex);
   }
 }
