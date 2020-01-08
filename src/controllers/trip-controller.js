@@ -1,5 +1,5 @@
 import NoRoutePoints from '../components/no-route-points.js';
-import Sorting from '../components/sorting.js';
+import Sorting, {SortType} from '../components/sorting.js';
 import EventForm from '../components/event-datails.js';
 import TripDaysList from '../components/trip-days-list.js';
 import TripDays from '../components/trip-days.js';
@@ -25,6 +25,7 @@ const renderRoutePoint = (tripDaysListComponent, eventDetailsData, route, routeI
   };
 
   const tripDaysComponent = new TripDays(route, routeIndex);
+
   tripDaysComponent.setClickHandler(() => {
     replacetripDaysToEventForm();
     document.addEventListener(`keydown`, onEscKeyDown);
@@ -41,6 +42,13 @@ const renderRoutePoint = (tripDaysListComponent, eventDetailsData, route, routeI
   render(tripDaysListComponent.getElement(), tripDaysComponent.getElement(), RenderPosition.BEFOREEND);
 };
 
+const renderTripPoints = (tripDaysListComponent, eventDetailsData, routeData) => {
+
+  routeData.map((route, routeIndex) => {
+    renderRoutePoint(tripDaysListComponent, eventDetailsData, route, routeIndex);
+  });
+
+};
 
 export default class TripController {
   constructor(container) {
@@ -70,8 +78,56 @@ export default class TripController {
       isExpensesCalculated = true;
     }
 
-    routeData.map((route, routeIndex) => {
-      renderRoutePoint(this._tripDaysList, eventDetailsData, route, routeIndex);
+    renderTripPoints(this._tripDaysList, eventDetailsData, routeData);
+
+    const hideTripDays = (isDisplayed) => {
+
+      const daysHeader = this._sorting.getElement().querySelector(`.trip-sort__item--day`);
+      const daysList = tripDaysListElement.querySelectorAll(`.day__info`);
+
+      if (isDisplayed === false) {
+        daysHeader.style = `visibility:hidden`;
+        daysList.forEach((it) => {
+          it.style.visibility = `hidden`;
+        });
+
+      } else {
+        daysHeader.style = `visibility:visible `;
+        daysList.forEach((it) => {
+          it.style.visibility = `visible`;
+        });
+      }
+
+    };
+
+    this._sorting.sortTypeChangeHandler((sortType) => {
+      let sortedData = [];
+
+
+      switch (sortType) {
+        case SortType.EVENT:
+          sortedData = routeData.slice();
+          hideTripDays(true);
+          break;
+        case SortType.TIME:
+          sortedData = routeData.slice().sort((a, b) => {
+            if (b.date.eventDurationHours !== a.date.eventDurationHours) {
+              return b.date.eventDurationHours - a.date.eventDurationHours;
+            } else {
+              return b.date.eventDurationMinutes - a.date.eventDurationMinutes;
+            }
+          });
+          hideTripDays(false);
+          break;
+        case SortType.PRICE:
+          sortedData = routeData.slice().sort((a, b) => b.price - a.price);
+          hideTripDays(false);
+          break;
+      }
+
+      tripDaysListElement.innerHTML = ``;
+      renderTripPoints(this._tripDaysList, eventDetailsData, sortedData);
+
     });
 
     if (isExpensesCalculated) {
