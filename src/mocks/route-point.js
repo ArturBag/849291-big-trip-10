@@ -26,7 +26,7 @@ const getRandomIntegerNumber = (min, max) => {
 
 const getDescription = (text) => {
   let textArray = text.split(`. `);
-  let sentenceQty = getRandomIntegerNumber(1, 3);
+  let sentenceQty = getRandomIntegerNumber(1, 5);
   let description = ``;
   for (let i = 0; i < sentenceQty; i++) {
     description += textArray[getRandomIntegerNumber(0, textArray.length)] + `. `;
@@ -92,7 +92,6 @@ const generateRoutePoint = () => {
     const randomTypeArray = Object.entries(ROUTE_POINTS_TYPES[randomTypeKey]);
     const randomTypeElement = randomTypeArray[getRandomIntegerNumber(0, randomTypeArray.length)];
 
-
     return {
       'travelType': randomTypeElement[0],
       'icon': randomTypeElement[1],
@@ -100,14 +99,18 @@ const generateRoutePoint = () => {
     };
   };
 
+
   return {
-    'type': getRandomType(),
+    'travelType': getRandomType().travelType,
+    'icon': getRandomType().icon,
+    'prefix': getRandomType().prefix,
     'city': CITIES[getRandomIntegerNumber(0, CITIES.length)],
     'pictures': generatePictures(PICTURES_QTY),
     'description': getDescription(descriptionText),
     'price': getRandomIntegerNumber(10, 1000),
     'date': getRandomDate(),
-    'options': optionsInfo
+    'options': optionsInfo,
+    'isFavorite': Math.random() > 0.5
   };
 };
 

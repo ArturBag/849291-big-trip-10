@@ -14,13 +14,9 @@ export default class TripDays extends AbstractComponent {
 
   getTemplate() {
 
-    const {type, city, price, date, options} = this._route;
+    const {travelType, icon, prefix, city, price, date, options} = this._route;
 
     const dayCounter = this._routeIndex + 1;
-
-    const travelType = type.travelType;
-    const iconSrc = type.icon;
-    const prefix = type.prefix;
 
     const dayInfo = date.day;
     const monthInfo = date.month.slice(0, 3).toUpperCase();
@@ -50,7 +46,7 @@ export default class TripDays extends AbstractComponent {
         <li class="trip-events__item">
           <div class="event">
             <div class="event__type">
-              <img class="event__type-icon" width="42" height="42" src="${iconSrc}" alt="Event type icon">
+              <img class="event__type-icon" width="42" height="42" src="${icon}" alt="Event type icon">
             </div>
             <h3 class="event__title">${travelType} ${prefix} ${city}</h3>
 
