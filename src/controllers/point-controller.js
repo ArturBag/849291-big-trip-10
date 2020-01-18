@@ -28,7 +28,7 @@ export default class PointController {
     this._tripDaysComponent = new TripDays(route, routeIndex);
 
     this._tripDaysComponent.setClickHandler(() => {
-      this._replaceEventFormToTripDays();
+      this._replacetripDaysToEventForm();
       document.addEventListener(`keydown`, this._onEscKeyDown);
     });
 
@@ -70,8 +70,6 @@ export default class PointController {
           description: route.description
         }));
       }
-
-
     });
 
     render(this._container, this._tripDaysComponent.getElement(), RenderPosition.BEFOREEND);
@@ -81,7 +79,7 @@ export default class PointController {
 
   setDefaultView() {
     if (this._mode !== Mode.DEFAULT) {
-      this.replaceEventFormToTripDays();
+      this._replaceEventFormToTripDays();
     }
   }
 

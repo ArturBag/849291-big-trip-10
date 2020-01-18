@@ -6,7 +6,7 @@ export default class EventForm extends AbstractSmartComponent {
     super();
 
     this._routeData = route;
-    this._eventType = null;
+    // this._eventType = null;
     // console.log(this._routeData)
 
     // this._subscribeOnEvents();
@@ -18,29 +18,36 @@ export default class EventForm extends AbstractSmartComponent {
     // this._subscribeOnEvents();
   }
 
-  // rerender() {
-  //   super.rerender();
+  rerender() {
+    super.rerender();
 
-  //   // this._applyFlatpickr();
-  // }
+    // this._applyFlatpickr();
+  }
 
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
   }
 
   setFavoriteClickHandler(handler) {
-    this.getElement().querySelector(`#event-favorite-1`).addEventListener(`click`, handler);
+    this.getElement().querySelector(`#event-favorite-1`).addEventListener(`click`, () => {
+      handler();
+      this.rerender();
+    });
   }
 
   setEventDestinationHandler(handler) {
-    this.getElement().querySelector(`#event-destination-1`).addEventListener(`change`, handler);
+    this.getElement().querySelector(`#event-destination-1`).addEventListener(`change`, () => {
+      handler();
+      this.rerender();
+    });
+
   }
 
   setRoutePointType(handler) {
     const element = this.getElement();
     const outputPlaceholder = element.querySelector(`.event__type-output`);
     const eventTypes = this.getElement().querySelectorAll(`.event__type-item`);
-    const eventTypeIcon = element.querySelector(`.event__type-icon`);
+    // const eventTypeIcon = element.querySelector(`.event__type-icon`);
     const transportEvents = ROUTE_POINTS_TYPES.ride;
     const stopEvents = ROUTE_POINTS_TYPES.stops;
     let chosedEventType = ``;
@@ -59,18 +66,19 @@ export default class EventForm extends AbstractSmartComponent {
         const isStopTypeChosed = chooseEventType(stopEvents, chosedEventType);
 
         if (isRideTypeChosed) {
-          eventTypeIcon.src = transportEvents[chosedEventType];
+          // eventTypeIcon.src = transportEvents[chosedEventType];
           icon = transportEvents[chosedEventType];
           outputPlaceholder.textContent = chosedEventType + ` to`;
 
         } else if (isStopTypeChosed) {
-          eventTypeIcon.src = stopEvents[chosedEventType];
+          // eventTypeIcon.src = stopEvents[chosedEventType];
           icon = stopEvents[chosedEventType];
           outputPlaceholder.textContent = chosedEventType + ` in`;
         }
 
-
+        this._routeData.icon = icon;
         handler(chosedEventType, icon);
+        // this.rerender();
       });
 
     });
@@ -87,7 +95,7 @@ export default class EventForm extends AbstractSmartComponent {
 
     // const eventData = this._routeData;
     const routeData = this._routeData;
-
+    // console.log(`routeData`, routeData, `this._routeData`, this._routeData);
     const destinationDescription = routeData.description;
     const additionalOptions = routeData.options;
     const isFavorite = routeData.isFavorite;
@@ -116,7 +124,7 @@ export default class EventForm extends AbstractSmartComponent {
       <div class="event__type-wrapper">
       <label class="event__type  event__type-btn" for="event-type-toggle-1">
         <span class="visually-hidden">Choose event type</span>
-        <img class="event__type-icon" width="17" height="17" src="img/icons/flight.png" alt="Event type icon">
+        <img class="event__type-icon" width="17" height="17" src="${routeData.icon}" alt="Event type icon">
       </label>
       <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 

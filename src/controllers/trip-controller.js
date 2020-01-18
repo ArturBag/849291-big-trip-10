@@ -39,7 +39,7 @@ export default class TripController {
 
     this._routeData = routeData;
 
-
+    // console.log(`render routeData`, routeData);
     const container = this._container;
     const tripDaysListElement = this._tripDaysList.getElement();
     const sortingList = this._sorting.getElement();
@@ -77,7 +77,10 @@ export default class TripController {
     }
   }
 
+
   _onDataChange(oldData, newData) {
+
+    // console.log(`this._routeData`, this._routeData, this, `onDataChange`);
 
     const index = this._routeData.findIndex((it) => it === oldData);
 
@@ -85,7 +88,10 @@ export default class TripController {
       return;
     }
 
-    this._routeData[index] = newData[index];
+    this._routeData[index] = newData;
+    // console.log(this._routeData[index])
+
+    this._showedPointControllers[index].render(this._routeData[index], index);
   }
 
   _onViewChange() {
