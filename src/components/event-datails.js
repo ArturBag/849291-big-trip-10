@@ -1,21 +1,23 @@
-import {ROUTE_POINTS_TYPES} from '../const.js';
+import { CITIES } from '../const.js';
+import { ROUTE_POINTS_TYPES } from '../const.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
 
 export default class EventForm extends AbstractSmartComponent {
-  constructor(route) {
+  constructor(route, onDataChange) {
     super();
 
     this._routeData = route;
+    this._onDataChange = onDataChange;
     // this._eventType = null;
     // console.log(this._routeData)
 
-    // this._subscribeOnEvents();
+    this._subscribeOnEvents();
 
   }
 
 
   recoveryListeners() {
-    // this._subscribeOnEvents();
+    this._subscribeOnEvents();
   }
 
   rerender() {
@@ -27,6 +29,7 @@ export default class EventForm extends AbstractSmartComponent {
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
   }
+
 
   setFavoriteClickHandler(handler) {
     this.getElement().querySelector(`#event-favorite-1`).addEventListener(`click`, () => {
@@ -44,10 +47,8 @@ export default class EventForm extends AbstractSmartComponent {
   }
 
   setRoutePointType(handler) {
-    const element = this.getElement();
-    const outputPlaceholder = element.querySelector(`.event__type-output`);
+
     const eventTypes = this.getElement().querySelectorAll(`.event__type-item`);
-    // const eventTypeIcon = element.querySelector(`.event__type-icon`);
     const transportEvents = ROUTE_POINTS_TYPES.ride;
     const stopEvents = ROUTE_POINTS_TYPES.stops;
     let chosedEventType = ``;
@@ -66,39 +67,79 @@ export default class EventForm extends AbstractSmartComponent {
         const isStopTypeChosed = chooseEventType(stopEvents, chosedEventType);
 
         if (isRideTypeChosed) {
-          // eventTypeIcon.src = transportEvents[chosedEventType];
           icon = transportEvents[chosedEventType];
-          outputPlaceholder.textContent = chosedEventType + ` to`;
+          this._routeData.prefix = `to`;
 
         } else if (isStopTypeChosed) {
-          // eventTypeIcon.src = stopEvents[chosedEventType];
           icon = stopEvents[chosedEventType];
-          outputPlaceholder.textContent = chosedEventType + ` in`;
+          this._routeData.prefix = `in`;
         }
 
         this._routeData.icon = icon;
         handler(chosedEventType, icon);
-        // this.rerender();
+        this.rerender();
+
       });
 
     });
 
+  }
+
+  _subscribeOnEvents() {
+    // document.addEventListener(`keydown`, this._onEscKeyDown);
+    this.setSubmitHandler(() => {
+      this._replaceEventFormToTripDays();
+      document.removeEventListener(`keydown`, this._onEscKeyDown);
+    });
+
+    this.setFavoriteClickHandler(() => {
+      const newData = Object.assign({}, this._routeData, {
+        isFavorite: !this._routeData.isFavorite
+      });
+      this._onDataChange(this._routeData, newData);
+      this._routeData = newData;
+    });
+
+    this.setRoutePointType((chosedEventType, chosedIcon) => {
+      const newData = Object.assign({}, this._routeData, {
+        travelType: chosedEventType,
+        icon: chosedIcon,
+        options: this._routeData.options
+      });
+      this._onDataChange(this._routeData, newData);
+      this._routeData = newData;
+
+    });
+
+    this.setEventDestinationHandler(() => {
+
+      let iputValue = this.getElement().querySelector(`#event-destination-1`).value;
+
+      const isDestinationExist = CITIES.some((it) => it === iputValue);
+
+      if (isDestinationExist) {
+
+        const newData = Object.assign({}, this._routeData, {
+          city: iputValue,
+          pictures: this._routeData.pictures,
+          description: this._routeData.description
+        });
+
+        this._onDataChange(this._routeData, newData);
+        this._routeData = newData;
+      }
+    });
 
   }
 
-  // _subscribeOnEvents() {};
-
-
-  // recoveryListeners();
-
   getTemplate() {
 
-    // const eventData = this._routeData;
-    const routeData = this._routeData;
-    // console.log(`routeData`, routeData, `this._routeData`, this._routeData);
-    const destinationDescription = routeData.description;
-    const additionalOptions = routeData.options;
-    const isFavorite = routeData.isFavorite;
+    const travelType = this._routeData.travelType;
+    const prefix = this._routeData.prefix;
+    const destinationCity = this._routeData.city;
+    const destinationDescription = this._routeData.description;
+    const additionalOptions = this._routeData.options;
+    const isFavorite = this._routeData.isFavorite;
     const isFavoriteChecked = isFavorite ? `checked` : ``;
 
     const eventOfferSelector = additionalOptions.map((it) => {
@@ -115,7 +156,7 @@ export default class EventForm extends AbstractSmartComponent {
       </div>`;
     }).join(``);
 
-    const imageTemplate = routeData.pictures.map((it) => {
+    const imageTemplate = this._routeData.pictures.map((it) => {
       return `<img class="event__photo" src="${it}" alt="Event photo">`;
     }).join(``);
 
@@ -124,7 +165,7 @@ export default class EventForm extends AbstractSmartComponent {
       <div class="event__type-wrapper">
       <label class="event__type  event__type-btn" for="event-type-toggle-1">
         <span class="visually-hidden">Choose event type</span>
-        <img class="event__type-icon" width="17" height="17" src="${routeData.icon}" alt="Event type icon">
+        <img class="event__type-icon" width="17" height="17" src="${this._routeData.icon}" alt="Event type icon">
       </label>
       <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -191,9 +232,9 @@ export default class EventForm extends AbstractSmartComponent {
 
       <div class="event__field-group  event__field-group--destination">
       <label class="event__label  event__type-output" for="event-destination-1">
-        Sightseeing at
+      ${travelType} ${prefix}
       </label>
-      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Geneva" list="destination-list-1">
+      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationCity}" list="destination-list-1">
       <datalist id="destination-list-1">
         <option value="Amsterdam"></option>
         <option value="Geneva"></option>

@@ -1,9 +1,6 @@
-import {CITIES} from '../const.js';
 import EventForm from '../components/event-datails.js';
 import TripDays from '../components/trip-days.js';
-
-// import TripDaysList from '../components/trip-days-list.js';
-import {render, replace, RenderPosition} from '../utils/render.js';
+import { render, replace, RenderPosition } from '../utils/render.js';
 
 const Mode = {
   DEFAULT: `default`,
@@ -32,45 +29,7 @@ export default class PointController {
       document.addEventListener(`keydown`, this._onEscKeyDown);
     });
 
-    this._eventFormComponent = new EventForm(route);
-
-
-    this._eventFormComponent.setSubmitHandler(() => {
-      this._replaceEventFormToTripDays();
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
-    });
-
-
-    this._eventFormComponent.setFavoriteClickHandler(() => {
-      this._onDataChange(route, Object.assign({}, route, {
-        isFavorite: !route.isFavorite
-      }));
-
-    });
-
-    this._eventFormComponent.setRoutePointType((chosedEventType, chosedIcon) => {
-
-      this._onDataChange(route, Object.assign({}, route, {
-        travelType: chosedEventType,
-        icon: chosedIcon,
-        options: route.options
-      }));
-
-    });
-
-    this._eventFormComponent.setEventDestinationHandler(() => {
-
-      let iputValue = this._eventFormComponent.getElement().querySelector(`#event-destination-1`).value;
-
-      const isDestinationExist = CITIES.some((it) => it === iputValue);
-
-      if (isDestinationExist) {
-        this._onDataChange(route, Object.assign({}, route, {
-          city: iputValue,
-          description: route.description
-        }));
-      }
-    });
+    this._eventFormComponent = new EventForm(route, this._onDataChange);
 
     render(this._container, this._tripDaysComponent.getElement(), RenderPosition.BEFOREEND);
 
@@ -99,7 +58,6 @@ export default class PointController {
   }
 
   _replaceEventFormToTripDays() {
-    this._onViewChange();
     replace(this._tripDaysComponent, this._eventFormComponent);
     this._mode = Mode.DEFAULT;
   }
