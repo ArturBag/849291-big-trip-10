@@ -1,6 +1,5 @@
 import NoRoutePoints from '../components/no-route-points.js';
 import Sorting, {SortType} from '../components/sorting.js';
-// import EventForm from '../components/event-datails.js';
 import TripDaysList from '../components/trip-days-list.js';
 import TripDays from '../components/trip-days.js';
 import PointController from './point-controller.js';
@@ -28,9 +27,11 @@ export default class TripController {
     this._sorting = new Sorting();
     this._tripDaysList = new TripDaysList();
     this._tripDays = new TripDays();
+
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
+
     this._sorting.sortTypeChangeHandler(this._onSortTypeChange);
 
   }
@@ -39,7 +40,6 @@ export default class TripController {
 
     this._routeData = routeData;
 
-    // console.log(`render routeData`, routeData);
     const container = this._container;
     const tripDaysListElement = this._tripDaysList.getElement();
     const sortingList = this._sorting.getElement();
@@ -59,6 +59,7 @@ export default class TripController {
     const newTripPoints = renderTripPoints(tripDaysListElement, this._routeData, this._onDataChange, this._onViewChange);
 
     this._showedPointControllers = newTripPoints;
+
     if (this._isExpensesCalculated) {
 
       const pricesData = document.querySelectorAll(`.event__price-value`);
@@ -80,8 +81,6 @@ export default class TripController {
 
   _onDataChange(oldData, newData) {
 
-    // console.log(`this._routeData`, this._routeData, this, `onDataChange`);
-
     const index = this._routeData.findIndex((it) => it === oldData);
 
     if (index === -1) {
@@ -89,7 +88,6 @@ export default class TripController {
     }
 
     this._routeData[index] = newData;
-    // console.log(this._routeData[index])
 
     this._showedPointControllers[index].render(this._routeData[index], index);
   }

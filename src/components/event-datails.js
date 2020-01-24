@@ -1,6 +1,8 @@
-import { CITIES } from '../const.js';
-import { ROUTE_POINTS_TYPES } from '../const.js';
+import {CITIES} from '../const.js';
+import {ROUTE_POINTS_TYPES} from '../const.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
+// import PointController from '../controllers/point-controller.js';
+// import PointController from '../controllers/point-controller.js';
 
 export default class EventForm extends AbstractSmartComponent {
   constructor(route, onDataChange) {
@@ -8,8 +10,6 @@ export default class EventForm extends AbstractSmartComponent {
 
     this._routeData = route;
     this._onDataChange = onDataChange;
-    // this._eventType = null;
-    // console.log(this._routeData)
 
     this._subscribeOnEvents();
 
@@ -28,6 +28,7 @@ export default class EventForm extends AbstractSmartComponent {
 
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
+
   }
 
 
@@ -86,9 +87,9 @@ export default class EventForm extends AbstractSmartComponent {
   }
 
   _subscribeOnEvents() {
-    // document.addEventListener(`keydown`, this._onEscKeyDown);
-    this.setSubmitHandler(() => {
-      this._replaceEventFormToTripDays();
+
+    this.setSubmitHandler((evt) => {
+      evt.preventDefault();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     });
 
