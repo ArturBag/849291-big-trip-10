@@ -1,4 +1,5 @@
 import AbstractComponent from './abstract-component.js';
+// import { formatHours, formatMinutes } from '../utils/common.js';
 
 export default class TripDays extends AbstractComponent {
   constructor(route, routeIndex) {
@@ -21,6 +22,19 @@ export default class TripDays extends AbstractComponent {
     const dayInfo = date.day;
     const monthInfo = date.month.slice(0, 3).toUpperCase();
     const dateInfo = `${dayInfo} ${monthInfo}`;
+
+    // const hours = date.startHours;
+    // const startHours = formatHours(hours);
+
+
+    // console.log(startHours, `startHoursFormat`)
+    // const startMinutes = formatMinutes(date.startMinutes);
+    // console.log(startMinutes, `startMinutes`)
+    // const endHours = date.endHours;
+    // const endMinutes = date.endMinutes;
+
+    // const startTime = ${startHours} ${startMinutes}
+
 
     const startTime = date.startTime;
     const endTime = date.endTime;

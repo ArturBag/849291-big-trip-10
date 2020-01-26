@@ -44,6 +44,7 @@ export default class PointController {
     });
 
     if (oldPointComponent && oldPointEditComponent) {
+
       replace(this._tripDaysComponent, oldPointComponent);
       replace(this._eventFormComponent, oldPointEditComponent);
 

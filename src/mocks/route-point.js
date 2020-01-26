@@ -76,6 +76,45 @@ const getRandomDate = () => {
   };
 };
 
+// const getRandomDate = () => {
+//   const startHours = getRandomIntegerNumber(1, hoursQty);
+//   const startMinutes = getRandomIntegerNumber(1, minutesQty);
+//   // const startTimeHours = randomStartHours < 10 ? `0` + randomStartHours : randomStartHours;
+//   // const startTimeMinutes = randomStartMinutes < 10 ? `0` + `${randomStartMinutes}` : randomStartMinutes;
+//   // const startTime = `${startTimeHours}:${startTimeMinutes}`;
+
+//   const endHours = getRandomIntegerNumber(parseInt(startHours, 10), hoursQty);
+//   const endMinutes = getRandomIntegerNumber(1, minutesQty);
+//   // const endTimeHours = randomEndHours < 10 ? `0` + randomEndHours : randomEndHours;
+//   // const endTimeMinutes = randomEndMinutes < 10 ? `0` + `${randomEndMinutes}` : randomEndMinutes;
+//   // const endTime = `${endTimeHours}:${endTimeMinutes}`;
+
+//   // let eventDurationHours = endTimeHours - startTimeHours;
+//   // let eventDurationMinutes = endTimeMinutes - startTimeMinutes;
+
+//   // if (eventDurationHours === 0 && eventDurationMinutes < 0) {
+//   //   eventDurationHours = 24 - 1;
+//   // } else if (startTimeHours === endTimeHours && startTimeMinutes === endTimeMinutes) {
+//   //   eventDurationHours = 24;
+
+//   // }
+
+//   // eventDurationHours = eventDurationHours < 0 ? 24 + eventDurationHours : eventDurationHours;
+//   // eventDurationMinutes = eventDurationMinutes < 0 ? minutesQty + eventDurationMinutes : eventDurationMinutes;
+
+
+//   // const eventDurationTime = `${eventDurationHours + `H`} ${eventDurationMinutes + `M`}`;
+
+//   return {
+//     'year': new Date().getFullYear(),
+//     'month': MONTH_NAMES[getRandomIntegerNumber(0, MONTH_NAMES.length)],
+//     'day': getRandomIntegerNumber(1, monthDaysQty),
+//     startHours,
+//     startMinutes,
+//     endHours,
+//     endMinutes
+//   };
+// };
 
 const generateRoutePoint = () => {
 

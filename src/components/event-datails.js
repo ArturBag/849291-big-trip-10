@@ -13,6 +13,7 @@ export default class EventForm extends AbstractSmartComponent {
 
     this._subscribeOnEvents();
 
+
   }
 
 
