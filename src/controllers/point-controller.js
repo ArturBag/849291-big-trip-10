@@ -1,6 +1,5 @@
 import EventForm from '../components/event-datails.js';
 import TripDays from '../components/trip-days.js';
-// import {render, replace, remove, RenderPosition} from '../utils/render.js';
 import {render, replace, RenderPosition} from '../utils/render.js';
 
 const Mode = {
@@ -52,14 +51,6 @@ export default class PointController {
       render(this._container, this._tripDaysComponent.getElement(), RenderPosition.BEFOREEND);
     }
 
-    // if (oldPointComponent && oldPointEditComponent) {
-    //   remove(oldPointComponent);
-    //   remove(oldPointEditComponent);
-
-    //   render(this._container, this._eventFormComponent.getElement(), RenderPosition.AFTERBEGIN);
-    // } else {
-    //   render(this._container, this._tripDaysComponent.getElement(), RenderPosition.BEFOREEND);
-    // }
   }
   setDefaultView() {
     if (this._mode !== Mode.DEFAULT) {

@@ -1,5 +1,6 @@
 import AbstractComponent from './abstract-component.js';
-// import { formatHours, formatMinutes } from '../utils/common.js';
+import {formatTime, formatDay, formatMonth, formatDate, dateDiff} from '../utils/common.js';
+import moment from 'moment';
 
 export default class TripDays extends AbstractComponent {
   constructor(route, routeIndex) {
@@ -7,6 +8,7 @@ export default class TripDays extends AbstractComponent {
 
     this._route = route;
     this._routeIndex = routeIndex;
+
   }
 
   setClickHandler(handler) {
@@ -15,31 +17,26 @@ export default class TripDays extends AbstractComponent {
 
   getTemplate() {
 
-    const {travelType, icon, prefix, city, price, date, options} = this._route;
+    const {travelType, icon, prefix, city, price, options, dateData} = this._route;
+
+    const startDate = formatDate(dateData.date_from);
+
+    const dateStartTime = moment(dateData.date_from).format(`YYYY-MM-DDTHH:mm`);
+    const dateEndTime = moment(dateData.date_to).format(`YYYY-MM-DDTHH:mm`);
+
+    const month = formatMonth(startDate).toUpperCase();
+    const day = formatDay(startDate);
+
+    const startTime = formatTime(dateData.date_from);
+    const endTime = formatTime(dateData.date_to);
 
     const dayCounter = this._routeIndex + 1;
 
-    const dayInfo = date.day;
-    const monthInfo = date.month.slice(0, 3).toUpperCase();
-    const dateInfo = `${dayInfo} ${monthInfo}`;
+    const eventDurationDays = dateDiff(dateEndTime, dateStartTime) + `D`;
+    const eventDuartionHours = moment.duration(endTime, `HH:mm`).subtract(moment.duration(startTime, `HH:mm`)).hours() + `H`;
+    const eventDuartionMinutes = moment.duration(endTime, `HH:mm`).subtract(moment.duration(startTime, `HH:mm`)).minutes() + `M`;
 
-    // const hours = date.startHours;
-    // const startHours = formatHours(hours);
-
-
-    // console.log(startHours, `startHoursFormat`)
-    // const startMinutes = formatMinutes(date.startMinutes);
-    // console.log(startMinutes, `startMinutes`)
-    // const endHours = date.endHours;
-    // const endMinutes = date.endMinutes;
-
-    // const startTime = ${startHours} ${startMinutes}
-
-
-    const startTime = date.startTime;
-    const endTime = date.endTime;
-
-    const eventDurationTime = date.eventDurationTime;
+    const eventDurationTime = `${eventDurationDays} ${eventDuartionHours} ${eventDuartionMinutes}`;
 
     const optionsInfo = options.map((it) => {
 
@@ -53,7 +50,7 @@ export default class TripDays extends AbstractComponent {
     return `<li class="trip-days__item  day">
      <div class="day__info">
      <span class="day__counter">${dayCounter}</span>
-       <time class="day__date" datetime="2019-03-18">${dateInfo}</time>
+       <time class="day__date" datetime="2019-03-18">${day} ${month}</time>
      </div>
 
       <ul class="trip-events__list">
@@ -66,9 +63,9 @@ export default class TripDays extends AbstractComponent {
 
             <div class="event__schedule">
               <p class="event__time">
-                <time class="event__start-time" datetime="2019-03-18T10:30">${startTime}</time>
+                <time class="event__start-time" datetime="${dateStartTime}">${startTime}</time>
                 &mdash;
-                <time class="event__end-time" datetime="2019-03-18T11:00">${endTime}</time>
+                <time class="event__end-time" datetime="${dateEndTime}">${endTime}</time>
               </p>
               <p class="event__duration">${eventDurationTime}</p>
             </div>

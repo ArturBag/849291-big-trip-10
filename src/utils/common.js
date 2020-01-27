@@ -1,13 +1,27 @@
 import moment from 'moment';
 
-export const formatHours = (hours) => {
-  return moment(hours).format(`H HH`);
+export const formatTime = (time, formatType) => {
+  return moment(time, formatType).utc().format(`HH:mm`);
+
 };
 
-export const formatMinutes = (minutes) => {
-  return moment(minutes).format(`m mm`);
+export const formatDay = (day) => {
+  return moment(day).format(`DD`);
+
 };
 
-export const formatDate = (date) => {
-  return moment(date).format(`DD/MM/YYYY`);
+export const formatMonth = (month) => {
+  return moment(month).format(`MMM`);
+
+};
+
+
+export const formatDate = (date, formatType) => {
+  return moment(date, formatType).utc().format(`DD/MM/YY`);
+};
+
+export const dateDiff = (dateA, dateB) => {
+  const a = moment(dateA);
+  const b = moment(dateB);
+  return a.diff(b, `days`);
 };

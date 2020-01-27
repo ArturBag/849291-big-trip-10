@@ -1,8 +1,11 @@
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
+import 'flatpickr/dist/themes/light.css';
+
 import {CITIES} from '../const.js';
 import {ROUTE_POINTS_TYPES} from '../const.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
-// import PointController from '../controllers/point-controller.js';
-// import PointController from '../controllers/point-controller.js';
+
 
 export default class EventForm extends AbstractSmartComponent {
   constructor(route, onDataChange) {
@@ -10,7 +13,10 @@ export default class EventForm extends AbstractSmartComponent {
 
     this._routeData = route;
     this._onDataChange = onDataChange;
+    this._flatpickr = null;
 
+
+    this._applyFlatpickr();
     this._subscribeOnEvents();
 
 
@@ -24,7 +30,7 @@ export default class EventForm extends AbstractSmartComponent {
   rerender() {
     super.rerender();
 
-    // this._applyFlatpickr();
+    this._applyFlatpickr();
   }
 
   setSubmitHandler(handler) {
@@ -36,14 +42,12 @@ export default class EventForm extends AbstractSmartComponent {
   setFavoriteClickHandler(handler) {
     this.getElement().querySelector(`#event-favorite-1`).addEventListener(`click`, () => {
       handler();
-      this.rerender();
     });
   }
 
   setEventDestinationHandler(handler) {
     this.getElement().querySelector(`#event-destination-1`).addEventListener(`change`, () => {
       handler();
-      this.rerender();
     });
 
   }
@@ -79,10 +83,36 @@ export default class EventForm extends AbstractSmartComponent {
 
         this._routeData.icon = icon;
         handler(chosedEventType, icon);
-        this.rerender();
 
       });
 
+    });
+
+  }
+
+  _applyFlatpickr() {
+
+    if (this._flatpickr) {
+
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+
+    const firsttDate = this.getElement().querySelector(`#event-start-time-1`);
+    const lastDate = this.getElement().querySelector(`#event-end-time-1`);
+
+    this._flatpickr = flatpickr(firsttDate, {
+      altInput: true,
+      allowInput: true,
+      defaultDate: this._routeData.dateData.date_to,
+      dateFormat: `d/m/Y`,
+    });
+
+    this._flatpickr = flatpickr(lastDate, {
+      altInput: true,
+      allowInput: true,
+      defaultDate: this._routeData.dateData.date_from,
+      dateFormat: `d/m/Y`
     });
 
   }
@@ -100,6 +130,7 @@ export default class EventForm extends AbstractSmartComponent {
       });
       this._onDataChange(this._routeData, newData);
       this._routeData = newData;
+
     });
 
     this.setRoutePointType((chosedEventType, chosedIcon) => {
@@ -131,7 +162,6 @@ export default class EventForm extends AbstractSmartComponent {
         this._routeData = newData;
       }
     });
-
   }
 
   getTemplate() {
