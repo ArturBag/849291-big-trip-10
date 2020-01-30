@@ -1,6 +1,7 @@
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/light.css';
+import moment from 'moment';
 
 import {CITIES} from '../const.js';
 import {ROUTE_POINTS_TYPES} from '../const.js';
@@ -14,7 +15,8 @@ export default class EventForm extends AbstractSmartComponent {
     this._routeData = route;
     this._onDataChange = onDataChange;
     this._flatpickr = null;
-
+    this._firstDateValue = `12/12/2019`;
+    this._lastDateValue = `11/02/2020`;
 
     this._applyFlatpickr();
     this._subscribeOnEvents();
@@ -90,30 +92,77 @@ export default class EventForm extends AbstractSmartComponent {
 
   }
 
+  _setFullDate(inputType, fullDate) {
+    const firstDate = this.getElement().querySelector(`#event-start-time-1`);
+    const lastDate = this.getElement().querySelector(`#event-end-time-1`);
+
+    if (inputType === firstDate) {
+      const chosedDate = fullDate;
+      const isoDate = moment(chosedDate, `DD/MM/YYYY hh:mm`).utc(chosedDate).toISOString();
+
+      const newData = Object.assign({}, this._routeData, {
+        dateFrom: isoDate
+      });
+
+      this._firstDateValue = inputType.value;
+      this._routeData = newData;
+      this._onDataChange(this._routeData, newData);
+      this.rerender();
+
+    } else if (inputType === lastDate) {
+      const chosedDate = fullDate;
+      const isoDate = moment(chosedDate, `DD/MM/YYYY hh:mm`).utc(chosedDate).toISOString();
+
+      const newData = Object.assign({}, this._routeData, {
+        dateTo: isoDate
+      });
+
+      this._lastDateValue = inputType.value;
+      this._routeData = newData;
+      this._onDataChange(this._routeData, newData);
+      this.rerender();
+
+    }
+
+  }
+
   _applyFlatpickr() {
 
     if (this._flatpickr) {
-
       this._flatpickr.destroy();
       this._flatpickr = null;
     }
 
-    const firsttDate = this.getElement().querySelector(`#event-start-time-1`);
+    const firstDate = this.getElement().querySelector(`#event-start-time-1`);
     const lastDate = this.getElement().querySelector(`#event-end-time-1`);
 
-    this._flatpickr = flatpickr(firsttDate, {
-      altInput: true,
-      allowInput: true,
-      defaultDate: this._routeData.dateData.date_to,
-      dateFormat: `d/m/Y`,
+
+    this._flatpickr = flatpickr(firstDate, {
+      'allowInput': true,
+      'enableTime': true,
+      'hourIncrement': 1,
+      'minuteIncrement': 5,
+      'time_24hr': true,
+      'defaultDate': this._routeData.dateFrom,
+      'dateFormat': `d/m/Y/ H:i`,
+      'onClose': (selectedDates, dateStr) => {
+        this._setFullDate(firstDate, dateStr);
+      }
     });
 
     this._flatpickr = flatpickr(lastDate, {
-      altInput: true,
-      allowInput: true,
-      defaultDate: this._routeData.dateData.date_from,
-      dateFormat: `d/m/Y`
+      'allowInput': true,
+      'enableTime': true,
+      'hourIncrement': 1,
+      'minuteIncrement': 5,
+      'time_24hr': true,
+      'defaultDate': this._routeData.dateTo,
+      'dateFormat': `d/m/Y/ H:i`,
+      'onClose': (selectedDates, dateStr) => {
+        this._setFullDate(lastDate, dateStr);
+      }
     });
+
 
   }
 
@@ -173,6 +222,7 @@ export default class EventForm extends AbstractSmartComponent {
     const additionalOptions = this._routeData.options;
     const isFavorite = this._routeData.isFavorite;
     const isFavoriteChecked = isFavorite ? `checked` : ``;
+
 
     const eventOfferSelector = additionalOptions.map((it) => {
       const isOptionChecked = Math.random() > 0.5;
@@ -279,12 +329,12 @@ export default class EventForm extends AbstractSmartComponent {
       <label class="visually-hidden" for="event-start-time-1">
         From
       </label>
-      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="18/03/19 00:00">
+      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${this._firstDateValue}">
       &mdash;
       <label class="visually-hidden" for="event-end-time-1">
         To
       </label>
-      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="18/03/19 00:00">
+      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${this._lastDateValue}">
       </div>
 
       <div class="event__field-group  event__field-group--price">

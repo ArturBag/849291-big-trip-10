@@ -17,7 +17,7 @@ export const formatMonth = (month) => {
 
 
 export const formatDate = (date, formatType) => {
-  return moment(date, formatType).utc().format(`DD/MM/YY`);
+  return moment(date, formatType).utc().format(`MM/DD/YY`);
 };
 
 export const dateDiff = (dateA, dateB) => {

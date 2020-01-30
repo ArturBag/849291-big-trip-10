@@ -17,24 +17,27 @@ export default class TripDays extends AbstractComponent {
 
   getTemplate() {
 
-    const {travelType, icon, prefix, city, price, options, dateData} = this._route;
+    const {travelType, icon, prefix, city, price, options, dateFrom, dateTo} = this._route;
 
-    const startDate = formatDate(dateData.date_from);
+    const startDate = formatDate(dateFrom);
 
-    const dateStartTime = moment(dateData.date_from).format(`YYYY-MM-DDTHH:mm`);
-    const dateEndTime = moment(dateData.date_to).format(`YYYY-MM-DDTHH:mm`);
+    const dateStartTime = moment(dateFrom).format(`YYYY-MM-DDTHH:mm`);
+    const dateTime = moment(dateFrom).format(`YYYY-MM-DD`);
+
+    const dateEndTime = moment(dateTo).format(`YYYY-MM-DDTHH:mm`);
 
     const month = formatMonth(startDate).toUpperCase();
     const day = formatDay(startDate);
 
-    const startTime = formatTime(dateData.date_from);
-    const endTime = formatTime(dateData.date_to);
+
+    const startTime = formatTime(dateFrom);
+    const endTime = formatTime(dateTo);
 
     const dayCounter = this._routeIndex + 1;
 
     const eventDurationDays = dateDiff(dateEndTime, dateStartTime) + `D`;
-    const eventDuartionHours = moment.duration(endTime, `HH:mm`).subtract(moment.duration(startTime, `HH:mm`)).hours() + `H`;
-    const eventDuartionMinutes = moment.duration(endTime, `HH:mm`).subtract(moment.duration(startTime, `HH:mm`)).minutes() + `M`;
+    const eventDuartionHours = moment.duration(startTime, `HH:mm`).subtract(moment.duration(endTime, `HH:mm`)).hours() + `H`;
+    const eventDuartionMinutes = moment.duration(startTime, `HH:mm`).subtract(moment.duration(endTime, `HH:mm`)).minutes() + `M`;
 
     const eventDurationTime = `${eventDurationDays} ${eventDuartionHours} ${eventDuartionMinutes}`;
 
@@ -50,7 +53,7 @@ export default class TripDays extends AbstractComponent {
     return `<li class="trip-days__item  day">
      <div class="day__info">
      <span class="day__counter">${dayCounter}</span>
-       <time class="day__date" datetime="2019-03-18">${day} ${month}</time>
+       <time class="day__date" datetime="${dateTime}">${day} ${month}</time>
      </div>
 
       <ul class="trip-events__list">

@@ -67,10 +67,8 @@ const generateRoutePoint = () => {
     'price': getRandomIntegerNumber(10, 1000),
     'options': optionsInfo,
     'isFavorite': Math.random() > 0.5,
-    'dateData': {
-      'date_from': `2019-07-10T22:22:00.845Z`,
-      'date_to': `2019-07-14T21:01:00.375Z`,
-    }
+    'dateFrom': `2019-12-15T22:22:00.845Z`,
+    'dateTo': `2020-02-11T20:36:00.375Z`
   };
 };
 
