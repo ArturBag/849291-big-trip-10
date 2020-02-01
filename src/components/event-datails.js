@@ -15,8 +15,8 @@ export default class EventForm extends AbstractSmartComponent {
     this._routeData = route;
     this._onDataChange = onDataChange;
     this._flatpickr = null;
-    this._firstDateValue = `12/12/2019`;
-    this._lastDateValue = `11/02/2020`;
+    this._firstDateValue = `12/12/2019 10:00`;
+    this._lastDateValue = `11/02/2020 13:30`;
 
     this._applyFlatpickr();
     this._subscribeOnEvents();
@@ -93,34 +93,16 @@ export default class EventForm extends AbstractSmartComponent {
   }
 
   _setFullDate(inputType, fullDate) {
-    const firstDate = this.getElement().querySelector(`#event-start-time-1`);
-    const lastDate = this.getElement().querySelector(`#event-end-time-1`);
+    const firstDateInput = this.getElement().querySelector(`#event-start-time-1`);
+    const lastDateInput = this.getElement().querySelector(`#event-end-time-1`);
 
-    if (inputType === firstDate) {
-      const chosedDate = fullDate;
-      const isoDate = moment(chosedDate, `DD/MM/YYYY hh:mm`).utc(chosedDate).toISOString();
+    if (inputType === firstDateInput) {
 
-      const newData = Object.assign({}, this._routeData, {
-        dateFrom: isoDate
-      });
+      this._firstDateValue = fullDate;
 
-      this._firstDateValue = inputType.value;
-      this._routeData = newData;
-      this._onDataChange(this._routeData, newData);
-      this.rerender();
+    } else if (inputType === lastDateInput) {
 
-    } else if (inputType === lastDate) {
-      const chosedDate = fullDate;
-      const isoDate = moment(chosedDate, `DD/MM/YYYY hh:mm`).utc(chosedDate).toISOString();
-
-      const newData = Object.assign({}, this._routeData, {
-        dateTo: isoDate
-      });
-
-      this._lastDateValue = inputType.value;
-      this._routeData = newData;
-      this._onDataChange(this._routeData, newData);
-      this.rerender();
+      this._lastDateValue = fullDate;
 
     }
 
@@ -136,6 +118,8 @@ export default class EventForm extends AbstractSmartComponent {
     const firstDate = this.getElement().querySelector(`#event-start-time-1`);
     const lastDate = this.getElement().querySelector(`#event-end-time-1`);
 
+    let startDateValue = this._firstDateValue;
+    // let endDateValue = ``;
 
     this._flatpickr = flatpickr(firstDate, {
       'allowInput': true,
@@ -144,9 +128,10 @@ export default class EventForm extends AbstractSmartComponent {
       'minuteIncrement': 5,
       'time_24hr': true,
       'defaultDate': this._routeData.dateFrom,
-      'dateFormat': `d/m/Y/ H:i`,
+      'dateFormat': `d/m/Y H:i`,
       'onClose': (selectedDates, dateStr) => {
         this._setFullDate(firstDate, dateStr);
+        startDateValue = dateStr;
       }
     });
 
@@ -157,13 +142,29 @@ export default class EventForm extends AbstractSmartComponent {
       'minuteIncrement': 5,
       'time_24hr': true,
       'defaultDate': this._routeData.dateTo,
-      'dateFormat': `d/m/Y/ H:i`,
+      'dateFormat': `d/m/Y H:i`,
       'onClose': (selectedDates, dateStr) => {
+
         this._setFullDate(lastDate, dateStr);
+        this._checkDateDiff(startDateValue, dateStr);
       }
     });
 
 
+  }
+
+  _checkDateDiff(startDate, endDate) {
+
+    const startDateMiliseconds = moment(startDate, `DD/MM/YYYY HH:mm`).valueOf();
+    const endDateMiliseconds = moment(endDate, `DD/MM/YYYY HH:mm`).valueOf();
+    const lastDateInput = this.getElement().querySelector(`#event-end-time-1`);
+
+    if (endDateMiliseconds < startDateMiliseconds) {
+
+      lastDateInput.style.background = `red`;
+    } else {
+      lastDateInput.style.background = `none`;
+    }
   }
 
   _subscribeOnEvents() {
