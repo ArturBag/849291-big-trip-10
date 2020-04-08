@@ -25,3 +25,22 @@ export const dateDiff = (dateA, dateB) => {
   const b = moment(dateB);
   return a.diff(b, `days`);
 };
+
+export const getDurationTime = (dateFrom, dateTo) => {
+  const dateStartTime = moment(dateFrom).format(`YYYY-MM-DDTHH:mm`);
+  const dateEndTime = moment(dateTo).format(`YYYY-MM-DDTHH:mm`);
+  const startTime = formatTime(dateFrom);
+  const endTime = formatTime(dateTo);
+
+  const eventDurationDays = dateDiff(dateEndTime, dateStartTime);
+  const eventDuartionHours = moment.duration(startTime, `HH:mm`).
+                              subtract(moment.duration(endTime, `HH:mm`)).hours();
+  const eventDuartionMinutes = moment.duration(startTime, `HH:mm`).
+                              subtract(moment.duration(endTime, `HH:mm`)).minutes();
+
+  return {
+    'eventDurationDays': eventDurationDays,
+    'eventDuartionHours': eventDuartionHours,
+    'eventDuartionMinutes': eventDuartionMinutes
+  };
+};

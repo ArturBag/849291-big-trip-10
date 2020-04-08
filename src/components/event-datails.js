@@ -3,13 +3,13 @@ import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/light.css';
 import moment from 'moment';
 
-import {CITIES} from '../const.js';
-import {ROUTE_POINTS_TYPES} from '../const.js';
+import { CITIES } from '../const.js';
+import { ROUTE_POINTS_TYPES } from '../const.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
 
 
 export default class EventForm extends AbstractSmartComponent {
-  constructor(route, onDataChange) {
+  constructor(pointController, route, onDataChange) {
     super();
 
     this._routeData = route;
@@ -17,6 +17,8 @@ export default class EventForm extends AbstractSmartComponent {
     this._flatpickr = null;
     this._firstDateValue = `12/12/2019 10:00`;
     this._lastDateValue = `11/02/2020 13:30`;
+
+    this._pointController = pointController;
 
     this._applyFlatpickr();
     this._subscribeOnEvents();
@@ -119,7 +121,7 @@ export default class EventForm extends AbstractSmartComponent {
     const lastDate = this.getElement().querySelector(`#event-end-time-1`);
 
     let startDateValue = this._firstDateValue;
-    // let endDateValue = ``;
+
 
     this._flatpickr = flatpickr(firstDate, {
       'allowInput': true,
@@ -178,7 +180,7 @@ export default class EventForm extends AbstractSmartComponent {
       const newData = Object.assign({}, this._routeData, {
         isFavorite: !this._routeData.isFavorite
       });
-      this._onDataChange(this._routeData, newData);
+      this._onDataChange(this._pointController, this._routeData, newData);
       this._routeData = newData;
 
     });
@@ -189,7 +191,7 @@ export default class EventForm extends AbstractSmartComponent {
         icon: chosedIcon,
         options: this._routeData.options
       });
-      this._onDataChange(this._routeData, newData);
+      this._onDataChange(this._pointController, this._routeData, newData);
       this._routeData = newData;
 
     });
@@ -208,7 +210,7 @@ export default class EventForm extends AbstractSmartComponent {
           description: this._routeData.description
         });
 
-        this._onDataChange(this._routeData, newData);
+        this._onDataChange(this._pointController, this._routeData, newData);
         this._routeData = newData;
       }
     });

@@ -1,18 +1,33 @@
 import EventForm from '../components/event-datails.js';
 import TripDays from '../components/trip-days.js';
-import {render, replace, RenderPosition} from '../utils/render.js';
+import { render, replace, remove, RenderPosition } from '../utils/render.js';
 
-const Mode = {
+export const Mode = {
+  ADDING: `adding`,
   DEFAULT: `default`,
   EDIT: `edit`,
+};
+
+export const EmptyPoint = {
+  'id': null,
+  'travelType': ``,
+  'icon': ``,
+  'prefix': ``,
+  'city': ``,
+  'pictures': [],
+  'description': ``,
+  'price': 0,
+  'options': [],
+  'isFavorite': false,
+  'dateFrom': null,
+  'dateTo': null
 };
 
 export default class PointController {
   constructor(container, onDataChange, onViewChange) {
 
     this._container = container;
-    this._eventFormComponent = null;
-    this._tripDaysComponent = null;
+
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
     this._mode = Mode.DEFAULT;
@@ -23,10 +38,11 @@ export default class PointController {
   }
 
 
-  render(route, routeIndex) {
+  render(route, routeIndex, mode) {
 
     const oldPointComponent = this._tripDaysComponent;
     const oldPointEditComponent = this._eventFormComponent;
+    this._mode = mode;
 
     this._tripDaysComponent = new TripDays(route, routeIndex);
 
@@ -36,7 +52,7 @@ export default class PointController {
       document.addEventListener(`keydown`, this._onEscKeyDown);
     });
 
-    this._eventFormComponent = new EventForm(route, this._onDataChange);
+    this._eventFormComponent = new EventForm(this, route, this._onDataChange);
 
     this._eventFormComponent.setSubmitHandler(() => {
       this._replaceEventFormToTripDays();
@@ -62,9 +78,18 @@ export default class PointController {
     const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
 
     if (isEscKey) {
+      if (this._mode === Mode.ADDING) {
+        this._onDataChange(this, EmptyPoint, null);
+      }
       this._replaceEventFormToTripDays();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     }
+  }
+
+  destroy() {
+    remove(this._eventFormComponent);
+    remove(this._tripDaysComponent);
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
   _replacetripDaysToEventForm() {

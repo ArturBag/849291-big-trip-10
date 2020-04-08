@@ -1,5 +1,5 @@
 import AbstractComponent from './abstract-component.js';
-import {formatTime, formatDay, formatMonth, formatDate, dateDiff} from '../utils/common.js';
+import { formatTime, formatDay, formatMonth, formatDate, getDurationTime } from '../utils/common.js';
 import moment from 'moment';
 
 export default class TripDays extends AbstractComponent {
@@ -8,16 +8,19 @@ export default class TripDays extends AbstractComponent {
 
     this._route = route;
     this._routeIndex = routeIndex;
-
+    this.getDurationTime = getDurationTime;
   }
 
   setClickHandler(handler) {
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
   }
 
+
   getTemplate() {
 
-    const {travelType, icon, prefix, city, price, options, dateFrom, dateTo} = this._route;
+    const { travelType, icon, prefix, city, price, options, dateFrom, dateTo } = this._route;
+console.log(this._route);
+    const durationTime = this.getDurationTime(dateFrom, dateTo);
 
     const startDate = formatDate(dateFrom);
 
@@ -29,26 +32,28 @@ export default class TripDays extends AbstractComponent {
     const month = formatMonth(startDate).toUpperCase();
     const day = formatDay(startDate);
 
-
     const startTime = formatTime(dateFrom);
     const endTime = formatTime(dateTo);
 
     const dayCounter = this._routeIndex + 1;
 
-    const eventDurationDays = dateDiff(dateEndTime, dateStartTime) + `D`;
-    const eventDuartionHours = moment.duration(startTime, `HH:mm`).subtract(moment.duration(endTime, `HH:mm`)).hours() + `H`;
-    const eventDuartionMinutes = moment.duration(startTime, `HH:mm`).subtract(moment.duration(endTime, `HH:mm`)).minutes() + `M`;
+    const eventDurationDays = `${durationTime.eventDurationDays}D`;
+    const eventDuartionHours = `${durationTime.eventDuartionHours}H`;
+    const eventDuartionMinutes = `${durationTime.eventDuartionMinutes}M`;
 
     const eventDurationTime = `${eventDurationDays} ${eventDuartionHours} ${eventDuartionMinutes}`;
+    let optionsInfo = ``;
+    if (options.length) {
 
-    const optionsInfo = options.map((it) => {
+      optionsInfo = options.map((it) => {
 
-      return `<li class="event__offer">
-        <span class="event__offer-title">${it.title}</span>
-        &plus;
-        &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
-       </li>`;
-    }).join(``);
+        return `<li class="event__offer">
+          <span class="event__offer-title">${it.title}</span>
+          &plus;
+          &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
+         </li>`;
+      }).join(``);
+    }
 
     return `<li class="trip-days__item  day">
      <div class="day__info">

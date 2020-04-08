@@ -1,4 +1,4 @@
-import {ROUTE_POINTS_TYPES, CITIES, ADDITIONAL_OPTIONS} from '../const.js';
+import { ROUTE_POINTS_TYPES, CITIES, ADDITIONAL_OPTIONS } from '../const.js';
 
 
 const descriptionText = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -43,7 +43,13 @@ const generateRoutePoint = () => {
     optionsInfo.push(ADDITIONAL_OPTIONS[getRandomIntegerNumber(0, ADDITIONAL_OPTIONS.length)]);
   }
 
+  const getRandomDate = () => {
+    const randomDate = Math.floor(Math.random() * (29 - 1)) + 1;
+    return randomDate < 10 ? `0${randomDate}` : randomDate;
+  };
+
   const getRandomType = () => {
+
     const randomTypeKey = Math.random() > 0.5 ? `ride` : `stops`;
     const prefix = randomTypeKey === `ride` ? `to` : `in`;
     const randomTypeArray = Object.entries(ROUTE_POINTS_TYPES[randomTypeKey]);
@@ -58,6 +64,7 @@ const generateRoutePoint = () => {
 
 
   return {
+    'id': new Date().getUTCMilliseconds(),
     'travelType': getRandomType().travelType,
     'icon': getRandomType().icon,
     'prefix': getRandomType().prefix,
@@ -67,8 +74,8 @@ const generateRoutePoint = () => {
     'price': getRandomIntegerNumber(10, 1000),
     'options': optionsInfo,
     'isFavorite': Math.random() > 0.5,
-    'dateFrom': `2019-12-15T22:22:00.845Z`,
-    'dateTo': `2020-02-11T20:36:00.375Z`
+    'dateFrom': `2020-02-${getRandomDate()}T22:22:00.845Z`,
+    'dateTo': `2020-12-11T20:36:00.375Z`
   };
 };
 
@@ -78,4 +85,4 @@ const generateRoutePoints = (count) => {
     .map(generateRoutePoint);
 };
 
-export {generateRoutePoint, generateRoutePoints};
+export { generateRoutePoint, generateRoutePoints };
