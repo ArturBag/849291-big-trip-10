@@ -1,11 +1,10 @@
 import Route from './components/route.js';
 import Menu from './components/menu.js';
-// import Filters from './components/filters.js';
 import FilterController from './controllers/filter-controller.js';
 import TripController from './controllers/trip-controller.js';
 import PointsModel from './models/points.js';
-import { generateRoutePoints } from './mocks/route-point.js';
-import { RenderPosition, render } from './utils/render.js';
+import {generateRoutePoints} from './mocks/route-point.js';
+import {RenderPosition, render} from './utils/render.js';
 
 const ROUTES_QTY = 5;
 

@@ -16,6 +16,7 @@ export const ROUTE_POINTS_TYPES = {
   }
 };
 
+
 export const CITIES = [
   `Geneva`,
   `Chamonix`,
@@ -106,10 +107,3 @@ export const filterTypes = {
   }
 };
 
-// export const filterNames = [`Everything`, `Future`, `Past`];
-
-// export const FilterType = {
-//   EVERYTHING: `Everything`,
-//   FUTURE: `Future`,
-//   PAST: `Past`
-// };

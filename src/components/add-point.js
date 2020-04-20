@@ -87,7 +87,7 @@ export default class AddPointForm extends AbstractSmartComponent {
 
         this._routeData.icon = icon;
         handler(chosedEventType, icon);
-console.log(this._routeData)
+// console.log(this._routeData)
       });
 
     });

@@ -1,10 +1,10 @@
 import NoRoutePoints from '../components/no-route-points.js';
-import Sorting, { SortType } from '../components/sorting.js';
+import Sorting, {SortType} from '../components/sorting.js';
 import TripDaysList from '../components/trip-days-list.js';
 import AddPointForm from '../components/add-point.js';
-import PointController, { Mode as PointControllerMode, EmptyPoint } from './point-controller.js';
-import { render, RenderPosition } from '../utils/render.js';
-import { getDurationTime } from '../utils/common.js';
+import PointController, {Mode as PointControllerMode, EmptyPoint} from './point-controller.js';
+import {render, RenderPosition} from '../utils/render.js';
+import {getDurationTime} from '../utils/common.js';
 
 const renderTripPoints = (tripDaysListComponent, routeData, onDataChange, onViewChange) => {
 
@@ -25,6 +25,9 @@ export default class TripController {
     this._container = container;
 
     this._showedPointControllers = [];
+    this._showingPointsCount = null;
+
+    this._creatingPoint = null;
     this._isExpensesCalculated = false;
 
     this._noRoutePoints = new NoRoutePoints();
@@ -32,7 +35,7 @@ export default class TripController {
     this._tripDaysList = new TripDaysList();
 
     this.getDurationTime = getDurationTime;
-    // this._creatingPoint = null;
+
 
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
@@ -90,9 +93,12 @@ export default class TripController {
       return;
     }
 
+    this._showedPointControllers.forEach((it)=> {
+      it.setDefaultView();
+    });
     const tripDaysListElement = this._tripDaysList.getElement();
     this._creatingPoint = new PointController(tripDaysListElement, this._onDataChange, this._onViewChange);
-    this._creatingPoint.render(EmptyPoint, this._showedPointControllers.length, PointControllerMode.ADDING);
+    this._creatingPoint.render(EmptyPoint, PointControllerMode.ADDING);
 
     const container = document.querySelector(`.trip-sort`)
     const addPointComponent = new AddPointForm(EmptyPoint, this._onDataChange);
@@ -109,39 +115,71 @@ export default class TripController {
     const tripDaysListElement = this._tripDaysList.getElement();
     const newTripPoints = renderTripPoints(tripDaysListElement, points, this._onDataChange, this._onViewChange);
     this._showedPointControllers = this._showedPointControllers.concat(newTripPoints);
+
   }
 
   _updatePoints() {
     this._removePoints();
-    // console.log(`_updatePoints`, this._pointsModel.getPoints())
+    // console.log(this._pointsModel.getPoints().length)
     this._renderPoints(this._pointsModel.getPoints().slice());
   }
 
 
   _onDataChange(pointController, oldData, newData) {
 
-    // const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
-    // const index = this._showedPointControllers.indexOf(pointController);
-
-    // if (isSuccess) {
-    //   pointController.render(newData, index);
-    // }
-
     if (oldData === EmptyPoint) {
       this._creatingPoint = null;
       if (newData === null) {
         pointController.destroy();
-        this._updateTasks(this._showingTasksCount);
+        // this._updatePoints(this._showingPointsCount);
+        this._updatePoints();
       } else {
-
-        this._pointsModel.addTask(newData);
+        this._pointsModel.addPoint(newData);
         pointController.render(newData, PointControllerMode.DEFAULT);
 
-        const destroyedTask = this._showedTaskControllers.pop();
+        const destroyedTask = this._showedPointControllers.pop();
         destroyedTask.destroy();
 
+        this._showedPointControllers = [].concat(pointController, this._showedPointControllers);
+        // this._showingPointsCount = this._showedPointControllers.length;
+      }
+    } else if (newData === null) {
+      this._pointsModel.removePoint(oldData.id);
+      // this._updatePoints(this._showingPointsCount);
+      this._updatePoints();
+    } else {
+      const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
+
+      if (isSuccess) {
+        pointController.render(newData, PointControllerMode.DEFAULT);
       }
     }
+
+    // if (oldData === EmptyPoint) {
+    //   this._creatingPoint = null;
+    //   if (newData === null) {
+    //     pointController.destroy();
+    //     this._updatePoints(this._showingTasksCount);
+    //   } else {
+    //     this._pointsModel.addPoint(newData);
+    //     pointController.render(newData, PointControllerMode.DEFAULT);
+
+    //     const destroyedTask = this._showedPointControllers.pop();
+    //     destroyedTask.destroy();
+
+    //     this._showedPointControllers = [].concat(pointController, this._showedPointControllers);
+    //     this._showingPointsCount = this._showedPointControllers.length;
+    //   }
+    // } else if (newData === null) {
+    //   this._pointsModel.removePoint(oldData.id);
+    //   this._updatePoints(this._showingTasksCount);
+    // } else {
+    //   const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
+
+    //   if (isSuccess) {
+    //     pointController.render(newData, PointControllerMode.DEFAULT);
+    //   }
+    // }
   }
 
   _onViewChange() {

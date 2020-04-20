@@ -9,11 +9,19 @@ export default class Filters extends AbstractComponent {
     // console.log(this.filters)
   }
 
-  setFilterChangeHandler(onFilterChange) {
+  // setFilterChangeHandler(onFilterChange) {
+  //   this.getElement().addEventListener(`change`, (evt) => {
+  //     const filterId = evt.target.id;
+  //     // console.log(evt.target.id);
+  //     onFilterChange(filterId);
+
+  //   });
+
+  // }
+
+  setFilterChangeHandler(handler) {
     this.getElement().addEventListener(`change`, (evt) => {
-      const filterId = evt.target.id;
-      // console.log(evt.target.id);
-      onFilterChange(filterId);
+      handler(evt);
 
     });
 

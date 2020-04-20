@@ -1,7 +1,7 @@
 import FilterComponent from '../components/filters.js';
-import { render, replace, RenderPosition } from '../utils/render.js';
-import { filterTypes } from '../const.js';
-// import { getPointsByFilter } from '../utils/filter.js';
+import {render, replace, RenderPosition} from '../utils/render.js';
+import {filterTypes} from '../const.js';
+
 
 export default class FilterController {
   constructor(container, pointsModel) {
@@ -30,24 +30,24 @@ export default class FilterController {
     });
 
     const oldComponent = this._filterComponent;
-    // console.log(filters);
+
     this._filterComponent = new FilterComponent(filters);
     this._filterComponent.setFilterChangeHandler(this._onFilterChange);
     if (oldComponent) {
-      // console.log(this._filterComponent);
       replace(this._filterComponent, oldComponent);
     } else {
-      // console.log(container, this._filterComponent);
       render(container, this._filterComponent.getElement(), RenderPosition.AFTEREND);
     }
+
   }
 
-  _onFilterChange(filterId) {
-    //  console.log(filterId)
-    this._activeFilterType = filterTypes[filterId].name;
+  _onFilterChange(evt) {
+    const filterId = evt.target.id;
+
     this._pointsModel.setFilter(filterId);
+    this._activeFilterType = filterTypes[filterId].name;
     this.render(); // ?
-    // console.log(this._pointsModel.getPoints(),`getPoints`)
+
   }
 
   _onDataChange() {

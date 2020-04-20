@@ -1,16 +1,18 @@
 import {filterTypes} from '../const.js';
 import moment from 'moment';
 
+
 export const getFutureRoutePoints = (nowDate, points) => {
+
   const nowDateInMiliseconds = moment(nowDate, `DD/MM/YYYY HH:mm`).valueOf();
   return points.filter((it) => {
-    const futureDateInMiliseconds = moment(it.dateFrom).valueOf();
+    const futureDateInMiliseconds = moment(it.dateTo).valueOf();
     return futureDateInMiliseconds > nowDateInMiliseconds;
-
   });
 };
 
 export const gePastRoutePoints = (nowDate, points) => {
+
   const nowDateInMiliseconds = moment(nowDate, `DD/MM/YYYY HH:mm`).valueOf();
   return points.filter((it) => {
     const pastDateInMiliseconds = moment(it.dateFrom).valueOf();
@@ -35,3 +37,4 @@ export const getPointsByFilter = (points, filterType) => {
 
   return points;
 };
+

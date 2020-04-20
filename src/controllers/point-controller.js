@@ -1,6 +1,7 @@
 import EventForm from '../components/event-datails.js';
 import TripDays from '../components/trip-days.js';
-import { render, replace, remove, RenderPosition } from '../utils/render.js';
+import {render, replace, remove, RenderPosition} from '../utils/render.js';
+import { CITIES } from '../const.js';
 
 export const Mode = {
   ADDING: `adding`,
@@ -43,31 +44,94 @@ export default class PointController {
     const oldPointComponent = this._tripDaysComponent;
     const oldPointEditComponent = this._eventFormComponent;
     this._mode = mode;
-
+// console.log(`render`, mode)
+console.log(route)
     this._tripDaysComponent = new TripDays(route, routeIndex);
 
 
     this._tripDaysComponent.setClickHandler(() => {
+      // this._mode = Mode.EDIT;
+      // this.setDefaultView()
       this._replacetripDaysToEventForm();
       document.addEventListener(`keydown`, this._onEscKeyDown);
+
     });
 
     this._eventFormComponent = new EventForm(this, route, this._onDataChange);
+
+    this._eventFormComponent.setRollupButtonClickHandler(() => {
+      this._replaceEventFormToTripDays();
+    });
 
     this._eventFormComponent.setSubmitHandler(() => {
       this._replaceEventFormToTripDays();
     });
 
-    if (oldPointComponent && oldPointEditComponent) {
+    this._eventFormComponent.setRoutePointTypeHandler((chosedEventType, chosedIcon, chosedPrefix) => {
+console.log(chosedEventType, chosedIcon, chosedPrefix)
+      this._onDataChange(this, route, Object.assign({}, route, {
+        travelType: chosedEventType,
+        icon: chosedIcon,
+        prefix: chosedPrefix,
+      }));
+    });
 
-      replace(this._tripDaysComponent, oldPointComponent);
-      replace(this._eventFormComponent, oldPointEditComponent);
+    this._eventFormComponent.setEventDestinationHandler((iputValue) => {
+      const isDestinationExist = CITIES.some((it) => it === iputValue);
 
-    } else {
-      render(this._container, this._tripDaysComponent.getElement(), RenderPosition.BEFOREEND);
+      if (isDestinationExist) {
+
+        this._onDataChange(this, route, Object.assign({}, route, {
+          city: iputValue,
+          pictures: route.pictures,
+          description: route.description
+        }));
+      }
+    });
+
+
+    this._eventFormComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, route, null));
+
+    this._eventFormComponent.setSubmitHandler((evt) => {
+      evt.preventDefault();
+      const data = this._eventFormComponent.getData();
+      this._onDataChange(this, route, data);
+    });
+
+    // this._eventFormComponent.setFavoriteClickHandler(() => {
+    //   // НЕ РАБОТАЕТ !!!
+    //   this._onDataChange(this, route, Object.assign({}, route, {
+    //     isFavorite: !route.isFavorite
+    //   }));
+    // });
+
+
+    // this._eventFormComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, route, null));
+
+    switch (mode) {
+      case Mode.DEFAULT:
+        if (oldPointEditComponent && oldPointComponent) {
+          replace(this._tripDaysComponent, oldPointComponent);
+          replace(this._eventFormComponent, oldPointEditComponent);
+          // this._replaceEditToTask();
+        } else {
+          render(this._container, this._tripDaysComponent.getElement(), RenderPosition.BEFOREEND);
+        }
+        break;
+      case Mode.ADDING:
+        if (oldPointEditComponent && oldPointComponent) {
+          remove(oldPointComponent);
+          remove(oldPointEditComponent);
+        }
+        // this.setDefaultView();
+        // console.log(this._eventFormComponent.getElement())
+        // console.log(`111`)
+        document.addEventListener(`keydown`, this._onEscKeyDown);
+        render(this._container, this._eventFormComponent, RenderPosition.AFTERBEGIN);
+        break;
     }
-
   }
+
   setDefaultView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceEventFormToTripDays();
@@ -104,6 +168,10 @@ export default class PointController {
 
     replace(this._tripDaysComponent, this._eventFormComponent);
     this._mode = Mode.DEFAULT;
+  }
+
+  _resetEditForm() {
+    this._eventFormComponent.getElement().reset();
   }
 
 }

@@ -1,5 +1,5 @@
-import { getPointsByFilter } from '../utils/filter.js';
-import { filterTypes } from '../const.js';
+import {getPointsByFilter} from '../utils/filter.js';
+import {filterTypes} from '../const.js';
 
 
 export default class Points {

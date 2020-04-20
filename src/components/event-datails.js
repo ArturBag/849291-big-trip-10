@@ -3,9 +3,33 @@ import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/light.css';
 import moment from 'moment';
 
-import { CITIES } from '../const.js';
+// import { CITIES } from '../const.js';
 import { ROUTE_POINTS_TYPES } from '../const.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
+
+
+const parseFormData = (formData) => {
+  // const repeatingDays = DAYS.reduce((acc, day) => {
+  //   acc[day] = false;
+  //   return acc;
+  // }, {});
+  // const date = formData.get(`date`);
+  console.log(formData.get(`event-type`))
+
+  return {
+    id: new Date().getUTCMilliseconds(),
+    city: formData.get(`event-destination`),
+
+    // description: formData.get(`text`),
+    // color: formData.get(`color`),
+    // tags: formData.getAll(`hashtag`),
+    // dueDate: date ? new Date(date) : null,
+    // repeatingDays: formData.getAll(`repeat`).reduce((acc, it) => {
+    //   acc[it] = true;
+    //   return acc;
+    // }, repeatingDays),
+  };
+};
 
 
 export default class EventForm extends AbstractSmartComponent {
@@ -22,7 +46,9 @@ export default class EventForm extends AbstractSmartComponent {
 
     this._applyFlatpickr();
     this._subscribeOnEvents();
-
+    // this._deleteButtonClickHandler = null;
+    // this._submitHandler = null;
+    // console.log(this.getElement())
 
   }
 
@@ -37,32 +63,50 @@ export default class EventForm extends AbstractSmartComponent {
     this._applyFlatpickr();
   }
 
+  getData() {
+    const form = this.getElement();
+    const formData = new FormData(form);
+
+    return parseFormData(formData);
+  }
+
+
+  // setFavoriteClickHandler(handler) {
+  //   this.getElement().querySelector(`#event-favorite-1`).addEventListener(`click`, handler);
+  // }
+
+  setEventDestinationHandler(handler) {
+    this.getElement().querySelector(`.event__input--destination`).addEventListener(`blur`, () => {
+      let iputValue = this.getElement().querySelector(`.event__input--destination`).value;
+      handler(iputValue);
+    });
+
+  }
+
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
 
+    // this._submitHandler = handler;
   }
 
+  setDeleteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__reset-btn`)
+      .addEventListener(`click`, handler);
 
-  setFavoriteClickHandler(handler) {
-    this.getElement().querySelector(`#event-favorite-1`).addEventListener(`click`, () => {
-      handler();
-    });
+    // this._deleteButtonClickHandler = handler;
+  }
+  setRollupButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
   }
 
-  setEventDestinationHandler(handler) {
-    this.getElement().querySelector(`#event-destination-1`).addEventListener(`change`, () => {
-      handler();
-    });
-
-  }
-
-  setRoutePointType(handler) {
+  setRoutePointTypeHandler(handler) {
 
     const eventTypes = this.getElement().querySelectorAll(`.event__type-item`);
     const transportEvents = ROUTE_POINTS_TYPES.ride;
     const stopEvents = ROUTE_POINTS_TYPES.stops;
     let chosedEventType = ``;
     let icon = ``;
+    let prefix = ``;
 
     const chooseEventType = (eventsData, choosedType) => {
       return Array.from(Object.keys(eventsData)).slice().some((item) => item === choosedType);
@@ -76,23 +120,32 @@ export default class EventForm extends AbstractSmartComponent {
         const isRideTypeChosed = chooseEventType(transportEvents, chosedEventType);
         const isStopTypeChosed = chooseEventType(stopEvents, chosedEventType);
 
+        // if (isRideTypeChosed) {
+        //   icon = transportEvents[chosedEventType];
+        //   this._routeData.prefix = `to`;
+
+        // } else if (isStopTypeChosed) {
+        //   icon = stopEvents[chosedEventType];
+        //   this._routeData.prefix = `in`;
+        // }
         if (isRideTypeChosed) {
           icon = transportEvents[chosedEventType];
-          this._routeData.prefix = `to`;
+          prefix = `to`;
 
         } else if (isStopTypeChosed) {
           icon = stopEvents[chosedEventType];
-          this._routeData.prefix = `in`;
+          prefix = `in`;
         }
 
-        this._routeData.icon = icon;
-        handler(chosedEventType, icon);
+        // this._routeData.icon = icon;
+        handler(chosedEventType, icon, prefix);
 
       });
 
     });
 
   }
+
 
   _setFullDate(inputType, fullDate) {
     const firstDateInput = this.getElement().querySelector(`#event-start-time-1`);
@@ -122,7 +175,6 @@ export default class EventForm extends AbstractSmartComponent {
 
     let startDateValue = this._firstDateValue;
 
-
     this._flatpickr = flatpickr(firstDate, {
       'allowInput': true,
       'enableTime': true,
@@ -134,6 +186,7 @@ export default class EventForm extends AbstractSmartComponent {
       'onClose': (selectedDates, dateStr) => {
         this._setFullDate(firstDate, dateStr);
         startDateValue = dateStr;
+        this._checkDateDiff(startDateValue, dateStr);
       }
     });
 
@@ -163,60 +216,75 @@ export default class EventForm extends AbstractSmartComponent {
 
     if (endDateMiliseconds < startDateMiliseconds) {
 
-      lastDateInput.style.background = `red`;
+      lastDateInput.style.outline = `1px solid red`;
     } else {
-      lastDateInput.style.background = `none`;
+      lastDateInput.style.outline = `none`;
     }
   }
 
   _subscribeOnEvents() {
+    // this.setFavoriteClickHandler((handler)=>{
+    //   this.getElement().querySelector(`#event-favorite-1`).addEventListener(`click`, handler);
+    // });
+    const element = this.getElement();
 
-    this.setSubmitHandler((evt) => {
-      evt.preventDefault();
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
-    });
-
-    this.setFavoriteClickHandler(() => {
-      const newData = Object.assign({}, this._routeData, {
-        isFavorite: !this._routeData.isFavorite
-      });
-      this._onDataChange(this._pointController, this._routeData, newData);
-      this._routeData = newData;
+    element.querySelector(`#event-favorite-1`).addEventListener(`click`, () => {
+      this._routeData.isFavorite = !this._routeData.isFavorite;
+      this.rerender();
 
     });
 
-    this.setRoutePointType((chosedEventType, chosedIcon) => {
-      const newData = Object.assign({}, this._routeData, {
-        travelType: chosedEventType,
-        icon: chosedIcon,
-        options: this._routeData.options
-      });
-      this._onDataChange(this._pointController, this._routeData, newData);
-      this._routeData = newData;
 
-    });
+    // this.setSubmitHandler((evt) => {
+    //   evt.preventDefault();
+    //   document.removeEventListener(`keydown`, this._onEscKeyDown);
+    // });
 
-    this.setEventDestinationHandler(() => {
+    // this.setFavoriteClickHandler(() => {
+    //   const newData = Object.assign({}, this._routeData, {
+    //     isFavorite: !this._routeData.isFavorite
+    //   });
+    //   this._onDataChange(this._pointController, this._routeData, newData);
+    //   this._routeData = newData;
 
-      let iputValue = this.getElement().querySelector(`#event-destination-1`).value;
+    // });
 
-      const isDestinationExist = CITIES.some((it) => it === iputValue);
 
-      if (isDestinationExist) {
 
-        const newData = Object.assign({}, this._routeData, {
-          city: iputValue,
-          pictures: this._routeData.pictures,
-          description: this._routeData.description
-        });
+    // this.setRoutePointType((chosedEventType, chosedIcon) => {
+    //   const newData = Object.assign({}, this._routeData, {
+    //     travelType: chosedEventType,
+    //     icon: chosedIcon,
+    //     options: this._routeData.options
+    //   });
+    //   this._onDataChange(this._pointController, this._routeData, newData);
+    //   this._routeData = newData;
 
-        this._onDataChange(this._pointController, this._routeData, newData);
-        this._routeData = newData;
-      }
-    });
+    // });
+
+    // this.setEventDestinationHandler(() => {
+
+    //   let iputValue = this.getElement().querySelector(`#event-destination-1`).value;
+
+    //   const isDestinationExist = CITIES.some((it) => it === iputValue);
+
+    //   if (isDestinationExist) {
+
+    //     const newData = Object.assign({}, this._routeData, {
+    //       city: iputValue,
+    //       pictures: this._routeData.pictures,
+    //       description: this._routeData.description
+    //     });
+
+    //     this._onDataChange(this._pointController, this._routeData, newData);
+    //     this._routeData = newData;
+    //   }
+    // });
   }
 
   getTemplate() {
+
+    // console.log(this._routeData.options)
 
     const travelType = this._routeData.travelType;
     const prefix = this._routeData.prefix;
@@ -224,6 +292,7 @@ export default class EventForm extends AbstractSmartComponent {
     const destinationDescription = this._routeData.description;
     const additionalOptions = this._routeData.options;
     const isFavorite = this._routeData.isFavorite;
+    console.log(isFavorite, `RENDERED`)
     const isFavoriteChecked = isFavorite ? `checked` : ``;
 
 
@@ -241,6 +310,26 @@ export default class EventForm extends AbstractSmartComponent {
       </div>`;
     }).join(``);
 
+    const transferTypeGroup = Object.keys(this._routeData.eventTypeList.ride).map((it) => {
+
+      return (`<div class="event__type-item">
+                <input id="event-type-${it.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${it.toLowerCase()}">
+                <label class="event__type-label  event__type-label--${it.toLowerCase()}" for="event-type-${it.toLowerCase()}">${it}</label>
+              </div>`);
+    }).join(` `);
+
+    const activityTypeGroup = Object.keys(this._routeData.eventTypeList.stops).map((it) => {
+
+
+      return (
+        `<div class="event__type-item">
+            <input id="event-type-${it.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${it.toLowerCase()}">
+            <label class="event__type-label  event__type-label--${it.toLowerCase()}" for="event-type-${it.toLowerCase()}-1">${it}</label>
+          </div>`
+      );
+    }).join(` `);
+
+
     const imageTemplate = this._routeData.pictures.map((it) => {
       return `<img class="event__photo" src="${it}" alt="Event photo">`;
     }).join(``);
@@ -257,60 +346,12 @@ export default class EventForm extends AbstractSmartComponent {
       <div class="event__type-list">
         <fieldset class="event__type-group">
           <legend class="visually-hidden">Transfer</legend>
-
-          <div class="event__type-item">
-            <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
-            <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
-          </div>
-
-          <div class="event__type-item">
-            <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
-            <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
-          </div>
-
-          <div class="event__type-item">
-            <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
-            <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
-          </div>
-
-          <div class="event__type-item">
-            <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
-            <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
-          </div>
-
-          <div class="event__type-item">
-            <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport">
-            <label class="event__type-label  event__type-label--transport" for="event-type-transport-1">Transport</label>
-          </div>
-
-          <div class="event__type-item">
-            <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
-            <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
-          </div>
-
-          <div class="event__type-item">
-            <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
-            <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
-          </div>
+          ${transferTypeGroup}
         </fieldset>
 
         <fieldset class="event__type-group">
           <legend class="visually-hidden">Activity</legend>
-
-          <div class="event__type-item">
-            <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
-            <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
-          </div>
-
-          <div class="event__type-item">
-            <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
-            <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
-          </div>
-
-          <div class="event__type-item">
-            <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
-            <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
-          </div>
+          ${activityTypeGroup}
         </fieldset>
       </div>
       </div>

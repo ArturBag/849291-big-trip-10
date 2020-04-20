@@ -48,6 +48,12 @@ const generateRoutePoint = () => {
     return randomDate < 10 ? `0${randomDate}` : randomDate;
   };
 
+  const getRandomMonth = () => {
+    const randomMonth = (Math.floor(Math.random() * (12 - 1)) + 1).toString();
+
+    return randomMonth < 10 ? `0${randomMonth}` : randomMonth;
+  };
+
   const getRandomType = () => {
 
     const randomTypeKey = Math.random() > 0.5 ? `ride` : `stops`;
@@ -66,6 +72,7 @@ const generateRoutePoint = () => {
   return {
     'id': new Date().getUTCMilliseconds(),
     'travelType': getRandomType().travelType,
+    'eventTypeList': ROUTE_POINTS_TYPES,
     'icon': getRandomType().icon,
     'prefix': getRandomType().prefix,
     'city': CITIES[getRandomIntegerNumber(0, CITIES.length)],
@@ -74,15 +81,17 @@ const generateRoutePoint = () => {
     'price': getRandomIntegerNumber(10, 1000),
     'options': optionsInfo,
     'isFavorite': Math.random() > 0.5,
-    'dateFrom': `2020-02-${getRandomDate()}T22:22:00.845Z`,
-    'dateTo': `2020-12-11T20:36:00.375Z`
+    'dateFrom': `2020-${getRandomMonth()}-${getRandomDate()}T22:22:00.845Z`,
+    'dateTo': `2020-${getRandomMonth()}-${getRandomDate()}T20:36:00.375Z`
   };
 };
+
 
 const generateRoutePoints = (count) => {
   return new Array(count)
     .fill(``)
     .map(generateRoutePoint);
-};
+}; // id ????
+
 
 export { generateRoutePoint, generateRoutePoints };
