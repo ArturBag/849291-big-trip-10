@@ -1,13 +1,15 @@
 import EventForm from '../components/event-datails.js';
 import TripDays from '../components/trip-days.js';
 import {render, replace, remove, RenderPosition} from '../utils/render.js';
-import { CITIES } from '../const.js';
+import { ROUTE_POINTS_TYPES, CITIES, ADDITIONAL_OPTIONS } from '../const.js';
 
 export const Mode = {
   ADDING: `adding`,
   DEFAULT: `default`,
   EDIT: `edit`,
 };
+
+
 
 export const EmptyPoint = {
   'id': null,
@@ -24,6 +26,26 @@ export const EmptyPoint = {
   'dateTo': null
 };
 
+// const defaulFormtData = {
+//   'id': 1,
+//   'travelType': `flight`,
+//   'eventTypeList': ROUTE_POINTS_TYPES,
+//   'icon': `img/icons/flight.png`,
+//   'prefix': `to`,
+//   'city': `Amsterdam`,
+//   'pictures': [`https://i.picsum.photos/id/257/300/150.jpg`, `https://i.picsum.photos/id/85/300/150.jpg`,
+//     `https://i.picsum.photos/id/257/300/150.jpg`, `https://i.picsum.photos/id/948/300/150.jpg`,
+//     `https://i.picsum.photos/id/1001/300/150.jpg`],
+//   'description': `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
+//   'price': 0,
+//   'options': ADDITIONAL_OPTIONS,
+//   'isFavorite': false,
+//   'dateFrom': `2020-02-17T22:22:00.845Z`,
+//   'dateTo': `2020-07-24T20:36:00.375Z`
+
+
+// }
+
 export default class PointController {
   constructor(container, onDataChange, onViewChange) {
 
@@ -36,16 +58,20 @@ export default class PointController {
 
     this._tripDaysComponent = null;
     this._eventFormComponent = null;
+
+    // this._localRouteData = null;
   }
 
 
   render(route, routeIndex, mode) {
 
+    this._routeData = route;
+
     const oldPointComponent = this._tripDaysComponent;
     const oldPointEditComponent = this._eventFormComponent;
     this._mode = mode;
-// console.log(`render`, mode)
-console.log(route)
+
+    // this._tripDaysComponent = new TripDays(route, routeIndex);
     this._tripDaysComponent = new TripDays(route, routeIndex);
 
 
@@ -57,24 +83,45 @@ console.log(route)
 
     });
 
+    // this._eventFormComponent = new EventForm(this, route, this._onDataChange);
     this._eventFormComponent = new EventForm(this, route, this._onDataChange);
 
     this._eventFormComponent.setRollupButtonClickHandler(() => {
+      // console.log(this._eventFormComponent.getElement().reset())
+      // this._onDataChange(this, route, Object.assign({}, route, defaulFormtData));
+      this.render(route, routeIndex, mode)
       this._replaceEventFormToTripDays();
     });
 
-    this._eventFormComponent.setSubmitHandler(() => {
+    this._eventFormComponent.setSubmitHandler((evt) => {
+      // console.log(evt)
+      evt.preventDefault();
       this._replaceEventFormToTripDays();
     });
 
-    this._eventFormComponent.setRoutePointTypeHandler((chosedEventType, chosedIcon, chosedPrefix) => {
-console.log(chosedEventType, chosedIcon, chosedPrefix)
-      this._onDataChange(this, route, Object.assign({}, route, {
-        travelType: chosedEventType,
-        icon: chosedIcon,
-        prefix: chosedPrefix,
-      }));
-    });
+    // this._eventFormComponent.setRoutePointTypeHandler((chosedEventType, chosedIcon, chosedPrefix) => {
+
+    //         this._onDataChange(this, route, Object.assign({}, this._localRouteData, {
+    //           travelType: chosedEventType,
+    //           icon: chosedIcon,
+    //           prefix: chosedPrefix,
+    //         }));
+    //       });
+
+//     this._eventFormComponent.setRoutePointTypeHandler((chosedEventType, chosedIcon, chosedPrefix) => {
+//       // this._routeData = Object.assign({}, this._routeData, {
+//       //   'travelType': chosedEventType,
+//       //   'icon': chosedIcon,
+//       //   'prefix': chosedPrefix
+//       // });
+//       // this.render(this._routeData,routeIndex, mode)
+// // console.log(chosedEventType, chosedIcon, chosedPrefix)
+//       // this._onDataChange(this, route, Object.assign({}, route, {
+//       //   travelType: chosedEventType,
+//       //   icon: chosedIcon,
+//       //   prefix: chosedPrefix,
+//       // }));
+//     });
 
     this._eventFormComponent.setEventDestinationHandler((iputValue) => {
       const isDestinationExist = CITIES.some((it) => it === iputValue);
@@ -98,38 +145,46 @@ console.log(chosedEventType, chosedIcon, chosedPrefix)
       this._onDataChange(this, route, data);
     });
 
-    // this._eventFormComponent.setFavoriteClickHandler(() => {
-    //   // НЕ РАБОТАЕТ !!!
-    //   this._onDataChange(this, route, Object.assign({}, route, {
-    //     isFavorite: !route.isFavorite
-    //   }));
-    // });
+    if (oldPointComponent && oldPointEditComponent) {
+      replace(this._tripDaysComponent, oldPointComponent);
+      replace(this._eventFormComponent, oldPointEditComponent);
+    } else {
+      render(this._container, this._tripDaysComponent.getElement(), RenderPosition.BEFOREEND);
+    }
+
+
+    this._eventFormComponent.setFavoriteClickHandler(() => {
+
+      this._onDataChange(this, route, Object.assign({}, route, {
+        isFavorite: !route.isFavorite
+      }));
+    });
 
 
     // this._eventFormComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, route, null));
 
-    switch (mode) {
-      case Mode.DEFAULT:
-        if (oldPointEditComponent && oldPointComponent) {
-          replace(this._tripDaysComponent, oldPointComponent);
-          replace(this._eventFormComponent, oldPointEditComponent);
-          // this._replaceEditToTask();
-        } else {
-          render(this._container, this._tripDaysComponent.getElement(), RenderPosition.BEFOREEND);
-        }
-        break;
-      case Mode.ADDING:
-        if (oldPointEditComponent && oldPointComponent) {
-          remove(oldPointComponent);
-          remove(oldPointEditComponent);
-        }
-        // this.setDefaultView();
-        // console.log(this._eventFormComponent.getElement())
-        // console.log(`111`)
-        document.addEventListener(`keydown`, this._onEscKeyDown);
-        render(this._container, this._eventFormComponent, RenderPosition.AFTERBEGIN);
-        break;
-    }
+    // switch (mode) {
+    //   case Mode.DEFAULT:
+    //     if (oldPointEditComponent && oldPointComponent) {
+    //       replace(this._tripDaysComponent, oldPointComponent);
+    //       replace(this._eventFormComponent, oldPointEditComponent);
+    //       // this._replaceEditToTask();
+    //     } else {
+    //       render(this._container, this._tripDaysComponent.getElement(), RenderPosition.BEFOREEND);
+    //     }
+    //     break;
+    //   case Mode.ADDING:
+    //     if (oldPointEditComponent && oldPointComponent) {
+    //       remove(oldPointComponent);
+    //       remove(oldPointEditComponent);
+    //     }
+    //     // this.setDefaultView();
+    //     // console.log(this._eventFormComponent.getElement())
+    //     // console.log(`111`)
+    //     document.addEventListener(`keydown`, this._onEscKeyDown);
+    //     render(this._container, this._eventFormComponent, RenderPosition.AFTERBEGIN);
+    //     break;
+    // }
   }
 
   setDefaultView() {
@@ -165,9 +220,10 @@ console.log(chosedEventType, chosedIcon, chosedPrefix)
 
   _replaceEventFormToTripDays() {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
-
+    // this._eventFormComponent.reset();
     replace(this._tripDaysComponent, this._eventFormComponent);
     this._mode = Mode.DEFAULT;
+    // console.log(this._eventFormComponent.getElement());
   }
 
   _resetEditForm() {

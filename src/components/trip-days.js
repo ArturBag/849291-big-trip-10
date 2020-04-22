@@ -19,7 +19,7 @@ export default class TripDays extends AbstractComponent {
   getTemplate() {
 
     const { travelType, icon, prefix, city, price, options, dateFrom, dateTo } = this._route;
-// console.log(this._route);
+// console.log(travelType,`from TripDays`);
     const durationTime = this.getDurationTime(dateFrom, dateTo);
 
     const startDate = formatDate(dateFrom);
