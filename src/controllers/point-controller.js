@@ -78,6 +78,7 @@ export default class PointController {
     this._tripDaysComponent.setClickHandler(() => {
       // this._mode = Mode.EDIT;
       // this.setDefaultView()
+      // this._eventFormComponent = new EventForm(this, route, this._onDataChange);
       this._replacetripDaysToEventForm();
       document.addEventListener(`keydown`, this._onEscKeyDown);
 
@@ -86,11 +87,13 @@ export default class PointController {
     // this._eventFormComponent = new EventForm(this, route, this._onDataChange);
     this._eventFormComponent = new EventForm(this, route, this._onDataChange);
 
-    this._eventFormComponent.setRollupButtonClickHandler(() => {
-      // console.log(this._eventFormComponent.getElement().reset())
-      // this._onDataChange(this, route, Object.assign({}, route, defaulFormtData));
-      this.render(route, routeIndex, mode)
+    this._eventFormComponent.setCloseFormButtonClickHandler(() => {
+
+      if (oldPointEditComponent) {
+        replace(this._eventFormComponent, oldPointEditComponent);
+      }
       this._replaceEventFormToTripDays();
+
     });
 
     this._eventFormComponent.setSubmitHandler((evt) => {
@@ -99,29 +102,6 @@ export default class PointController {
       this._replaceEventFormToTripDays();
     });
 
-    // this._eventFormComponent.setRoutePointTypeHandler((chosedEventType, chosedIcon, chosedPrefix) => {
-
-    //         this._onDataChange(this, route, Object.assign({}, this._localRouteData, {
-    //           travelType: chosedEventType,
-    //           icon: chosedIcon,
-    //           prefix: chosedPrefix,
-    //         }));
-    //       });
-
-//     this._eventFormComponent.setRoutePointTypeHandler((chosedEventType, chosedIcon, chosedPrefix) => {
-//       // this._routeData = Object.assign({}, this._routeData, {
-//       //   'travelType': chosedEventType,
-//       //   'icon': chosedIcon,
-//       //   'prefix': chosedPrefix
-//       // });
-//       // this.render(this._routeData,routeIndex, mode)
-// // console.log(chosedEventType, chosedIcon, chosedPrefix)
-//       // this._onDataChange(this, route, Object.assign({}, route, {
-//       //   travelType: chosedEventType,
-//       //   icon: chosedIcon,
-//       //   prefix: chosedPrefix,
-//       // }));
-//     });
 
     this._eventFormComponent.setEventDestinationHandler((iputValue) => {
       const isDestinationExist = CITIES.some((it) => it === iputValue);
@@ -153,12 +133,12 @@ export default class PointController {
     }
 
 
-    this._eventFormComponent.setFavoriteClickHandler(() => {
+    // this._eventFormComponent.setFavoriteClickHandler(() => {
 
-      this._onDataChange(this, route, Object.assign({}, route, {
-        isFavorite: !route.isFavorite
-      }));
-    });
+    //   // this._onDataChange(this, route, Object.assign({}, route, {
+    //   //   isFavorite: !route.isFavorite
+    //   // }));
+    // });
 
 
     // this._eventFormComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, route, null));

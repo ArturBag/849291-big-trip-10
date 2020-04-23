@@ -47,17 +47,22 @@ export default class EventForm extends AbstractSmartComponent {
     this._travelType = this._routeData.travelType;
     this._prefix = this._routeData.prefix;
     this._icon = this._routeData.icon;
+    this._isFavorite = this._routeData.isFavorite;
+
+    this._closeFormHandler = null;
+    this._favoriteClickHandler = null;
 
     this._applyFlatpickr();
     this._subscribeOnEvents();
-    // this._deleteButtonClickHandler = null;
     // this._submitHandler = null;
-    console.log(this._routeData)
+    // console.log(this._routeData)
 
   }
 
 
   recoveryListeners() {
+    this.setCloseFormButtonClickHandler(this._closeFormHandler);
+    this.setFavoriteClickHandler(this._favoriteClickHandler);
     this._subscribeOnEvents();
   }
 
@@ -77,6 +82,7 @@ export default class EventForm extends AbstractSmartComponent {
 
   setFavoriteClickHandler(handler) {
     this.getElement().querySelector(`#event-favorite-1`).addEventListener(`click`, handler);
+    this._favoriteClickHandler = handler;
   }
 
   setEventDestinationHandler(handler) {
@@ -99,93 +105,10 @@ export default class EventForm extends AbstractSmartComponent {
 
     // this._deleteButtonClickHandler = handler;
   }
-  setRollupButtonClickHandler(handler) {
+  setCloseFormButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
+    this._closeFormHandler = handler;
   }
-
-  // setRoutePointTypeHandler(handler) {
-
-  //   const eventTypes = this.getElement().querySelectorAll(`.event__type-item`);
-  //   const transportEvents = ROUTE_POINTS_TYPES.ride;
-  //   const stopEvents = ROUTE_POINTS_TYPES.stops;
-  //   let chosedEventType = ``;
-  //   let icon = ``;
-  //   let prefix = ``;
-
-  //   const chooseEventType = (eventsData, choosedType) => {
-  //     return Array.from(Object.keys(eventsData)).slice().some((item) => item === choosedType);
-  //   };
-
-  //   eventTypes.forEach((it) => {
-  //     it.addEventListener(`click`, () => {
-  //       chosedEventType = it.querySelector(`input`).value;
-  //       chosedEventType = chosedEventType.charAt(0).toUpperCase() + chosedEventType.substr(1);
-
-  //       const isRideTypeChosed = chooseEventType(transportEvents, chosedEventType);
-  //       const isStopTypeChosed = chooseEventType(stopEvents, chosedEventType);
-
-  //       if (isRideTypeChosed) {
-  //         icon = transportEvents[chosedEventType];
-  //         prefix = `to`;
-
-  //       } else if (isStopTypeChosed) {
-  //         icon = stopEvents[chosedEventType];
-  //         prefix = `in`;
-  //       }
-
-  //       // this._routeData.icon = icon;
-  //       handler(chosedEventType, icon, prefix);
-
-  //     });
-
-  //   });
-
-  // }
-
-  // setRoutePointTypeHandler(handler) {
-
-  //   const eventTypes = this.getElement().querySelectorAll(`.event__type-item`);
-  //   const transportEvents = ROUTE_POINTS_TYPES.ride;
-  //   const stopEvents = ROUTE_POINTS_TYPES.stops;
-  //   let chosedEventType = ``;
-  //   let icon = ``;
-  //   let prefix = ``;
-
-  //   const chooseEventType = (eventsData, choosedType) => {
-  //     return Array.from(Object.keys(eventsData)).slice().some((item) => item === choosedType);
-  //   };
-
-  //   eventTypes.forEach((it) => {
-  //     it.addEventListener(`click`, () => {
-  //       chosedEventType = it.querySelector(`input`).value;
-  //       chosedEventType = chosedEventType.charAt(0).toUpperCase() + chosedEventType.substr(1);
-
-  //       const isRideTypeChosed = chooseEventType(transportEvents, chosedEventType);
-  //       const isStopTypeChosed = chooseEventType(stopEvents, chosedEventType);
-
-  //       if (isRideTypeChosed) {
-  //         icon = transportEvents[chosedEventType];
-  //         prefix = `to`;
-
-  //       } else if (isStopTypeChosed) {
-  //         icon = stopEvents[chosedEventType];
-  //         prefix = `in`;
-  //       }
-
-  //       // this._routeData = Object.assign({}, this._routeData, {
-  //       //   'travelType': chooseEventType,
-  //       //   'icon': icon,
-  //       //   'prefix': prefix
-  //       // });
-  //       this._travelType = chooseEventType;
-  //       this.rerender();
-  //       // handler(chosedEventType, icon, prefix);
-
-  //     });
-
-  //   });
-
-  // }
 
 
   _setFullDate(inputType, fullDate) {
@@ -264,71 +187,13 @@ export default class EventForm extends AbstractSmartComponent {
   }
 
   _subscribeOnEvents() {
-
-    // this.setFavoriteClickHandler((handler)=>{
-    //   this.getElement().querySelector(`#event-favorite-1`).addEventListener(`click`, handler);
-    // });
-    // const element = this.getElement();
-
-    // element.querySelector(`#event-favorite-1`).addEventListener(`click`, () => {
-    //   this._routeData.isFavorite = !this._routeData.isFavorite;
-    //   this.rerender();
-
-    // });
-
-
-    // this.setSubmitHandler((evt) => {
-    //   evt.preventDefault();
-    //   document.removeEventListener(`keydown`, this._onEscKeyDown);
-    // });
-
-    // this.setFavoriteClickHandler(() => {
-    //   const newData = Object.assign({}, this._routeData, {
-    //     isFavorite: !this._routeData.isFavorite
-    //   });
-    //   this._onDataChange(this._pointController, this._routeData, newData);
-    //   this._routeData = newData;
-
-    // });
-
-
-
-    // this.setRoutePointType((chosedEventType, chosedIcon) => {
-    //   const newData = Object.assign({}, this._routeData, {
-    //     travelType: chosedEventType,
-    //     icon: chosedIcon,
-    //     options: this._routeData.options
-    //   });
-    //   this._onDataChange(this._pointController, this._routeData, newData);
-    //   this._routeData = newData;
-
-    // });
-
-    // this.setEventDestinationHandler(() => {
-
-    //   let iputValue = this.getElement().querySelector(`#event-destination-1`).value;
-
-    //   const isDestinationExist = CITIES.some((it) => it === iputValue);
-
-    //   if (isDestinationExist) {
-
-    //     const newData = Object.assign({}, this._routeData, {
-    //       city: iputValue,
-    //       pictures: this._routeData.pictures,
-    //       description: this._routeData.description
-    //     });
-
-    //     this._onDataChange(this._pointController, this._routeData, newData);
-    //     this._routeData = newData;
-    //   }
-    // });
-
     const eventTypes = this.getElement().querySelectorAll(`.event__type-item`);
+    const favoriteButton = this.getElement().querySelector(`#event-favorite-1`);
+
     const transportEvents = ROUTE_POINTS_TYPES.ride;
     const stopEvents = ROUTE_POINTS_TYPES.stops;
     let chosedEventType = ``;
-    let icon = ``;
-    let prefix = ``;
+
 
     const chooseEventType = (eventsData, choosedType) => {
       return Array.from(Object.keys(eventsData)).slice().some((item) => item === choosedType);
@@ -343,52 +208,46 @@ export default class EventForm extends AbstractSmartComponent {
         const isStopTypeChosed = chooseEventType(stopEvents, chosedEventType);
 
         if (isRideTypeChosed) {
-          // icon = transportEvents[chosedEventType];
-          // prefix = `to`;
           this._icon = transportEvents[chosedEventType];
           this._prefix = `to`;
           this._travelType = chosedEventType;
 
         } else if (isStopTypeChosed) {
-          // icon = stopEvents[chosedEventType];
-          // prefix = `in`;
-          this._icon = transportEvents[chosedEventType];
+          this._icon = stopEvents[chosedEventType];
           this._prefix = `in`;
           this._travelType = chosedEventType;
         }
-
-        // this._routeData = Object.assign({}, this._routeData, {
-        //   'travelType': chooseEventType,
-        //   'icon': icon,
-        //   'prefix': prefix
-        // });
-        // this._travelType = chooseEventType;
         this.rerender();
-        // handler(chosedEventType, icon, prefix);
 
       });
 
     });
+    // console.log(`before`,this._isFavorite)
+    favoriteButton.addEventListener(`click`, ()=>{
+      this._isFavorite = !this._isFavorite;
+      this.rerender();
+    });
+    // console.log(`after`,this._isFavorite)
 
 
   }
 
-  resetForm(){
+  // resetForm(){
 
 
-  }
+  // }
 
   getTemplate() {
 
     // console.log(this._routeData, `getTemplate`)
 
-    const travelType = this._travelType;
-    const prefix = this._routeData.prefix;
+    // const travelType = this._travelType;
+    // const prefix = this._routeData.prefix;
     const destinationCity = this._routeData.city;
     const destinationDescription = this._routeData.description;
     const additionalOptions = this._routeData.options;
-    const isFavorite = this._routeData.isFavorite;
-    const isFavoriteChecked = isFavorite ? `checked` : ``;
+    // const isFavorite = this._routeData.isFavorite;
+    const isFavoriteChecked = this._isFavorite ? `checked` : ``;
 
 
     const eventOfferSelector = additionalOptions.map((it) => {
@@ -433,7 +292,7 @@ export default class EventForm extends AbstractSmartComponent {
       <div class="event__type-wrapper">
       <label class="event__type  event__type-btn" for="event-type-toggle-1">
         <span class="visually-hidden">Choose event type</span>
-        <img class="event__type-icon" width="17" height="17" src="${this._routeData.icon}" alt="Event type icon">
+        <img class="event__type-icon" width="17" height="17" src="${this._icon}" alt="Event type icon">
       </label>
       <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -452,7 +311,7 @@ export default class EventForm extends AbstractSmartComponent {
 
       <div class="event__field-group  event__field-group--destination">
       <label class="event__label  event__type-output" for="event-destination-1">
-      ${travelType} ${prefix}
+      ${this._travelType} ${this._prefix}
       </label>
       <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationCity}" list="destination-list-1">
       <datalist id="destination-list-1">
