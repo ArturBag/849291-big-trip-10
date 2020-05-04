@@ -1,7 +1,8 @@
-import EventForm from '../components/event-datails.js';
-import TripDays from '../components/trip-days.js';
+import EventForm from '../components/event-form.js';
+import TripDay from '../components/trip-day.js';
 import {render, replace, remove, RenderPosition} from '../utils/render.js';
-import { ROUTE_POINTS_TYPES, CITIES, ADDITIONAL_OPTIONS } from '../const.js';
+import {ROUTE_POINTS_TYPES} from '../const.js';
+
 
 export const Mode = {
   ADDING: `adding`,
@@ -10,41 +11,67 @@ export const Mode = {
 };
 
 
-
-export const EmptyPoint = {
-  'id': null,
-  'travelType': ``,
-  'icon': ``,
-  'prefix': ``,
-  'city': ``,
-  'pictures': [],
-  'description': ``,
-  'price': 0,
-  'options': [],
-  'isFavorite': false,
-  'dateFrom': null,
-  'dateTo': null
+const PICTURES_QTY = 5;
+const generatePictureURL = () => `http://picsum.photos/300/150?r=${Math.random()}`;
+const generatePictures = (count) => {
+  return new Array(count).fill(``)
+    .map(generatePictureURL);
 };
 
-// const defaulFormtData = {
-//   'id': 1,
-//   'travelType': `flight`,
-//   'eventTypeList': ROUTE_POINTS_TYPES,
-//   'icon': `img/icons/flight.png`,
-//   'prefix': `to`,
-//   'city': `Amsterdam`,
-//   'pictures': [`https://i.picsum.photos/id/257/300/150.jpg`, `https://i.picsum.photos/id/85/300/150.jpg`,
-//     `https://i.picsum.photos/id/257/300/150.jpg`, `https://i.picsum.photos/id/948/300/150.jpg`,
-//     `https://i.picsum.photos/id/1001/300/150.jpg`],
-//   'description': `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-//   'price': 0,
-//   'options': ADDITIONAL_OPTIONS,
-//   'isFavorite': false,
-//   'dateFrom': `2020-02-17T22:22:00.845Z`,
-//   'dateTo': `2020-07-24T20:36:00.375Z`
 
+export const EmptyPoint = {
+  'id': 0,
+  'travelType': `Flight`,
+  'eventTypeList': ROUTE_POINTS_TYPES,
+  'icon': `flight`,
+  'prefix': `to`,
+  'city': ``,
+  'pictures': generatePictures(PICTURES_QTY),
+  'description': ``,
+  'price': 0,
+  'options': [
 
-// }
+    {
+      'title': `Add luggage`,
+      'price': 10,
+      'isChecked': false,
+      'id': `event-offer-luggage-1`,
+      'name': `event-offer-luggage`
+    },
+    {
+      'title': `Switch to comfort class`,
+      'price': 150,
+      'isChecked': false,
+      'id': `event-offer-comfort-1`,
+      'name': `event-offer-comfort`
+    },
+    {
+      'title': `Add meal`,
+      'price': 2,
+      'isChecked': false,
+      'id': `event-offer-meal-1`,
+      'name': `event-offer-meal`
+    },
+    {
+      'title': `Choose seats`,
+      'price': 9,
+      'isChecked': false,
+      'id': `event-offer-seats-1`,
+      'name': `event-offer-seats`
+    },
+    {
+      'title': `Travel by train`,
+      'price': 40,
+      'isChecked': false,
+      'id': `event-offer-train-1`,
+      'name': `event-offer-train`
+    }
+  ],
+  'isFavorite': false,
+  'dateFrom': `2019-07-10T22:55:56.845Z`,
+  'dateTo': `2019-07-11T11:22:13.375Z`
+};
+
 
 export default class PointController {
   constructor(container, onDataChange, onViewChange) {
@@ -59,7 +86,8 @@ export default class PointController {
     this._tripDaysComponent = null;
     this._eventFormComponent = null;
 
-    // this._localRouteData = null;
+    this._formAction = Mode.ADDING;
+
   }
 
 
@@ -71,49 +99,20 @@ export default class PointController {
     const oldPointEditComponent = this._eventFormComponent;
     this._mode = mode;
 
-    // this._tripDaysComponent = new TripDays(route, routeIndex);
-    this._tripDaysComponent = new TripDays(route, routeIndex);
-
+    this._tripDaysComponent = new TripDay(route, routeIndex);
+    this._eventFormComponent = new EventForm(this, route, this._onDataChange, this._mode);
 
     this._tripDaysComponent.setClickHandler(() => {
-      // this._mode = Mode.EDIT;
-      // this.setDefaultView()
-      // this._eventFormComponent = new EventForm(this, route, this._onDataChange);
+      this._mode = Mode.EDIT;
+
       this._replacetripDaysToEventForm();
       document.addEventListener(`keydown`, this._onEscKeyDown);
 
     });
 
-    // this._eventFormComponent = new EventForm(this, route, this._onDataChange);
-    this._eventFormComponent = new EventForm(this, route, this._onDataChange);
 
     this._eventFormComponent.setCloseFormButtonClickHandler(() => {
-
-      if (oldPointEditComponent) {
-        replace(this._eventFormComponent, oldPointEditComponent);
-      }
       this._replaceEventFormToTripDays();
-
-    });
-
-    this._eventFormComponent.setSubmitHandler((evt) => {
-      // console.log(evt)
-      evt.preventDefault();
-      this._replaceEventFormToTripDays();
-    });
-
-
-    this._eventFormComponent.setEventDestinationHandler((iputValue) => {
-      const isDestinationExist = CITIES.some((it) => it === iputValue);
-
-      if (isDestinationExist) {
-
-        this._onDataChange(this, route, Object.assign({}, route, {
-          city: iputValue,
-          pictures: route.pictures,
-          description: route.description
-        }));
-      }
     });
 
 
@@ -122,49 +121,52 @@ export default class PointController {
     this._eventFormComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
       const data = this._eventFormComponent.getData();
-      this._onDataChange(this, route, data);
+      if (this._mode === `adding`) {
+        this._formAction = Mode.ADDING;
+        this._onDataChange(this, EmptyPoint, data);
+      } else {
+        this._formAction = Mode.EDIT;
+        this._onDataChange(this, route, data);
+      }
+
     });
 
-    if (oldPointComponent && oldPointEditComponent) {
-      replace(this._tripDaysComponent, oldPointComponent);
-      replace(this._eventFormComponent, oldPointEditComponent);
-    } else {
-      render(this._container, this._tripDaysComponent.getElement(), RenderPosition.BEFOREEND);
+    this._eventFormComponent.setFavoriteClickHandler(() => {
+
+      this._onDataChange(this, route, Object.assign({}, route, {
+        isFavorite: !route.isFavorite
+      }));
+    });
+
+
+    switch (this._mode) {
+      case Mode.DEFAULT:
+        if (oldPointComponent && oldPointEditComponent) {
+          replace(this._tripDaysComponent, oldPointComponent);
+          replace(this._eventFormComponent, oldPointEditComponent);
+
+          if (this._formAction === Mode.ADDING) {
+            render(this._container, this._tripDaysComponent.getElement(), RenderPosition.BEFOREEND);
+            remove(this._eventFormComponent);
+          } else {
+            this._replaceEventFormToTripDays();
+          }
+
+
+        } else {
+          render(this._container, this._tripDaysComponent.getElement(), RenderPosition.BEFOREEND);
+        }
+        break;
+      case Mode.ADDING:
+        if (oldPointComponent && oldPointEditComponent) {
+          remove(oldPointComponent);
+          remove(oldPointEditComponent);
+        }
+        document.addEventListener(`keydown`, this._onEscKeyDown);
+        render(this._container, this._eventFormComponent.getElement(), RenderPosition.AFTERBEGIN);
+        break;
     }
 
-
-    // this._eventFormComponent.setFavoriteClickHandler(() => {
-
-    //   // this._onDataChange(this, route, Object.assign({}, route, {
-    //   //   isFavorite: !route.isFavorite
-    //   // }));
-    // });
-
-
-    // this._eventFormComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, route, null));
-
-    // switch (mode) {
-    //   case Mode.DEFAULT:
-    //     if (oldPointEditComponent && oldPointComponent) {
-    //       replace(this._tripDaysComponent, oldPointComponent);
-    //       replace(this._eventFormComponent, oldPointEditComponent);
-    //       // this._replaceEditToTask();
-    //     } else {
-    //       render(this._container, this._tripDaysComponent.getElement(), RenderPosition.BEFOREEND);
-    //     }
-    //     break;
-    //   case Mode.ADDING:
-    //     if (oldPointEditComponent && oldPointComponent) {
-    //       remove(oldPointComponent);
-    //       remove(oldPointEditComponent);
-    //     }
-    //     // this.setDefaultView();
-    //     // console.log(this._eventFormComponent.getElement())
-    //     // console.log(`111`)
-    //     document.addEventListener(`keydown`, this._onEscKeyDown);
-    //     render(this._container, this._eventFormComponent, RenderPosition.AFTERBEGIN);
-    //     break;
-    // }
   }
 
   setDefaultView() {
@@ -196,18 +198,23 @@ export default class PointController {
 
     replace(this._eventFormComponent, this._tripDaysComponent);
     this._mode = Mode.EDIT;
+
   }
+
 
   _replaceEventFormToTripDays() {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
-    // this._eventFormComponent.reset();
-    replace(this._tripDaysComponent, this._eventFormComponent);
+
+    this._resetEditForm();
+
+    if (document.contains(this._eventFormComponent.getElement())) {
+      replace(this._tripDaysComponent, this._eventFormComponent);
+    }
     this._mode = Mode.DEFAULT;
-    // console.log(this._eventFormComponent.getElement());
   }
 
   _resetEditForm() {
-    this._eventFormComponent.getElement().reset();
+    this._eventFormComponent.resetFormToDefault();
   }
 
 }

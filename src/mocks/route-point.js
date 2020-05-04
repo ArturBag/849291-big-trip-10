@@ -57,14 +57,12 @@ const generateRoutePoint = () => {
   const getRandomType = () => {
 
     const randomTypeKey = Math.random() > 0.5 ? `ride` : `stops`;
-    const prefix = randomTypeKey === `ride` ? `to` : `in`;
     const randomTypeArray = Object.entries(ROUTE_POINTS_TYPES[randomTypeKey]);
     const randomTypeElement = randomTypeArray[getRandomIntegerNumber(0, randomTypeArray.length)];
 
     return {
       'travelType': randomTypeElement[0],
       'icon': randomTypeElement[1],
-      prefix
     };
   };
 
@@ -74,7 +72,6 @@ const generateRoutePoint = () => {
     'travelType': getRandomType().travelType,
     'eventTypeList': ROUTE_POINTS_TYPES,
     'icon': getRandomType().icon,
-    'prefix': getRandomType().prefix,
     'city': CITIES[getRandomIntegerNumber(0, CITIES.length)],
     'pictures': generatePictures(PICTURES_QTY),
     'description': getDescription(descriptionText),
@@ -84,6 +81,7 @@ const generateRoutePoint = () => {
     'dateFrom': `2020-${getRandomMonth()}-${getRandomDate()}T22:22:00.845Z`,
     'dateTo': `2020-${getRandomMonth()}-${getRandomDate()}T20:36:00.375Z`
   };
+
 };
 
 

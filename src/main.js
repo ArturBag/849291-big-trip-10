@@ -21,9 +21,6 @@ render(tripInfo, routeComponent.getElement(), RenderPosition.AFTERBEGIN);
 const menuComponent = new Menu();
 render(tripControlHeaders[0], menuComponent.getElement(), RenderPosition.AFTEREND);
 
-// Быстрое решение для подписки на клик по кнопке.
-// Это противоречит нашей архитектуре работы с DOM-элементами, но это временное решение.
-// Совсем скоро мы создадим полноценный компонент для работы с меню.
 header.querySelector(`.trip-main__event-add-btn`)
   .addEventListener(`click`, () => {
     tripControllerComponent.createPoint();

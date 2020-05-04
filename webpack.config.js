@@ -11,9 +11,10 @@ module.exports = {
   devtool: 'source-map',
   devServer: {
     contentBase: path.join(__dirname, 'public'),
-    open: true,
-    port: 1337,
-    watchContentBase: true
+    compress: true,
+    // port: 1337,
+    // publicPath: `http://localhost:8080/`,
+    watchContentBase: true,
   },
   module: {
     rules: [

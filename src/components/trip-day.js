@@ -1,26 +1,43 @@
-import AbstractComponent from './abstract-component.js';
-import { formatTime, formatDay, formatMonth, formatDate, getDurationTime } from '../utils/common.js';
+import AbstractSmartComponent from './abstract-smart-component.js';
+import {formatTime, formatDay, formatMonth, formatDate, getDurationTime, getPrefix} from '../utils/common.js';
 import moment from 'moment';
 
-export default class TripDays extends AbstractComponent {
+export default class TripDay extends AbstractSmartComponent {
   constructor(route, routeIndex) {
     super();
 
     this._route = route;
     this._routeIndex = routeIndex;
     this.getDurationTime = getDurationTime;
+
+    this._setClickHandler = null;
+  }
+
+  recoveryListeners() {
+    this.setClickHandler(this._setClickHandler);
+
+  }
+
+  rerender() {
+    super.rerender();
+
   }
 
   setClickHandler(handler) {
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
+
+    this._setClickHandler = handler;
   }
 
 
   getTemplate() {
 
-    const { travelType, icon, prefix, city, price, options, dateFrom, dateTo } = this._route;
-// console.log(travelType,`from TripDays`);
+    const {travelType, icon, city, price, options, dateFrom, dateTo} = this._route;
+
+
     const durationTime = this.getDurationTime(dateFrom, dateTo);
+
+    const prefix = getPrefix(this._route.travelType);
 
     const startDate = formatDate(dateFrom);
 
@@ -35,7 +52,8 @@ export default class TripDays extends AbstractComponent {
     const startTime = formatTime(dateFrom);
     const endTime = formatTime(dateTo);
 
-    const dayCounter = this._routeIndex + 1;
+    const dayCounter = this._routeIndex;
+
 
     const eventDurationDays = `${durationTime.eventDurationDays}D`;
     const eventDuartionHours = `${durationTime.eventDuartionHours}H`;
@@ -43,6 +61,7 @@ export default class TripDays extends AbstractComponent {
 
     const eventDurationTime = `${eventDurationDays} ${eventDuartionHours} ${eventDuartionMinutes}`;
     let optionsInfo = ``;
+
     if (options.length) {
 
       optionsInfo = options.map((it) => {
@@ -65,7 +84,7 @@ export default class TripDays extends AbstractComponent {
         <li class="trip-events__item">
           <div class="event">
             <div class="event__type">
-              <img class="event__type-icon" width="42" height="42" src="${icon}" alt="Event type icon">
+              <img class="event__type-icon" width="42" height="42" src="img/icons/${icon}.png" alt="Event type icon">
             </div>
             <h3 class="event__title">${travelType} ${prefix} ${city}</h3>
 

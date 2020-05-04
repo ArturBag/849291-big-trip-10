@@ -9,7 +9,7 @@ import AbstractSmartComponent from './abstract-smart-component.js';
 
 
 export default class AddPointForm extends AbstractSmartComponent {
-  constructor(pointController, route, onDataChange) {
+  constructor(emptyPoint, onDataChange) {
 
     super();
 
