@@ -6,7 +6,7 @@ import {generateRoutePoints} from './mocks/route-point.js';
 import {generateEventDetailsData} from './mocks/edit-event-details.js';
 import {RenderPosition, render} from './utils/render.js';
 
-const ROUTES_QTY = 5;
+const ROUTES_QTY = 11;
 
 const header = document.querySelector(`.page-header`);
 const tripInfo = header.querySelector(`.trip-main__trip-info`);
@@ -27,7 +27,7 @@ render(tripControlHeaders[1], filtersComponent.getElement(), RenderPosition.AFTE
 const tripEvents = document.querySelector(`.trip-events`);
 
 const eventDetailsData = generateEventDetailsData(routeData);
-
+// console.log(eventDetailsData)
 
 const tripControllerComponent = new TripController(tripEvents);
 

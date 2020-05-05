@@ -1,11 +1,45 @@
 import NoRoutePoints from '../components/no-route-points.js';
 import Sorting from '../components/sorting.js';
-import EventForm from '../components/event-datails.js';
+import EventForm from '../components/event-form.js';
 import TripDaysList from '../components/trip-days-list.js';
-import TripDays from '../components/trip-days.js';
+import TripDay from '../components/trip-day.js';
 import {render, replace, RenderPosition} from '../utils/render.js';
 
-const renderRoutePoint = (tripDaysListComponent, eventDetailsData, route, routeIndex) => {
+const getDates = (events)=>{
+  const set = new Set();
+  events.forEach((evt)=> set.add(JSON.stringify(
+      {
+        day: evt.startDate.getDate(),
+        month: evt.startDate.getMonth()
+        // month: months[evt.startDate.getMonth()]
+
+      }
+  )));
+  return Array.from(set).map((evt) => JSON.parse(evt));
+
+};
+
+const getDefaultEvents = (routeData) => {
+  const dates = getDates(routeData);
+  let newData = [];
+
+  dates.forEach((date) => {
+    const dayEvents = routeData
+  .filter((event)=> event.startDate.getDate() === date.day)
+  .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+    dayEvents[0].date = date;
+    newData = [...newData, ...dayEvents]
+
+  });
+
+  return newData;
+
+};
+
+
+
+const renderTripPoints = (tripDaysListComponent, eventDetailsData, route, routeIndex ) => {
 
   const onEscKeyDown = (evt) => {
 
@@ -24,7 +58,7 @@ const renderRoutePoint = (tripDaysListComponent, eventDetailsData, route, routeI
     replace(tripDaysComponent, eventFormComponent);
   };
 
-  const tripDaysComponent = new TripDays(route, routeIndex);
+  const tripDaysComponent = new TripDay(route, routeIndex);
   tripDaysComponent.setClickHandler(() => {
     replacetripDaysToEventForm();
     document.addEventListener(`keydown`, onEscKeyDown);
@@ -42,6 +76,7 @@ const renderRoutePoint = (tripDaysListComponent, eventDetailsData, route, routeI
 };
 
 
+
 export default class TripController {
   constructor(container) {
     this._container = container;
@@ -49,10 +84,12 @@ export default class TripController {
     this._sorting = new Sorting();
     this._eventForm = new EventForm();
     this._tripDaysList = new TripDaysList();
-    this._tripDays = new TripDays();
+    this._tripDay = new TripDay();
   }
 
   render(routeData, eventDetailsData) {
+
+    const data = getDefaultEvents(routeData);
 
     const container = this._container;
     const tripDaysListElement = this._tripDaysList.getElement();
@@ -61,7 +98,7 @@ export default class TripController {
 
     let isExpensesCalculated = false;
 
-    if (!routeData.length) {
+    if (!data.length) {
       render(container, noRoutePointsNode, RenderPosition.BEFOREEND);
       isExpensesCalculated = false;
     } else {
@@ -70,8 +107,8 @@ export default class TripController {
       isExpensesCalculated = true;
     }
 
-    routeData.map((route, routeIndex) => {
-      renderRoutePoint(this._tripDaysList, eventDetailsData, route, routeIndex);
+    data.map((route, routeIndex) => {
+      renderTripPoints(this._tripDaysList, eventDetailsData, route, routeIndex);
     });
 
     if (isExpensesCalculated) {

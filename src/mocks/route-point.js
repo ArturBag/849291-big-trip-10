@@ -35,35 +35,48 @@ const getDescription = (text) => {
   return description;
 };
 
-const getRandomDate = () => {
-  const randomStartHours = getRandomIntegerNumber(1, hoursQty);
-  const randomStartMinutes = getRandomIntegerNumber(1, minutesQty);
-  const startTimeHours = randomStartHours < 10 ? `0` + randomStartHours : randomStartHours;
-  const startTimeMinutes = randomStartMinutes < 10 ? `0` + `${randomStartMinutes}` : randomStartMinutes;
-  const startTime = `${startTimeHours}:${startTimeMinutes}`;
+// const getRandomDate = () => {
+//   const randomStartHours = getRandomIntegerNumber(1, hoursQty);
+//   const randomStartMinutes = getRandomIntegerNumber(1, minutesQty);
+//   const startTimeHours = randomStartHours < 10 ? `0` + randomStartHours : randomStartHours;
+//   const startTimeMinutes = randomStartMinutes < 10 ? `0` + `${randomStartMinutes}` : randomStartMinutes;
+//   const startTime = `${startTimeHours}:${startTimeMinutes}`;
 
-  const randomEndHours = getRandomIntegerNumber(parseInt(startTimeHours, 10), hoursQty);
-  const randomEndMinutes = getRandomIntegerNumber(1, minutesQty);
-  const endTimeHours = randomEndHours < 10 ? `0` + randomEndHours : randomEndHours;
-  const endTimeMinutes = randomEndMinutes < 10 ? `0` + `${randomEndMinutes}` : randomEndMinutes;
-  const endTime = `${endTimeHours}:${endTimeMinutes}`;
+//   const randomEndHours = getRandomIntegerNumber(parseInt(startTimeHours, 10), hoursQty);
+//   const randomEndMinutes = getRandomIntegerNumber(1, minutesQty);
+//   const endTimeHours = randomEndHours < 10 ? `0` + randomEndHours : randomEndHours;
+//   const endTimeMinutes = randomEndMinutes < 10 ? `0` + `${randomEndMinutes}` : randomEndMinutes;
+//   const endTime = `${endTimeHours}:${endTimeMinutes}`;
 
-  let eventDurationHours = endTimeHours - startTimeHours;
-  eventDurationHours = eventDurationHours < 0 ? 24 + eventDurationHours : eventDurationHours;
+//   let eventDurationHours = endTimeHours - startTimeHours;
+//   eventDurationHours = eventDurationHours < 0 ? 24 + eventDurationHours : eventDurationHours;
 
-  let eventDurationMinutes = endTimeMinutes - startTimeMinutes;
-  eventDurationMinutes = eventDurationMinutes < 0 ? minutesQty + eventDurationMinutes : eventDurationMinutes;
+//   let eventDurationMinutes = endTimeMinutes - startTimeMinutes;
+//   eventDurationMinutes = eventDurationMinutes < 0 ? minutesQty + eventDurationMinutes : eventDurationMinutes;
 
-  const eventDurationTime = `${eventDurationHours + `H`} ${eventDurationMinutes + `M`}`;
+//   const eventDurationTime = `${eventDurationHours + `H`} ${eventDurationMinutes + `M`}`;
 
-  return {
-    'year': new Date().getFullYear(),
-    'month': MONTH_NAMES[getRandomIntegerNumber(0, MONTH_NAMES.length)],
-    'day': getRandomIntegerNumber(1, monthDaysQty),
-    startTime,
-    endTime,
-    eventDurationTime
-  };
+//   return {
+//     'year': new Date().getFullYear(),
+//     'month': MONTH_NAMES[getRandomIntegerNumber(0, MONTH_NAMES.length)],
+//     'day': getRandomIntegerNumber(1, monthDaysQty),
+//     startTime,
+//     endTime,
+//     eventDurationTime
+//   };
+// };
+
+const getRandomDate = (date)=> {
+
+  const result = new Date(date);
+  const diffDays = getRandomIntegerNumber(0, 3);
+  const diffMinutes = getRandomIntegerNumber(0, 120);
+
+  result.setDate(result.getDate() + diffDays);
+  result.setMinutes(result.getMinutes() + diffMinutes);
+
+  return result;
+
 };
 
 
@@ -77,26 +90,30 @@ const generateRoutePoint = () => {
   }
 
   const getRandomType = () => {
+
     const randomTypeKey = Math.random() > 0.5 ? `ride` : `stops`;
-    const prefix = randomTypeKey === `ride` ? `to` : `in`;
     const randomTypeArray = Object.entries(ROUTE_POINTS_TYPES[randomTypeKey]);
     const randomTypeElement = randomTypeArray[getRandomIntegerNumber(0, randomTypeArray.length)];
-
 
     return {
       'travelType': randomTypeElement[0],
       'icon': randomTypeElement[1],
-      prefix
     };
   };
 
+  const startDate = getRandomDate(new Date());
+
+
   return {
-    'type': getRandomType(),
+    // 'type': getRandomType(),
+    'travelType': getRandomType().travelType ,
+    'icon': getRandomType().icon,
     'city': CITIES[getRandomIntegerNumber(0, CITIES.length)],
     'pictures': generatePictures(PICTURES_QTY),
     'description': getDescription(descriptionText),
     'price': getRandomIntegerNumber(10, 1000),
-    'date': getRandomDate(),
+    startDate,
+    'endDate': getRandomDate(startDate),
     'options': optionsInfo
   };
 };

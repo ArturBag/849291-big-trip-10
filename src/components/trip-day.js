@@ -1,6 +1,7 @@
 import AbstractComponent from './abstract-component.js';
+import {getPrefix, getFormattedTime, getTimeDiff} from '../utils/common.js';
 
-export default class TripDays extends AbstractComponent {
+export default class TripDay extends AbstractComponent {
   constructor(route, routeIndex) {
     super();
 
@@ -14,22 +15,27 @@ export default class TripDays extends AbstractComponent {
 
   getTemplate() {
 
-    const {type, city, price, date, options} = this._route;
+    const {travelType, icon, city, price, date, options, startDate, endDate} = this._route;
 
-    const dayCounter = this._routeIndex + 1;
+    const dayCounter = date ? this._routeIndex + 1 : 0;
 
-    const travelType = type.travelType;
-    const iconSrc = type.icon;
-    const prefix = type.prefix;
+    // const travelType = type.travelType;
+    // const iconSrc = type.icon;
+    const prefix = getPrefix(this._route.travelType);
 
-    const dayInfo = date.day;
-    const monthInfo = date.month.slice(0, 3).toUpperCase();
-    const dateInfo = `${dayInfo} ${monthInfo}`;
+    // const dayInfo = date.day;
+    // const monthInfo = date.month.slice(0, 3).toUpperCase();
+    // const dateInfo = `${dayInfo} ${monthInfo}`;
 
-    const startTime = date.startTime;
-    const endTime = date.endTime;
+    const startTime = getFormattedTime(startDate, date);
+    const endTime = getFormattedTime(endDate, date);
 
-    const eventDurationTime = date.eventDurationTime;
+    // const startDateDuration = getTimeDiff(startTime);
+    // const endDateDuration = getTimeDiff(endTime);
+
+    const duration = getTimeDiff(endTime);
+    // const eventDurationTime = date.eventDurationTime;
+
 
     const optionsInfo = options.map((it) => {
 
@@ -42,15 +48,17 @@ export default class TripDays extends AbstractComponent {
 
     return `<li class="trip-days__item  day">
      <div class="day__info">
-     <span class="day__counter">${dayCounter}</span>
-       <time class="day__date" datetime="2019-03-18">${dateInfo}</time>
+     ${date ?
+    `<span class="day__counter">${dayCounter}</span>
+      <time class="day__date" datetime="2019-03-18">${date.month} ${date.day}</time>` : ``
+}
      </div>
 
       <ul class="trip-events__list">
         <li class="trip-events__item">
           <div class="event">
             <div class="event__type">
-              <img class="event__type-icon" width="42" height="42" src="${iconSrc}" alt="Event type icon">
+              <img class="event__type-icon" width="42" height="42" src="${icon}" alt="Event type icon">
             </div>
             <h3 class="event__title">${travelType} ${prefix} ${city}</h3>
 
@@ -60,7 +68,7 @@ export default class TripDays extends AbstractComponent {
                 &mdash;
                 <time class="event__end-time" datetime="2019-03-18T11:00">${endTime}</time>
               </p>
-              <p class="event__duration">${eventDurationTime}</p>
+              <p class="event__duration">${duration}</p>
             </div>
 
             <p class="event__price">
