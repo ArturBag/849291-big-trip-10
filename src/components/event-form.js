@@ -1,10 +1,10 @@
 import AbstractComponent from './abstract-component.js';
 
 export default class EventForm extends AbstractComponent {
-  constructor(eventDetailsData) {
+  constructor(route) {
     super();
 
-    this._eventDetailsData = eventDetailsData;
+    this._routeData = route;
   }
 
   setSubmitHandler(handler) {
@@ -13,10 +13,9 @@ export default class EventForm extends AbstractComponent {
 
   getTemplate() {
 
-    const eventData = this._eventDetailsData;
 
-    const destinationDescription = eventData.description;
-    const additionalOptions = eventData.options;
+    const destinationDescription = this._routeData.description;
+    const additionalOptions = this._routeData.options;
 
 
     const eventOfferSelector = additionalOptions.map((it) => {
@@ -33,7 +32,7 @@ export default class EventForm extends AbstractComponent {
       </div>`;
     }).join(``);
 
-    const imageTemplate = eventData.pictures.map((it) => {
+    const imageTemplate = this._routeData.pictures.map((it) => {
       return `<img class="event__photo" src="${it}" alt="Event photo">`;
     }).join(``);
 

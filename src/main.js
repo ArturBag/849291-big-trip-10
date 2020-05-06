@@ -2,8 +2,8 @@ import Route from './components/route.js';
 import Menu from './components/menu.js';
 import Filters from './components/filters.js';
 import TripController from './controllers/trip-controller.js';
+import PointsModel from './models/points.js';
 import {generateRoutePoints} from './mocks/route-point.js';
-import {generateEventDetailsData} from './mocks/edit-event-details.js';
 import {RenderPosition, render} from './utils/render.js';
 
 const ROUTES_QTY = 11;
@@ -24,13 +24,14 @@ render(tripControlHeaders[0], menuComponent.getElement(), RenderPosition.AFTEREN
 const filtersComponent = new Filters();
 render(tripControlHeaders[1], filtersComponent.getElement(), RenderPosition.AFTEREND);
 
-const tripEvents = document.querySelector(`.trip-events`);
+const tripEventsContainer = document.querySelector(`.trip-events`);
 
-const eventDetailsData = generateEventDetailsData(routeData);
-// console.log(eventDetailsData)
+const pointsModel = new PointsModel();
+pointsModel.setPoints(routeData);
 
-const tripControllerComponent = new TripController(tripEvents);
 
-tripControllerComponent.render(routeData, eventDetailsData);
+const tripControllerComponent = new TripController(tripEventsContainer, pointsModel);
+
+tripControllerComponent.render(routeData);
 
 

@@ -35,3 +35,8 @@ export const getTimeDiff = (time) => {
   const minutes = duration.minutes();
   return `${days > 0 ? days + `D` : ``} ${hours > 0 ? hours + `H` : ``} ${minutes > 0 ? minutes + `M` : ``}`;
 };
+
+export const getDuartionInMiliseconds = (date) => {
+
+  return moment.duration(date).milliseconds();
+}

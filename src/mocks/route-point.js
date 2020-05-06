@@ -1,4 +1,4 @@
-import {ROUTE_POINTS_TYPES, CITIES, MONTH_NAMES, ADDITIONAL_OPTIONS} from '../const.js';
+import {ROUTE_POINTS_TYPES, CITIES, ADDITIONAL_OPTIONS} from '../const.js';
 
 
 const descriptionText = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -10,10 +10,8 @@ purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue conval
 Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.`;
 
 const PICTURES_QTY = 5;
-const monthDaysQty = 31;
 const generatePictureURL = () => `http://picsum.photos/300/150?r=${Math.random()}`;
-const minutesQty = 60;
-const hoursQty = 23;
+
 
 const generatePictures = (count) => {
   return new Array(count).fill(``)
@@ -35,36 +33,6 @@ const getDescription = (text) => {
   return description;
 };
 
-// const getRandomDate = () => {
-//   const randomStartHours = getRandomIntegerNumber(1, hoursQty);
-//   const randomStartMinutes = getRandomIntegerNumber(1, minutesQty);
-//   const startTimeHours = randomStartHours < 10 ? `0` + randomStartHours : randomStartHours;
-//   const startTimeMinutes = randomStartMinutes < 10 ? `0` + `${randomStartMinutes}` : randomStartMinutes;
-//   const startTime = `${startTimeHours}:${startTimeMinutes}`;
-
-//   const randomEndHours = getRandomIntegerNumber(parseInt(startTimeHours, 10), hoursQty);
-//   const randomEndMinutes = getRandomIntegerNumber(1, minutesQty);
-//   const endTimeHours = randomEndHours < 10 ? `0` + randomEndHours : randomEndHours;
-//   const endTimeMinutes = randomEndMinutes < 10 ? `0` + `${randomEndMinutes}` : randomEndMinutes;
-//   const endTime = `${endTimeHours}:${endTimeMinutes}`;
-
-//   let eventDurationHours = endTimeHours - startTimeHours;
-//   eventDurationHours = eventDurationHours < 0 ? 24 + eventDurationHours : eventDurationHours;
-
-//   let eventDurationMinutes = endTimeMinutes - startTimeMinutes;
-//   eventDurationMinutes = eventDurationMinutes < 0 ? minutesQty + eventDurationMinutes : eventDurationMinutes;
-
-//   const eventDurationTime = `${eventDurationHours + `H`} ${eventDurationMinutes + `M`}`;
-
-//   return {
-//     'year': new Date().getFullYear(),
-//     'month': MONTH_NAMES[getRandomIntegerNumber(0, MONTH_NAMES.length)],
-//     'day': getRandomIntegerNumber(1, monthDaysQty),
-//     startTime,
-//     endTime,
-//     eventDurationTime
-//   };
-// };
 
 const getRandomDate = (date)=> {
 
@@ -105,8 +73,7 @@ const generateRoutePoint = () => {
 
 
   return {
-    // 'type': getRandomType(),
-    'travelType': getRandomType().travelType ,
+    'travelType': getRandomType().travelType,
     'icon': getRandomType().icon,
     'city': CITIES[getRandomIntegerNumber(0, CITIES.length)],
     'pictures': generatePictures(PICTURES_QTY),

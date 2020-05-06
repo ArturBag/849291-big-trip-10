@@ -90,20 +90,18 @@ export const MENU_ITEMS = [
   }
 ];
 
-export const FILTER_ITEMS = [
-  {
-    'filterName': `Everything`,
-    'id': `filter-everything`,
+export const filterTypes = {
+
+  'filter-everything': {
+    'name': `Everything`,
     'isChecked': true
   },
-  {
-    'filterName': `Future`,
-    'id': `filter-future`,
+  'filter-future': {
+    'name': `Future`,
     'isChecked': false
   },
-  {
-    'filterName': `Past`,
-    'id': `filter-past`,
+  'filter-past': {
+    'name': `Past`,
     'isChecked': false
-  },
-];
+  }
+};

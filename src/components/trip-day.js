@@ -19,32 +19,26 @@ export default class TripDay extends AbstractComponent {
 
     const dayCounter = date ? this._routeIndex + 1 : 0;
 
-    // const travelType = type.travelType;
-    // const iconSrc = type.icon;
     const prefix = getPrefix(this._route.travelType);
 
-    // const dayInfo = date.day;
-    // const monthInfo = date.month.slice(0, 3).toUpperCase();
-    // const dateInfo = `${dayInfo} ${monthInfo}`;
-
-    const startTime = getFormattedTime(startDate, date);
-    const endTime = getFormattedTime(endDate, date);
-
-    // const startDateDuration = getTimeDiff(startTime);
-    // const endDateDuration = getTimeDiff(endTime);
+    const startTime = getFormattedTime(startDate);
+    const endTime = getFormattedTime(endDate);
 
     const duration = getTimeDiff(endTime);
-    // const eventDurationTime = date.eventDurationTime;
 
+    let optionsInfo = ``;
 
-    const optionsInfo = options.map((it) => {
+    if (options.length) {
 
-      return `<li class="event__offer">
-        <span class="event__offer-title">${it.title}</span>
-        &plus;
-        &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
-       </li>`;
-    }).join(``);
+      optionsInfo = options.map((it) => {
+
+        return `<li class="event__offer">
+          <span class="event__offer-title">${it.title}</span>
+          &plus;
+          &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
+         </li>`;
+      }).join(``);
+    }
 
     return `<li class="trip-days__item  day">
      <div class="day__info">

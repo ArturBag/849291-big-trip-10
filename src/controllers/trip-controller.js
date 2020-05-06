@@ -1,11 +1,11 @@
 import NoRoutePoints from '../components/no-route-points.js';
-import Sorting from '../components/sorting.js';
-import EventForm from '../components/event-form.js';
+import Sorting, {SortType} from '../components/sorting.js';
+import PointController from './point-controller.js';
 import TripDaysList from '../components/trip-days-list.js';
-import TripDay from '../components/trip-day.js';
 import {render, replace, RenderPosition} from '../utils/render.js';
+// import {getDuartionInMiliseconds} from '../utils/common.js';
 
-const getDates = (events)=>{
+const getDates = (events)=> {
   const set = new Set();
   events.forEach((evt)=> set.add(JSON.stringify(
       {
@@ -38,94 +38,99 @@ const getDefaultEvents = (routeData) => {
 };
 
 
+const renderTripPoints = (tripDaysListComponent, routeData) => {
 
-const renderTripPoints = (tripDaysListComponent, eventDetailsData, route, routeIndex ) => {
+  return routeData.map((route, routeIndex) => {
 
-  const onEscKeyDown = (evt) => {
+    const pointController = new PointController(tripDaysListComponent);
+    pointController.render(route, routeIndex);
+    return pointController;
 
-    const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
-    if (isEscKey) {
-      replaceEventFormToTripDays();
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    }
-  };
-
-  const replacetripDaysToEventForm = () => {
-    replace(eventFormComponent, tripDaysComponent);
-  };
-
-  const replaceEventFormToTripDays = () => {
-    replace(tripDaysComponent, eventFormComponent);
-  };
-
-  const tripDaysComponent = new TripDay(route, routeIndex);
-  tripDaysComponent.setClickHandler(() => {
-    replacetripDaysToEventForm();
-    document.addEventListener(`keydown`, onEscKeyDown);
   });
 
-  const eventFormComponent = new EventForm(eventDetailsData);
-
-  eventFormComponent.setSubmitHandler(() => {
-    replaceEventFormToTripDays();
-    document.removeEventListener(`keydown`, onEscKeyDown);
-  });
-
-
-  render(tripDaysListComponent.getElement(), tripDaysComponent.getElement(), RenderPosition.BEFOREEND);
 };
 
 
-
 export default class TripController {
-  constructor(container) {
+  constructor(container, pointsModel) {
+
+    this._pointsModel = pointsModel;
+
     this._container = container;
+
     this._noRoutePoints = new NoRoutePoints();
     this._sorting = new Sorting();
-    this._eventForm = new EventForm();
     this._tripDaysList = new TripDaysList();
-    this._tripDay = new TripDay();
+
+    this._onSortTypeChange = this._onSortTypeChange.bind(this);
+    this._sorting.sortTypeChangeHandler(this._onSortTypeChange);
+
+    this._activeSortType = SortType.EVENT;
   }
 
-  render(routeData, eventDetailsData) {
+  render(routeData) {
 
-    const data = getDefaultEvents(routeData);
+    const pointsData = getDefaultEvents(routeData);
 
     const container = this._container;
     const tripDaysListElement = this._tripDaysList.getElement();
     const sortingList = this._sorting.getElement();
     const noRoutePointsNode = this._noRoutePoints.getElement();
 
-    let isExpensesCalculated = false;
 
-    if (!data.length) {
+    if (!pointsData.length) {
       render(container, noRoutePointsNode, RenderPosition.BEFOREEND);
-      isExpensesCalculated = false;
+
     } else {
       render(container.children[0], sortingList, RenderPosition.AFTEREND);
       render(sortingList, tripDaysListElement, RenderPosition.AFTEREND);
-      isExpensesCalculated = true;
-    }
-
-    data.map((route, routeIndex) => {
-      renderTripPoints(this._tripDaysList, eventDetailsData, route, routeIndex);
-    });
-
-    if (isExpensesCalculated) {
-      const pricesData = document.querySelectorAll(`.event__price-value`);
-
-      const calculateFullTripExpenses = (pricesInfo) => {
-
-        const priceOutput = document.querySelector(`.trip-info__cost-value`);
-        const totalTriPrices = Array.from(pricesInfo).map((it) => parseInt(it.textContent, 10));
-
-        priceOutput.textContent = totalTriPrices.reduce((result, currentVal) => result + currentVal);
-
-      };
-
-      calculateFullTripExpenses(pricesData);
 
     }
+
+    const newTripPoints = renderTripPoints(tripDaysListElement, pointsData, this._onDataChange, this._onViewChange);
+
+    this._showedPointControllers = newTripPoints;
+
   }
+
+
+  _onSortTypeChange(sortType) {
+    const tripDaysListElement = this._tripDaysList.getElement();
+
+    this._activeSortType = sortType;
+
+    let sortedData = [];
+    const pointsData = this._pointsModel.getPoints();
+
+
+    switch (sortType) {
+
+      case SortType.EVENT:
+
+        sortedData = getDefaultEvents(pointsData.slice());
+
+        break;
+      case SortType.TIME:
+
+        sortedData = pointsData.slice().sort((a, b) => {
+
+          const DateA = a.endDate.getMilliseconds() - a.startDate.getMilliseconds();
+          const DateB = b.endDate.getMilliseconds() - b.startDate.getMilliseconds();
+          // console.log(DateA, DateB)
+          return DateB - DateA;
+
+        });
+
+        break;
+      case SortType.PRICE:
+        sortedData = pointsData.slice().sort((a, b) => b.price - a.price);
+        break;
+    }
+
+    tripDaysListElement.innerHTML = ``;
+    const newTripPoints = renderTripPoints(tripDaysListElement, sortedData);
+    this._showedPointControllers = newTripPoints;
+  }
+
 
 }
