@@ -19,9 +19,11 @@ const getDates = (events)=> {
 
 };
 
-const getDefaultEvents = (routeData) => {
-  const dates = getDates(routeData);
+const getDefaultEvents = (data) => {
   let newData = [];
+  const routeData = data.map((it) => Object.assign({}, it));
+  const dates = getDates(routeData);
+
 
   dates.forEach((date) => {
     const dayEvents = routeData
@@ -95,40 +97,31 @@ export default class TripController {
 
 
   _onSortTypeChange(sortType) {
-    const tripDaysListElement = this._tripDaysList.getElement();
 
+    const tripDaysListElement = this._tripDaysList.getElement();
     this._activeSortType = sortType;
 
-    let sortedData = [];
-    const pointsData = this._pointsModel.getPoints();
+    let pointsData = this._pointsModel.getPoints();
 
 
     switch (sortType) {
 
       case SortType.EVENT:
 
-        sortedData = getDefaultEvents(pointsData.slice());
-
+        pointsData = getDefaultEvents(pointsData.slice());
         break;
       case SortType.TIME:
 
-        sortedData = pointsData.slice().sort((a, b) => {
-
-          const DateA = a.endDate.getMilliseconds() - a.startDate.getMilliseconds();
-          const DateB = b.endDate.getMilliseconds() - b.startDate.getMilliseconds();
-          // console.log(DateA, DateB)
-          return DateB - DateA;
-
-        });
-
+        pointsData.sort((a, b) => (b.endDate - b.startDate) - (a.endDate - a.startDate));
         break;
       case SortType.PRICE:
-        sortedData = pointsData.slice().sort((a, b) => b.price - a.price);
+
+        pointsData.sort((a, b) => b.price - a.price);
         break;
     }
 
     tripDaysListElement.innerHTML = ``;
-    const newTripPoints = renderTripPoints(tripDaysListElement, sortedData);
+    const newTripPoints = renderTripPoints(tripDaysListElement, pointsData);
     this._showedPointControllers = newTripPoints;
   }
 

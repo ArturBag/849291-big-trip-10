@@ -24,7 +24,7 @@ export default class TripDay extends AbstractComponent {
     const startTime = getFormattedTime(startDate);
     const endTime = getFormattedTime(endDate);
 
-    const duration = getTimeDiff(endTime);
+    const duration = getTimeDiff(endDate - startDate);
 
     let optionsInfo = ``;
 
