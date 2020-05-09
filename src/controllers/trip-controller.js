@@ -11,15 +11,13 @@ const getDates = (events)=> {
       {
         day: evt.startDate.getDate(),
         month: evt.startDate.getMonth()
-        // month: months[evt.startDate.getMonth()]
-
       }
   )));
   return Array.from(set).map((evt) => JSON.parse(evt));
 
 };
 
-const getDefaultEvents = (data) => {
+export const getDefaultEvents = (data) => {
   let newData = [];
   const routeData = data.map((it) => Object.assign({}, it));
   const dates = getDates(routeData);
@@ -65,9 +63,13 @@ export default class TripController {
     this._tripDaysList = new TripDaysList();
 
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
-    this._sorting.sortTypeChangeHandler(this._onSortTypeChange);
+    this._onFilterChange = this._onFilterChange.bind(this);
 
     this._activeSortType = SortType.EVENT;
+
+    this._sorting.sortTypeChangeHandler(this._onSortTypeChange);
+    this._pointsModel.setFilterChangeHandler(this._onFilterChange);
+
   }
 
   render(routeData) {
@@ -93,6 +95,24 @@ export default class TripController {
 
     this._showedPointControllers = newTripPoints;
 
+  }
+
+  _removePoints() {
+    this._showedPointControllers.forEach((pointController) => pointController.destroy());
+    this._showedPointControllers = [];
+  }
+
+  _renderPoints(points) {
+    const tripDaysListElement = this._tripDaysList.getElement();
+    const newTripPoints = renderTripPoints(tripDaysListElement, points, this._onDataChange, this._onViewChange);
+    this._showedPointControllers = this._showedPointControllers.concat(newTripPoints);
+
+  }
+
+  _updatePoints() {
+    this._removePoints();
+
+    this._renderPoints(this._pointsModel.getPoints().slice());
   }
 
 
@@ -123,6 +143,11 @@ export default class TripController {
     tripDaysListElement.innerHTML = ``;
     const newTripPoints = renderTripPoints(tripDaysListElement, pointsData);
     this._showedPointControllers = newTripPoints;
+  }
+
+  _onFilterChange() {
+    this._updatePoints();
+    this._onSortTypeChange(this._activeSortType);
   }
 
 

@@ -44,8 +44,6 @@ export default class PointController {
 
   }
 
-
-
   _onEscKeyDown(evt) {
     const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
 
@@ -54,6 +52,12 @@ export default class PointController {
       this._replaceEventFormToTripDays();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     }
+  }
+
+  destroy() {
+    remove(this._eventFormComponent);
+    remove(this._tripDaysComponent);
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
   _replacetripDaysToEventForm() {
