@@ -3,10 +3,12 @@ import {getPrefix, getFormattedTime, getTimeDiff} from '../utils/common.js';
 
 export default class TripDay extends AbstractComponent {
   constructor(route, routeIndex) {
+
     super();
 
     this._route = route;
     this._routeIndex = routeIndex;
+
   }
 
   setClickHandler(handler) {
@@ -19,7 +21,7 @@ export default class TripDay extends AbstractComponent {
 
     const dayCounter = date ? this._routeIndex + 1 : 0;
 
-    const prefix = getPrefix(this._route.travelType);
+    const prefix = getPrefix(travelType);
 
     const startTime = getFormattedTime(startDate);
     const endTime = getFormattedTime(endDate);

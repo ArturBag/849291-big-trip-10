@@ -16,6 +16,7 @@ const tripControlHeaders = header.querySelectorAll(`.trip-main__trip-controls h2
 
 const routeData = generateRoutePoints(ROUTES_QTY);
 
+
 const routeComponent = new Route(routeData);
 render(tripInfo, routeComponent.getElement(), RenderPosition.AFTERBEGIN);
 

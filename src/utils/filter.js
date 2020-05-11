@@ -1,5 +1,4 @@
 import {filterTypes} from '../const.js';
-import {getDefaultEvents} from '../controllers/trip-controller.js';
 import moment from 'moment';
 
 
@@ -31,7 +30,6 @@ export const getPointsByFilter = (points, filterType) => {
 
   switch (filterType) {
     case filterTypes[`filter-everything`].name:
-      // return getDefaultEvents(points).slice();
       return points;
     case filterTypes[`filter-future`].name:
       return getFutureRoutePoints(nowDate, points);

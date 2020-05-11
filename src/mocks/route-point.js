@@ -35,7 +35,7 @@ const getDescription = (text) => {
 
 
 const getRandomDate = (date)=> {
-console.log(date)
+// console.log(date)
   const result = new Date(date);
   const diffDays = getRandomIntegerNumber(0, 3);
   const diffMinutes = getRandomIntegerNumber(0, 120);
@@ -76,12 +76,25 @@ const generateRoutePoint = () => {
       'travelType': randomTypeElement[0],
       'icon': randomTypeElement[1],
     };
+
+    // const randomTypeKey = Math.random() > 0.5 ? 0 : 1;
+    // const randomTypeArray = Object.keys(ROUTE_POINTS_TYPES[randomTypeKey]);
+    // const randomTypeElement = randomTypeArray[getRandomIntegerNumber(0, randomTypeArray.length)];
+
+
+
+    // return {
+    //   'travelType': randomTypeElement,
+    //   'icon': randomTypeArray[randomTypeArray[getRandomIntegerNumber(0, randomTypeArray.length)]]
+    // };
   };
 
   const startDate = getRandomDate(new Date());
-
+  const id = Math.floor(Math.random() * 1000)
+// console.log(getRandomType().icon)
 
   return {
+    id,
     'travelType': getRandomType().travelType,
     'icon': getRandomType().icon,
     'city': CITIES[getRandomIntegerNumber(0, CITIES.length)],
@@ -90,7 +103,8 @@ const generateRoutePoint = () => {
     'price': getRandomIntegerNumber(10, 1000),
     startDate,
     'endDate': getRandomDate(startDate),
-    'options': optionsInfo
+    'options': optionsInfo,
+    'isFavorite': false
   };
 };
 

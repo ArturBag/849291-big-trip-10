@@ -13,7 +13,7 @@ export default class FilterController {
 
     this._onFilterChange = this._onFilterChange.bind(this);
     // this._onDataChange = this._onDataChange.bind(this);
-    this._pointsModel.setDataChangeHandler(this._onDataChange);
+    // this._pointsModel.setDataChangeHandler(this._onDataChange);
 
   }
 
