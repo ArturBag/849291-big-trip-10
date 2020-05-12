@@ -1,6 +1,9 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
 import {ROUTE_POINTS_TYPES} from '../const.js';
 import {getPrefix} from '../utils/common.js';
+import flatpickr from "flatpickr";
+import "flatpickr/dist/flatpickr.min.css";
+import 'flatpickr/dist/themes/light.css';
 
 export default class EventForm extends AbstractSmartComponent {
   constructor(route, onDataChange, mode) {
@@ -27,6 +30,9 @@ export default class EventForm extends AbstractSmartComponent {
     this._deleteButtonClickHandler = null;
 
     this._subscribeOnEvents();
+
+    this._flatpickr = null;
+    this._applyFlatpickr();
   }
 
   recoveryListeners() {
@@ -39,8 +45,7 @@ export default class EventForm extends AbstractSmartComponent {
 
   rerender() {
     super.rerender();
-
-    // this._applyFlatpickr();
+    this._applyFlatpickr();
   }
 
   reset() {
@@ -51,6 +56,28 @@ export default class EventForm extends AbstractSmartComponent {
     this._price = this._routeData.price;
     this._isFavorite = this._routeData.isFavorite;
     this.rerender();
+  }
+
+  _applyFlatpickr() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+
+    const startDateElement = this.getElement().querySelector(`#event-start-time-1`);
+    const endDateElement = this.getElement().querySelector(`#event-end-time-1`);
+    this._flatpickr = flatpickr(startDateElement, {
+      allowInput: true,
+      enableTime: true,
+      dateFormat: `d/m/y H:i`,
+      defaultDate: this._routeData.startDate || `today`
+    });
+
+    this._flatpickr = flatpickr(endDateElement, {
+      allowInput: true,
+      dateFormat: `d/m/y H:i`,
+      defaultDate: this._routeData.endDate || `today`
+    });
   }
 
   setFavoritesHandler(handler) {
@@ -243,13 +270,13 @@ export default class EventForm extends AbstractSmartComponent {
       </label>
 
       ${displayCloseFormButton ?
-  `<button class="event__rollup-btn" type="button">
+    `<button class="event__rollup-btn" type="button">
     <span class="visually-hidden">Open event</span>
   </button>`
-  : ``}
+    : ``}
     </header>
     ${this._isDestinationCityChosed ?
-  `<section class="event__details">
+    `<section class="event__details">
       <section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
         <div class="event__available-offers">${eventOffers}</div>
@@ -262,7 +289,7 @@ export default class EventForm extends AbstractSmartComponent {
         </div>
       </section>
     </section>`
-  : ``}
+    : ``}
     </form>`;
 
   }
