@@ -70,13 +70,17 @@ export default class EventForm extends AbstractSmartComponent {
       allowInput: true,
       enableTime: true,
       dateFormat: `d/m/y H:i`,
-      defaultDate: this._routeData.startDate || `today`
+      defaultDate: this._routeData.startDate || `today`,
+      minDate: this._routeData.startDate || `today`,
+      maxDate: this._routeData.endDate || `today`,
     });
 
     this._flatpickr = flatpickr(endDateElement, {
       allowInput: true,
+      enableTime: true,
       dateFormat: `d/m/y H:i`,
-      defaultDate: this._routeData.endDate || `today`
+      defaultDate: this._routeData.endDate || `today`,
+      minDate: this._routeData.startDate || `today`
     });
   }
 
@@ -107,6 +111,9 @@ export default class EventForm extends AbstractSmartComponent {
   _subscribeOnEvents() {
     const eventTypes = this.getElement().querySelectorAll(`.event__type-item`);
     const cityInput = this.getElement().querySelector(`.event__input--destination`);
+    const offers = this.getElement().querySelectorAll(`.event__offer-checkbox`);
+    const price = this.getElement().querySelector(`#event-price-1`);
+
 
     const transportEvents = ROUTE_POINTS_TYPES.ride;
     const stopEvents = ROUTE_POINTS_TYPES.stops;
@@ -145,6 +152,31 @@ export default class EventForm extends AbstractSmartComponent {
       this.rerender();
     });
 
+    offers.forEach((it)=>{
+      it.addEventListener(`change`, (evt)=>{
+
+        const chosedOffer = evt.target.name;
+        const index = this._routeData.options.findIndex((option)=> option.name === chosedOffer);
+
+        if (evt.target.checked) {
+
+          this._price += this._routeData.options[index].price;
+          this._routeData.options[index].isChecked = true;
+        } else {
+
+          this._price -= this._routeData.options[index].price;
+          this._routeData.options[index].isChecked = false;
+        }
+        this.rerender();
+      });
+
+    });
+
+    price.addEventListener(`change`, (evt)=>{
+      this._price = parseInt(evt.target.value, 10);
+      this.rerender();
+    });
+
 
   }
 
@@ -168,6 +200,7 @@ export default class EventForm extends AbstractSmartComponent {
 
     const eventOffers = additionalOptions.map((it) => {
       const isOptionChecked = additionalOptions.isChecked ? `checked` : ``;
+
 
       return `<div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="${it.id}" type="checkbox" name="${it.name}" ${isOptionChecked}>

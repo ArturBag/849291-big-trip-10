@@ -4,14 +4,13 @@ import Sorting, {SortType} from '../components/sorting.js';
 import TripDaysList from '../components/trip-days-list.js';
 import PointController, {EmptyPoint} from './point-controller.js';
 import {render, replace, RenderPosition} from '../utils/render.js';
-// import {getDuartionInMiliseconds} from '../utils/common.js';
 
 const getDates = (events)=> {
   const set = new Set();
   events.forEach((evt)=> set.add(JSON.stringify(
       {
         day: evt.startDate.getDate(),
-        month: evt.startDate.getMonth()
+        month: evt.startDate.getMonth() + 1
       }
   )));
   return Array.from(set).map((evt) => JSON.parse(evt));
@@ -23,14 +22,13 @@ export const getDefaultEvents = (data) => {
   const routeData = data.map((it) => Object.assign({}, it));
   const dates = getDates(routeData);
 
-
   dates.forEach((date) => {
     const dayEvents = routeData
   .filter((event)=> event.startDate.getDate() === date.day)
   .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
     dayEvents[0].date = date;
-    newData = [...newData, ...dayEvents]
+    newData = [...newData, ...dayEvents];
 
   });
 
@@ -119,11 +117,12 @@ export default class TripController {
   _updatePoints() {
     this._removePoints();
 
-    this._renderPoints(this._pointsModel.getPoints().slice());
+    const data = getDefaultEvents(this._pointsModel.getPoints().slice())
+
+    this._renderPoints(data);
   }
 
   _onDataChange(pointController, oldData, newData) {
-// console.log(oldData.isFavorite, newData.isFavorite)
 
     if (oldData === EmptyPoint) {
       // this._creatingPoint = null;
@@ -147,7 +146,7 @@ export default class TripController {
 
       this._updatePoints();
     } else {
-// console.log(oldData.id,`-- oldData`, newData, `-- newData`)
+
       const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
       const index = this._showedPointControllers.findIndex((it)=> it === pointController);
 

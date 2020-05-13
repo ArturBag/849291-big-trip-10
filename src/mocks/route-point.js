@@ -40,17 +40,17 @@ const getRandomDate = (date)=> {
   const diffDays = getRandomIntegerNumber(0, 3);
   const diffMinutes = getRandomIntegerNumber(0, 120);
 
-  // result.setDate(result.getDate() + diffDays);
-  // result.setMinutes(result.getMinutes() + diffMinutes);
-
-  // для тестировния фильтров. правильный код выше
-  const test = Math.random() > 0.5;
-  if (test) {
-    result.setDate(result.getDate() - diffDays);
-    result.setMinutes(result.getMinutes() - diffMinutes);
-  }
   result.setDate(result.getDate() + diffDays);
   result.setMinutes(result.getMinutes() + diffMinutes);
+
+  // для тестировния фильтров. правильный код выше
+  // const test = Math.random() > 0.5;
+  // if (test) {
+  //   result.setDate(result.getDate() - diffDays);
+  //   result.setMinutes(result.getMinutes() - diffMinutes);
+  // }
+  // result.setDate(result.getDate() + diffDays);
+  // result.setMinutes(result.getMinutes() + diffMinutes);
 
   return result;
 
@@ -76,22 +76,11 @@ const generateRoutePoint = () => {
       'travelType': randomTypeElement[0],
       'icon': randomTypeElement[1],
     };
-
-    // const randomTypeKey = Math.random() > 0.5 ? 0 : 1;
-    // const randomTypeArray = Object.keys(ROUTE_POINTS_TYPES[randomTypeKey]);
-    // const randomTypeElement = randomTypeArray[getRandomIntegerNumber(0, randomTypeArray.length)];
-
-
-
-    // return {
-    //   'travelType': randomTypeElement,
-    //   'icon': randomTypeArray[randomTypeArray[getRandomIntegerNumber(0, randomTypeArray.length)]]
-    // };
   };
 
   const startDate = getRandomDate(new Date());
-  const id = Math.floor(Math.random() * 1000)
-// console.log(getRandomType().icon)
+  const id = Math.floor(Math.random() * 1000);
+
 
   return {
     id,
