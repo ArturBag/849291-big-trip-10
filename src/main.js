@@ -1,6 +1,6 @@
 import Route from './components/route.js';
 import Menu from './components/menu.js';
-// import Filters from './components/filters.js';
+import PriceController from './controllers/price-controller.js';
 import FilterController from './controllers/filter-controller.js';
 import TripController from './controllers/trip-controller.js';
 import PointsModel from './models/points.js';
@@ -33,6 +33,9 @@ header.querySelector(`.trip-main__event-add-btn`)
 
 const pointsModel = new PointsModel();
 pointsModel.setPoints(routeData);
+
+const priceController = new PriceController(tripInfo, pointsModel);
+priceController.render();
 
 const filterController = new FilterController(tripControlHeaders[1], pointsModel);
 filterController.render();

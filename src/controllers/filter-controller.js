@@ -20,7 +20,7 @@ export default class FilterController {
   render() {
     const container = this._container;
     const filters = Object.values(filterTypes).map((filterId) => {
-      const id = `filter-${filterId.name.toLocaleLowerCase()}`;
+      const id = `filter-${filterId.name.toLowerCase()}`;
 
       return {
         id,

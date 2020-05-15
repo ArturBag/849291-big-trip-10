@@ -28,10 +28,12 @@ export default class EventForm extends AbstractSmartComponent {
     this._closeFormHandler = null;
     this._submitHandler = null;
     this._deleteButtonClickHandler = null;
+    this._setPriceOffersHandler = null;
 
     this._subscribeOnEvents();
 
-    this._flatpickr = null;
+    this._flatpickrStart = null;
+    this._flatpickrEnd = null;
     this._applyFlatpickr();
   }
 
@@ -40,6 +42,8 @@ export default class EventForm extends AbstractSmartComponent {
     this.setFavoritesHandler(this._favoriteHandler);
     this.setSubmitHandler(this._submitHandler);
     this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
+    this.setPriceOffersHandler(this._setPriceOffersHandler)
+
     this._subscribeOnEvents();
   }
 
@@ -59,28 +63,38 @@ export default class EventForm extends AbstractSmartComponent {
   }
 
   _applyFlatpickr() {
-    if (this._flatpickr) {
-      this._flatpickr.destroy();
-      this._flatpickr = null;
+    if (this._flatpickrStart && this._flatpickrEnd) {
+      this._flatpickrStart.destroy();
+      this._flatpickrEnd.destroy();
+      this._flatpickrStart = null;
+      this._flatpickrEnd = null;
     }
-
+    const self = this;
     const startDateElement = this.getElement().querySelector(`#event-start-time-1`);
     const endDateElement = this.getElement().querySelector(`#event-end-time-1`);
-    this._flatpickr = flatpickr(startDateElement, {
+    this._flatpickrStart = flatpickr(startDateElement, {
       allowInput: true,
       enableTime: true,
       dateFormat: `d/m/y H:i`,
       defaultDate: this._routeData.startDate || `today`,
       minDate: this._routeData.startDate || `today`,
-      maxDate: this._routeData.endDate || `today`,
+      onChange(selectedDates) {
+        if (self._flatpickrEnd.config._minDate < selectedDates[0]) {
+          self._flatpickrEnd.setDate(selectedDates[0], false, `d/m/y H:i`);
+        }
+        self._flatpickrEnd.set(`minDate`, selectedDates[0]);
+      }
     });
 
-    this._flatpickr = flatpickr(endDateElement, {
+    this._flatpickrEnd = flatpickr(endDateElement, {
       allowInput: true,
       enableTime: true,
       dateFormat: `d/m/y H:i`,
       defaultDate: this._routeData.endDate || `today`,
-      minDate: this._routeData.startDate || `today`
+      minDate: this._routeData.endDate || `today`,
+      onChange(selectedDates) {
+        self._flatpickrStart.set(`maxDate`, selectedDates[0]);
+      },
     });
   }
 
@@ -106,6 +120,21 @@ export default class EventForm extends AbstractSmartComponent {
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
     this._submitHandler = handler;
+  }
+
+  setPriceOffersHandler(handler) {
+    this.getElement().querySelectorAll(`.event__offer-checkbox`)
+    .forEach((it)=> it.addEventListener(`change`, handler));
+
+    this._setPriceOffersHandler = handler;
+
+
+    // const offer = evt.target.name;
+    // console.log(filterId)
+
+    // this._pointsModel.setFilter(filterId);
+    // this._activeFilterType = filterTypes[filterId].name;
+
   }
 
   _subscribeOnEvents() {
@@ -158,15 +187,10 @@ export default class EventForm extends AbstractSmartComponent {
         const chosedOffer = evt.target.name;
         const index = this._routeData.options.findIndex((option)=> option.name === chosedOffer);
 
-        if (evt.target.checked) {
+        this._routeData = Object.assign({}, this._routeData, {
+          this._routeData.options[index].isChecked: !isChecked
+        });
 
-          this._price += this._routeData.options[index].price;
-          this._routeData.options[index].isChecked = true;
-        } else {
-
-          this._price -= this._routeData.options[index].price;
-          this._routeData.options[index].isChecked = false;
-        }
         this.rerender();
       });
 
@@ -190,6 +214,7 @@ export default class EventForm extends AbstractSmartComponent {
     const iconName = this._icon;
     const destinationDescription = this._routeData.description;
     const additionalOptions = this._routeData.options;
+    console.log(additionalOptions)
     const isFavoriteChecked = this._isFavorite ? `checked` : ``;
 
     const dataTravelTypeName = iconName.charAt(0).toUpperCase() + iconName.substr(1);

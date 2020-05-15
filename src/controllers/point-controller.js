@@ -1,7 +1,7 @@
 import EventForm from '../components/event-form.js';
 import TripDay from '../components/trip-day.js';
 import {render, replace, remove, RenderPosition} from '../utils/render.js';
-import {ROUTE_POINTS_TYPES} from '../const.js';
+import {ROUTE_POINTS_TYPES, ADDITIONAL_OPTIONS} from '../const.js';
 
 
 export const Mode = {
@@ -106,6 +106,14 @@ export default class PointController {
       }));
     });
 
+    // this._eventFormComponent.setPriceOffersHandler((evt)=>{
+    //   this._onPriceDataChange(evt.target.name, this._routeData);
+    //   // console.log(evt.target.name)
+    //   // this._onDataChange(this, route, Object.assign({}, route, {
+    //   //   isFavorite: !route.isFavorite
+    //   // }));
+    // });
+
     this._eventFormComponent.setCloseFormHandler(()=>{
       this._eventFormComponent.reset();
       this._replaceEventFormToTripDays();
@@ -131,6 +139,7 @@ export default class PointController {
 
 
   }
+
 
   _onEscKeyDown(evt) {
     const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
