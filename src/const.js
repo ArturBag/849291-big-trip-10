@@ -16,23 +16,23 @@ export const ROUTE_POINTS_TYPES = {
   }
 };
 
-// export const ROUTE_POINTS_TYPES = [
-//   {
-//     'Bus': `img/icons/bus.png`,
-//     'Drive': `img/icons/drive.png`,
-//     'Flight': `img/icons/flight.png`,
-//     'Ship': `img/icons/ship.png`,
-//     'Taxi': `img/icons/taxi.png`,
-//     'Train': `img/icons/train.png`,
-//     'Transport': `img/icons/transport.png`
+// export const ROUTE_POINTS_TYPES = {
+//   'ride': {
+//     'Bus': `bus`,
+//     'Drive': `drive`,
+//     'Flight': `flight`,
+//     'Ship': `ship`,
+//     'Taxi': `taxi`,
+//     'Train': `train`,
+//     'Transport': `transport`
 //   },
-//   {
-//     'Check-in': `img/icons/check-in.png`,
-//     'Restaurant': `img/icons/restaurant.png`,
-//     'Sightseeing': `img/icons/sightseeing.png`,
-//     'Trip': `img/icons/trip.png`
+//   'stops': {
+//     'Check-in': `check-in`,
+//     'Restaurant': `restaurant`,
+//     'Sightseeing': `sightseeing`,
+//     'Trip': `trip`
 //   }
-// ];
+// };
 
 export const CITIES = [
   `Geneva`,

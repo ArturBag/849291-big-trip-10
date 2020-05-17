@@ -28,8 +28,6 @@ header.querySelector(`.trip-main__event-add-btn`)
     tripControllerComponent.createPoint();
   });
 
-// const filtersComponent = new Filters();
-// render(tripControlHeaders[1], filtersComponent.getElement(), RenderPosition.AFTEREND);
 
 const pointsModel = new PointsModel();
 pointsModel.setPoints(routeData);

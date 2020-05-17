@@ -35,7 +35,7 @@ const getDescription = (text) => {
 
 
 const getRandomDate = (date)=> {
-// console.log(date)
+
   const result = new Date(date);
   const diffDays = getRandomIntegerNumber(0, 3);
   const diffMinutes = getRandomIntegerNumber(0, 120);
@@ -43,18 +43,10 @@ const getRandomDate = (date)=> {
   result.setDate(result.getDate() + diffDays);
   result.setMinutes(result.getMinutes() + diffMinutes);
 
-  // для тестировния фильтров. правильный код выше
-  // const test = Math.random() > 0.5;
-  // if (test) {
-  //   result.setDate(result.getDate() - diffDays);
-  //   result.setMinutes(result.getMinutes() - diffMinutes);
-  // }
-  // result.setDate(result.getDate() + diffDays);
-  // result.setMinutes(result.getMinutes() + diffMinutes);
-
   return result;
 
 };
+
 
 
 const generateRoutePoint = () => {
@@ -103,4 +95,4 @@ const generateRoutePoints = (count) => {
     .map(generateRoutePoint);
 };
 
-export {generateRoutePoint, generateRoutePoints};
+export {generateRoutePoint, generateRoutePoints, getRandomDate};

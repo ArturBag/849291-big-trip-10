@@ -1,4 +1,5 @@
 // import { filterTypes } from '../const.js';
+// import AbstractSmartComponent from './abstract-smart-component.js';
 import AbstractComponent from './abstract-component.js';
 
 export default class Filters extends AbstractComponent {
@@ -6,36 +7,27 @@ export default class Filters extends AbstractComponent {
     super();
 
     this.filters = filters;
-    // console.log(this.filters)
+    this._setFilterChangeHandler = null;
   }
 
-  // setFilterChangeHandler(onFilterChange) {
-  //   this.getElement().addEventListener(`change`, (evt) => {
-  //     const filterId = evt.target.id;
-  //     // console.log(evt.target.id);
-  //     onFilterChange(filterId);
-
-  //   });
-
+  // recoveryListeners() {
+  //   this.setFilterChangeHandler(this._closeFormHandler);
   // }
 
-  // setFilterChangeHandler(handler) {
-  //   this.getElement().addEventListener(`change`, (evt) => {
-  //     handler(evt);
-
-  //   });
-
+  // rerender() {
+  //   super.rerender();
   // }
 
   setFilterChangeHandler(handler) {
     this.getElement().addEventListener(`change`, handler);
-    // this.render();
+    this._setFilterChangeHandler = handler;
+    // this.rerender();
   }
 
   getTemplate() {
 
     const filterTabs = this.filters.map((it) => {
-      // console.log(it)
+
       const isChecked = it.checked ? `checked` : ``;
       return `<div class="trip-filters__filter">
           <input id="${it.id}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${it.name.toLowerCase()}" ${isChecked}>

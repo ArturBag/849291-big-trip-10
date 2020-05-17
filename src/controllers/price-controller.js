@@ -9,10 +9,6 @@ export default class PriceController {
 
     this._priceComponent = null;
 
-    // this._onFilterChange = this._onFilterChange.bind(this);
-    // this._onPriceDataChange = this._onPriceDataChange.bind(this);
-    // this._pointsModel.setDataChangeHandler(this._onPriceDataChange);
-
   }
 
   render() {
@@ -30,13 +26,11 @@ export default class PriceController {
       totalPrice += (point.price + offersTotalPrice);
     });
 
-    // console.log(container)
 
     const oldComponent = this._priceComponent;
 
     this._priceComponent = new PriceComponent(totalPrice);
 
-    // this._priceComponent.setDataChangeHandler(this._onPriceDataChange);
     if (oldComponent) {
       replace(this._priceComponent, oldComponent);
     } else {
@@ -45,16 +39,6 @@ export default class PriceController {
 
   }
 
-  // _onPriceDataChange(evt) {
-
-  //   const offer = evt.target.name;
-  //   // this._pointsModel.setOffers(offer);
-  //   // console.log(filterId)
-
-  //   // this._pointsModel.setFilter(filterId);
-  //   // this._activeFilterType = filterTypes[filterId].name;
-
-  // }
 
 }
 

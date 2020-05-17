@@ -32,17 +32,8 @@ export default class Points {
 
   }
 
-  // setOffers(offer) {
-  //   // const index = this._points.forEach((it)=>{});
-  //   // this._points = Object.assign({}, this._points, {
-
-  //   // })
-  //   this._points = [].concat(this._points.slice(0, index), point, this._points.slice(index + 1));
-  //   this._callHandlers(this._dataChangeHandlers);
-  // }
-
   updatePoint(id, point) {
-    // console.log(id)
+
     const index = this._points.findIndex((it) => it.id === id);
 
     if (index === -1) {

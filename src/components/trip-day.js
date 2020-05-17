@@ -9,10 +9,15 @@ export default class TripDay extends AbstractComponent {
     this._route = route;
     this._routeIndex = routeIndex;
 
+    this._setClickHandler = null;
+
   }
 
   setClickHandler(handler) {
+
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
+
+    this._setClickHandler = handler;
   }
 
   getTemplate() {

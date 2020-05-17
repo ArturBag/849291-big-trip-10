@@ -2,8 +2,8 @@ import NoRoutePoints from '../components/no-route-points.js';
 import Sorting, {SortType} from '../components/sorting.js';
 // import PointController from './point-controller.js';
 import TripDaysList from '../components/trip-days-list.js';
-import PointController, {EmptyPoint} from './point-controller.js';
-import {render, replace, RenderPosition} from '../utils/render.js';
+import PointController, {Mode as PointControllerMode, EmptyPoint} from './point-controller.js';
+import {render, RenderPosition} from '../utils/render.js';
 
 const getDates = (events)=> {
   const set = new Set();
@@ -37,13 +37,13 @@ export const getDefaultEvents = (data) => {
 };
 
 
-const renderTripPoints = (tripDaysListComponent, routeData, onDataChange) => {
+const renderTripPoints = (tripDaysListComponent, routeData, onDataChange, onViewChange) => {
 
   return routeData.map((route, routeIndex) => {
 
-    const pointController = new PointController(tripDaysListComponent, onDataChange);
+    const pointController = new PointController(tripDaysListComponent, onDataChange, onViewChange);
 
-    pointController.render(route, routeIndex);
+    pointController.render(route, routeIndex, PointControllerMode.DEFAULT);
     return pointController;
 
   });
@@ -57,6 +57,10 @@ export default class TripController {
     this._pointsModel = pointsModel;
 
     this._container = container;
+
+    this._showedPointControllers = [];
+    this._showingPointsCount = null;
+    this._creatingPoint = null;
 
     this._noRoutePoints = new NoRoutePoints();
     this._sorting = new Sorting();
@@ -96,9 +100,28 @@ export default class TripController {
 
     }
 
-    const newTripPoints = renderTripPoints(tripDaysListElement, pointsData, this._onDataChange);
+    const newTripPoints = renderTripPoints(tripDaysListElement, pointsData, this._onDataChange, this._onViewChange);
 
     this._showedPointControllers = newTripPoints;
+
+  }
+
+  createPoint() {
+
+    if (this._creatingPoint) {
+      return;
+    }
+
+    this._showedPointControllers.forEach((it)=> {
+      it.setDefaultView();
+    });
+    const tripDaysListElement = this._tripDaysList.getElement();
+
+
+    const index = this._showedPointControllers.length;
+
+    this._creatingPoint = new PointController(tripDaysListElement, this._onDataChange, this._onViewChange);
+    this._creatingPoint.render(EmptyPoint, index, PointControllerMode.ADDING);
 
   }
 
@@ -109,7 +132,7 @@ export default class TripController {
 
   _renderPoints(points) {
     const tripDaysListElement = this._tripDaysList.getElement();
-    const newTripPoints = renderTripPoints(tripDaysListElement, points, this._onDataChange);
+    const newTripPoints = renderTripPoints(tripDaysListElement, points, this._onDataChange, this._onViewChange);
     this._showedPointControllers = this._showedPointControllers.concat(newTripPoints);
 
   }
@@ -117,15 +140,19 @@ export default class TripController {
   _updatePoints() {
     this._removePoints();
 
-    const data = getDefaultEvents(this._pointsModel.getPoints().slice())
+    const data = getDefaultEvents(this._pointsModel.getPoints().slice());
 
     this._renderPoints(data);
+  }
+
+  _onViewChange() {
+    this._showedPointControllers.forEach((it) => it.setDefaultView());
   }
 
   _onDataChange(pointController, oldData, newData) {
 
     if (oldData === EmptyPoint) {
-      // this._creatingPoint = null;
+      this._creatingPoint = null;
       if (newData === null) {
         pointController.destroy();
 
@@ -136,8 +163,7 @@ export default class TripController {
 
         const index = this._showedPointControllers.length;
 
-        // pointController.render(newData, index, PointControllerMode.DEFAULT);
-        pointController.render(newData, index);
+        pointController.render(newData, index, PointControllerMode.DEFAULT);
 
         this._showedPointControllers = [].concat(pointController, this._showedPointControllers);
       }
@@ -152,8 +178,7 @@ export default class TripController {
 
       if (isSuccess) {
 
-        // pointController.render(newData, index, PointControllerMode.DEFAULT);
-        pointController.render(newData, index);
+        pointController.render(newData, index, PointControllerMode.DEFAULT);
       }
     }
 
@@ -188,7 +213,7 @@ export default class TripController {
     }
 
     tripDaysListElement.innerHTML = ``;
-    const newTripPoints = renderTripPoints(tripDaysListElement, pointsData, this._onDataChange);
+    const newTripPoints = renderTripPoints(tripDaysListElement, pointsData, this._onDataChange, this._onViewChange);
     this._showedPointControllers = newTripPoints;
   }
 

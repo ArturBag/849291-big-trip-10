@@ -5,13 +5,55 @@ import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import 'flatpickr/dist/themes/light.css';
 
+const parseFormData = (formData, form, mode) => {
+
+  let isFavorite = false;
+  if (mode === `adding`) {
+    isFavorite = false;
+  } else {
+    isFavorite = form.querySelector(`.event__favorite-checkbox`).checked;
+  }
+
+  const travelType = form.querySelector(`.event__type-toggle`).dataset.travelType;
+  const pictures = Array.from(form.querySelectorAll(`.event__photo`));
+  const icon = ROUTE_POINTS_TYPES.ride[travelType] ? ROUTE_POINTS_TYPES.ride[travelType] : ROUTE_POINTS_TYPES.stops[travelType];
+  const description = form.querySelector(`.event__destination-description`);
+  const startDate = formData.get(`event-start-time`);
+  const endDate = formData.get(`event-end-time`);
+
+
+  const chosedOptions = [...form.querySelectorAll(`.event__offer-checkbox:checked`)];
+  const optionsData = chosedOptions.map((it) => {
+    return {
+      id: it.id,
+      name: it.name,
+      isChecked: true,
+      price: parseInt(it.parentElement.querySelector(`.event__offer-price`).textContent, 10),
+      title: it.parentElement.querySelector(`.event__offer-title`).textContent,
+    };
+  });
+
+  return {
+    id: new Date().getUTCMilliseconds(),
+    travelType,
+    city: formData.get(`event-destination`),
+    pictures,
+    icon,
+    price: formData.get(`event-price`),
+    options: optionsData,
+    isFavorite,
+    description,
+    startDate,
+    endDate,
+  };
+};
+
 export default class EventForm extends AbstractSmartComponent {
-  constructor(route, onDataChange, mode) {
+  constructor(route, mode) {
     super();
-    // console.log(route)
+
     this._routeData = route;
-    // this._onDataChange = onDataChange;
-    // this._mode = mode;
+    this._mode = mode;
 
     this._travelType = route.travelType;
     this._prefix = getPrefix(route.travelType);
@@ -19,6 +61,8 @@ export default class EventForm extends AbstractSmartComponent {
     this._city = route.city;
     this._isFavorite = route.isFavorite;
     this._price = route.price;
+    this._options = route.options;
+    this._indexOfChosedOption = -1;
 
     this._prefixForReset = getPrefix(route.travelType);
 
@@ -27,8 +71,7 @@ export default class EventForm extends AbstractSmartComponent {
     this._favoriteHandler = null;
     this._closeFormHandler = null;
     this._submitHandler = null;
-    this._deleteButtonClickHandler = null;
-    this._setPriceOffersHandler = null;
+    this._resetButtonClickHandler = null;
 
     this._subscribeOnEvents();
 
@@ -41,8 +84,7 @@ export default class EventForm extends AbstractSmartComponent {
     this.setCloseFormHandler(this._closeFormHandler);
     this.setFavoritesHandler(this._favoriteHandler);
     this.setSubmitHandler(this._submitHandler);
-    this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
-    this.setPriceOffersHandler(this._setPriceOffersHandler)
+    this.setResetButtonClickHandler(this._resetButtonClickHandler);
 
     this._subscribeOnEvents();
   }
@@ -52,6 +94,13 @@ export default class EventForm extends AbstractSmartComponent {
     this._applyFlatpickr();
   }
 
+  getData() {
+    const form = this.getElement();
+    const formData = new FormData(form);
+
+    return parseFormData(formData, form, this._mode);
+  }
+
   reset() {
     this._travelType = this._routeData.travelType;
     this._prefix = this._prefixForReset;
@@ -59,6 +108,8 @@ export default class EventForm extends AbstractSmartComponent {
     this._city = this._routeData.city;
     this._price = this._routeData.price;
     this._isFavorite = this._routeData.isFavorite;
+    this._options = this._routeData.options;
+
     this.rerender();
   }
 
@@ -69,6 +120,7 @@ export default class EventForm extends AbstractSmartComponent {
       this._flatpickrStart = null;
       this._flatpickrEnd = null;
     }
+
     const self = this;
     const startDateElement = this.getElement().querySelector(`#event-start-time-1`);
     const endDateElement = this.getElement().querySelector(`#event-end-time-1`);
@@ -99,19 +151,28 @@ export default class EventForm extends AbstractSmartComponent {
   }
 
   setFavoritesHandler(handler) {
+    if (this._mode === `adding`) {
+      return;
+    }
+
     this.getElement().querySelector(`.event__favorite-btn`)
       .addEventListener(`click`, handler);
     this._favoriteHandler = handler;
   }
 
-  setDeleteButtonClickHandler(handler) {
+  setResetButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__reset-btn`)
-      .addEventListener(`click`, handler);
+      .addEventListener(`click`, ()=>{
+        handler(this._mode);
+      });
 
-    this._deleteButtonClickHandler = handler;
+    this._resetButtonClickHandler = handler;
   }
 
   setCloseFormHandler(handler) {
+    if (this._mode === `adding`) {
+      return;
+    }
     this.getElement().querySelector(`.event__rollup-btn`)
       .addEventListener(`click`, handler);
     this._closeFormHandler = handler;
@@ -122,20 +183,6 @@ export default class EventForm extends AbstractSmartComponent {
     this._submitHandler = handler;
   }
 
-  setPriceOffersHandler(handler) {
-    this.getElement().querySelectorAll(`.event__offer-checkbox`)
-    .forEach((it)=> it.addEventListener(`change`, handler));
-
-    this._setPriceOffersHandler = handler;
-
-
-    // const offer = evt.target.name;
-    // console.log(filterId)
-
-    // this._pointsModel.setFilter(filterId);
-    // this._activeFilterType = filterTypes[filterId].name;
-
-  }
 
   _subscribeOnEvents() {
     const eventTypes = this.getElement().querySelectorAll(`.event__type-item`);
@@ -178,6 +225,9 @@ export default class EventForm extends AbstractSmartComponent {
 
     cityInput.addEventListener(`change`, () => {
       this._city = cityInput.value;
+      if (this._city) {
+        this._isDestinationCityChosed = true;
+      }
       this.rerender();
     });
 
@@ -187,11 +237,12 @@ export default class EventForm extends AbstractSmartComponent {
         const chosedOffer = evt.target.name;
         const index = this._routeData.options.findIndex((option)=> option.name === chosedOffer);
 
-        this._routeData = Object.assign({}, this._routeData, {
-          this._routeData.options[index].isChecked: !isChecked
+        this._routeData.options[index] = Object.assign({}, this._routeData.options[index], {
+          isChecked: !this._routeData.options[index].isChecked
         });
 
         this.rerender();
+
       });
 
     });
@@ -213,18 +264,17 @@ export default class EventForm extends AbstractSmartComponent {
     const destinationCity = this._city;
     const iconName = this._icon;
     const destinationDescription = this._routeData.description;
-    const additionalOptions = this._routeData.options;
-    console.log(additionalOptions)
+    const additionalOptions = this._options;
+
     const isFavoriteChecked = this._isFavorite ? `checked` : ``;
-
-    const dataTravelTypeName = iconName.charAt(0).toUpperCase() + iconName.substr(1);
-
     const buttonModeText = this._mode === `adding` ? `Cancel` : `Delete`;
-    const displayCloseFormButton = this._mode === `adding` ? false : true;
+    const isCloseFormButtonDisplayed = this._mode === `adding` ? false : true;
+    const isFavoriteButtonDisplayed = this._mode === `adding` ? false : true;
 
+    const dataTravelTypeName = this._travelType;
 
     const eventOffers = additionalOptions.map((it) => {
-      const isOptionChecked = additionalOptions.isChecked ? `checked` : ``;
+      const isOptionChecked = it.isChecked ? `checked` : ``;
 
 
       return `<div class="event__offer-selector">
@@ -318,16 +368,17 @@ export default class EventForm extends AbstractSmartComponent {
 
     <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
     <button class="event__reset-btn" type="reset">${buttonModeText}</button>
+    ${isFavoriteButtonDisplayed ?
+    `<input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavoriteChecked}>
+    <label class="event__favorite-btn" for="event-favorite-1">
+      <span class="visually-hidden">Add to favorite</span>
+      <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+        <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
+      </svg>
+    </label>`
+    : ``}
 
-      <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavoriteChecked}>
-      <label class="event__favorite-btn" for="event-favorite-1">
-        <span class="visually-hidden">Add to favorite</span>
-        <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
-          <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
-        </svg>
-      </label>
-
-      ${displayCloseFormButton ?
+      ${isCloseFormButtonDisplayed ?
     `<button class="event__rollup-btn" type="button">
     <span class="visually-hidden">Open event</span>
   </button>`
