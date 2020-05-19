@@ -1,6 +1,7 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
 import {ROUTE_POINTS_TYPES} from '../const.js';
 import {getPrefix} from '../utils/common.js';
+import {Mode as PointControllerMode} from '../controllers/point-controller.js';
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import 'flatpickr/dist/themes/light.css';
@@ -8,7 +9,7 @@ import 'flatpickr/dist/themes/light.css';
 const parseFormData = (formData, form, mode) => {
 
   let isFavorite = false;
-  if (mode === `adding`) {
+  if (mode === PointControllerMode.ADDING) {
     isFavorite = false;
   } else {
     isFavorite = form.querySelector(`.event__favorite-checkbox`).checked;
@@ -17,10 +18,10 @@ const parseFormData = (formData, form, mode) => {
   const travelType = form.querySelector(`.event__type-toggle`).dataset.travelType;
   const pictures = Array.from(form.querySelectorAll(`.event__photo`));
   const icon = ROUTE_POINTS_TYPES.ride[travelType] ? ROUTE_POINTS_TYPES.ride[travelType] : ROUTE_POINTS_TYPES.stops[travelType];
-  const description = form.querySelector(`.event__destination-description`);
-  const startDate = formData.get(`event-start-time`);
-  const endDate = formData.get(`event-end-time`);
-
+  const description = form.querySelector(`.event__destination-description`).innerText;
+  const startDate = flatpickr.parseDate(formData.get(`event-start-time`), `d/m/y H:i`);
+  const endDate = flatpickr.parseDate(formData.get(`event-end-time`), `d/m/y H:i`);
+// console.log(pictures)
 
   const chosedOptions = [...form.querySelectorAll(`.event__offer-checkbox:checked`)];
   const optionsData = chosedOptions.map((it) => {
@@ -56,15 +57,42 @@ export default class EventForm extends AbstractSmartComponent {
     this._mode = mode;
 
     this._travelType = route.travelType;
-    this._prefix = getPrefix(route.travelType);
-    this._icon = route.icon;
-    this._city = route.city;
+    console.log(this._travelType.toLowerCase())
+    this._prefix = getPrefix(this._travelType);
+    this._icon = `img/icons/${this._travelType.toLowerCase()}.png`;
+    this._city = route.city.name;
+    this._description = route.city.description;
     this._isFavorite = route.isFavorite;
     this._price = route.price;
     this._options = route.options;
-    this._indexOfChosedOption = -1;
+    this._pictures = route.city.pictures;
 
+    this._iconForReset = this._icon;
     this._prefixForReset = getPrefix(route.travelType);
+
+    // this._travelType = route.travelType.type;
+    // this._prefix = getPrefix(this._travelType);
+    // this._icon = route.travelType.icon;
+    // this._city = route.city.name;
+    // this._description = route.city.description;
+    // this._isFavorite = route.isFavorite;
+    // this._price = route.price;
+    // this._options = route.travelType.offers;
+    // this._pictures = route.city.pictures;
+
+    // this._prefixForReset = getPrefix(route.travelType.type);
+
+    // this._travelType = route.travelType;
+    // this._prefix = getPrefix(route.travelType);
+    // this._icon = route.icon;
+    // this._city = route.city;
+    // this._isFavorite = route.isFavorite;
+    // this._price = route.price;
+    // this._options = route.options;
+    // this._pictures = route.pictures;
+    // // this._indexOfChosedOption = -1;
+
+    // this._prefixForReset = getPrefix(route.travelType);
 
     this._isDestinationCityChosed = true;
 
@@ -89,6 +117,20 @@ export default class EventForm extends AbstractSmartComponent {
     this._subscribeOnEvents();
   }
 
+  removeFlatpickr() {
+    if (this._flatpickrStart && this._flatpickrEnd) {
+      this._flatpickrStart.destroy();
+      this._flatpickrEnd.destroy();
+      this._flatpickrStart = null;
+      this._flatpickrEnd = null;
+    }
+  }
+
+  removeElement() {
+    this.removeFlatpickr();
+    super.removeElement();
+  }
+
   rerender() {
     super.rerender();
     this._applyFlatpickr();
@@ -104,22 +146,18 @@ export default class EventForm extends AbstractSmartComponent {
   reset() {
     this._travelType = this._routeData.travelType;
     this._prefix = this._prefixForReset;
-    this._icon = this._routeData.icon;
-    this._city = this._routeData.city;
+    this._icon = this._iconForReset;
+    this._city = this._routeData.city.name;
     this._price = this._routeData.price;
     this._isFavorite = this._routeData.isFavorite;
-    this._options = this._routeData.options;
+    this._options = this._routeData.options.offers;
+    this._pictures = this._routeData.city.pictures;
 
     this.rerender();
   }
 
   _applyFlatpickr() {
-    if (this._flatpickrStart && this._flatpickrEnd) {
-      this._flatpickrStart.destroy();
-      this._flatpickrEnd.destroy();
-      this._flatpickrStart = null;
-      this._flatpickrEnd = null;
-    }
+    this.removeFlatpickr();
 
     const self = this;
     const startDateElement = this.getElement().querySelector(`#event-start-time-1`);
@@ -151,12 +189,15 @@ export default class EventForm extends AbstractSmartComponent {
   }
 
   setFavoritesHandler(handler) {
-    if (this._mode === `adding`) {
+    if (this._mode === PointControllerMode.ADDING) {
       return;
     }
 
     this.getElement().querySelector(`.event__favorite-btn`)
-      .addEventListener(`click`, handler);
+      .addEventListener(`click`, () => {
+        this._isFavorite = !this._isFavorite;
+        handler(this._isFavorite);
+      });
     this._favoriteHandler = handler;
   }
 
@@ -170,7 +211,7 @@ export default class EventForm extends AbstractSmartComponent {
   }
 
   setCloseFormHandler(handler) {
-    if (this._mode === `adding`) {
+    if (this._mode === PointControllerMode.ADDING) {
       return;
     }
     this.getElement().querySelector(`.event__rollup-btn`)
@@ -215,6 +256,7 @@ export default class EventForm extends AbstractSmartComponent {
           this._icon = stopEvents[chosedEventType];
           this._travelType = chosedEventType;
 
+
         }
         this.rerender();
 
@@ -234,11 +276,12 @@ export default class EventForm extends AbstractSmartComponent {
     offers.forEach((it)=>{
       it.addEventListener(`change`, (evt)=>{
 
-        const chosedOffer = evt.target.name;
-        const index = this._routeData.options.findIndex((option)=> option.name === chosedOffer);
+        const chosedOffer = evt.target.value;
 
-        this._routeData.options[index] = Object.assign({}, this._routeData.options[index], {
-          isChecked: !this._routeData.options[index].isChecked
+        const index = this._routeData.options.offers.findIndex((offer)=> offer.name === chosedOffer);
+
+        this._routeData.options.offers[index] = Object.assign({}, this._routeData.travelType.offers[index], {
+          isChecked: !this._routeData.travelType.offers[index].isChecked
         });
 
         this.rerender();
@@ -246,6 +289,22 @@ export default class EventForm extends AbstractSmartComponent {
       });
 
     });
+
+    // offers.forEach((it)=>{
+    //   it.addEventListener(`change`, (evt)=>{
+
+    //     const chosedOffer = evt.target.name;
+    //     const index = this._routeData.travelType.offers.findIndex((offer)=> offer.name === chosedOffer);
+
+    //     this._routeData.travelType.offers[index] = Object.assign({}, this._routeData.travelType.offers[index], {
+    //       isChecked: !this._routeData.travelType.offers[index].isChecked
+    //     });
+
+    //     this.rerender();
+
+    //   });
+
+    // });
 
     price.addEventListener(`change`, (evt)=>{
       this._price = parseInt(evt.target.value, 10);
@@ -257,58 +316,53 @@ export default class EventForm extends AbstractSmartComponent {
 
   getTemplate() {
 
-    if (this._mode === `adding` && this._city.length < 1) {
+
+    if (this._mode === PointControllerMode.ADDING && this._city.length < 1) {
       this._isDestinationCityChosed = false;
     }
 
     const destinationCity = this._city;
     const iconName = this._icon;
-    const destinationDescription = this._routeData.description;
-    const additionalOptions = this._options;
-
+    const destinationDescription = this._description;
     const isFavoriteChecked = this._isFavorite ? `checked` : ``;
-    const buttonModeText = this._mode === `adding` ? `Cancel` : `Delete`;
-    const isCloseFormButtonDisplayed = this._mode === `adding` ? false : true;
-    const isFavoriteButtonDisplayed = this._mode === `adding` ? false : true;
-
+    const buttonModeText = this._mode === PointControllerMode.ADDING ? `Cancel` : `Delete`;
+    const isCloseFormButtonDisplayed = this._mode === PointControllerMode.ADDING ? false : true;
+    const isFavoriteButtonDisplayed = this._mode === PointControllerMode.ADDING ? false : true;
     const dataTravelTypeName = this._travelType;
 
-    const eventOffers = additionalOptions.map((it) => {
-      const isOptionChecked = it.isChecked ? `checked` : ``;
+    const additionalOptionsData = this._options;
+
+    const travelType = this._travelType.toLowerCase();
+    let offers = ``;
+    let eventOffers = ``;
+
+    const indexOfTravelType = additionalOptionsData.findIndex((it)=> it.type === travelType);
+
+    if (indexOfTravelType === -1) {
+      offers = offers;
+    } else {
+
+      offers = additionalOptionsData[indexOfTravelType].offers;
+
+      eventOffers = offers.map((it) => {
+        const isOptionChecked = it.isChecked ? `checked` : ``;
 
 
-      return `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="${it.id}" type="checkbox" name="${it.name}" ${isOptionChecked}>
-        <label class="event__offer-label" for="${it.id}">
-          <span class="event__offer-title">${it.title}</span>
-          &plus;
-          &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
-        </label>
-      </div>`;
-    }).join(``);
+        return `<div class="event__offer-selector">
+          <input class="event__offer-checkbox  visually-hidden" id="${it.id}" type="checkbox" name="${it.name}" ${isOptionChecked}>
+          <label class="event__offer-label" for="${it.id}">
+            <span class="event__offer-title">${it.title}</span>
+            &plus;
+            &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
+          </label>
+        </div>`;
+      }).join(` \n`);
 
-    const transferTypeGroup = Object.keys(ROUTE_POINTS_TYPES.ride).map((transportType) => {
+    }
 
-      return (
-        `<div class="event__type-item">
-            <input id="event-type-${transportType.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${transportType.toLowerCase()}">
-            <label class="event__type-label  event__type-label--${transportType.toLowerCase()}" for="event-type-${transportType.toLowerCase()}">${transportType}</label>
-          </div>`
-      );
-    }).join(` \n`);
 
-    const activityTypeGroup = Object.keys(ROUTE_POINTS_TYPES.stops).map((stopsType) => {
-
-      return (
-        `<div class="event__type-item">
-            <input id="event-type-${stopsType.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${stopsType.toLowerCase()}">
-            <label class="event__type-label  event__type-label--${stopsType.toLowerCase()}" for="event-type-${stopsType.toLowerCase()}-1">${stopsType}</label>
-          </div>`
-      );
-    }).join(` \n`);
-
-    const imageTemplate = this._routeData.pictures.map((it) => {
-      return `<img class="event__photo" src="${it}" alt="Event photo">`;
+    const imageTemplate = this._pictures.map((it) => {
+      return `<img class="event__photo" src="${it.src}" alt="${it.description}">`;
     }).join(` \n`);
 
     return `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -323,12 +377,60 @@ export default class EventForm extends AbstractSmartComponent {
     <div class="event__type-list">
       <fieldset class="event__type-group">
         <legend class="visually-hidden">Transfer</legend>
-        ${transferTypeGroup}
+
+        <div class="event__type-item">
+          <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
+          <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
+        </div>
+
+        <div class="event__type-item">
+          <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
+          <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
+        </div>
+
+        <div class="event__type-item">
+          <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
+          <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
+        </div>
+
+        <div class="event__type-item">
+          <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
+          <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
+        </div>
+
+        <div class="event__type-item">
+          <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport">
+          <label class="event__type-label  event__type-label--transport" for="event-type-transport-1">Transport</label>
+        </div>
+
+        <div class="event__type-item">
+          <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
+          <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
+        </div>
+
+        <div class="event__type-item">
+          <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
+          <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
+        </div>
       </fieldset>
 
       <fieldset class="event__type-group">
         <legend class="visually-hidden">Activity</legend>
-        ${activityTypeGroup}
+
+        <div class="event__type-item">
+          <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
+          <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
+        </div>
+
+        <div class="event__type-item">
+          <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
+          <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
+        </div>
+
+        <div class="event__type-item">
+          <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
+          <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
+        </div>
       </fieldset>
     </div>
     </div>
@@ -386,10 +488,13 @@ export default class EventForm extends AbstractSmartComponent {
     </header>
     ${this._isDestinationCityChosed ?
     `<section class="event__details">
-      <section class="event__section  event__section--offers">
-        <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-        <div class="event__available-offers">${eventOffers}</div>
-      </section>
+    ${eventOffers.length > 0 ?
+    `<section class="event__section  event__section--offers">
+      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+      <div class="event__available-offers">${eventOffers}</div>
+    </section>`
+    :
+    ``}
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
         <p class="event__destination-description">${destinationDescription}</p>

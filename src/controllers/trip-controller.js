@@ -1,9 +1,9 @@
 import NoRoutePoints from '../components/no-route-points.js';
 import Sorting, {SortType} from '../components/sorting.js';
-// import PointController from './point-controller.js';
 import TripDaysList from '../components/trip-days-list.js';
 import PointController, {Mode as PointControllerMode, EmptyPoint} from './point-controller.js';
 import {render, RenderPosition} from '../utils/render.js';
+
 
 const getDates = (events)=> {
   const set = new Set();
@@ -84,6 +84,7 @@ export default class TripController {
   render(routeData) {
 
     const pointsData = getDefaultEvents(routeData);
+    // console.log(pointsData)
 
     const container = this._container;
     const tripDaysListElement = this._tripDaysList.getElement();
@@ -149,7 +150,7 @@ export default class TripController {
     this._showedPointControllers.forEach((it) => it.setDefaultView());
   }
 
-  _onDataChange(pointController, oldData, newData) {
+  _onDataChange(pointController, oldData, newData, isFavorite) {
 
     if (oldData === EmptyPoint) {
       this._creatingPoint = null;
@@ -176,7 +177,7 @@ export default class TripController {
       const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
       const index = this._showedPointControllers.findIndex((it)=> it === pointController);
 
-      if (isSuccess) {
+      if (isSuccess && !isFavorite) {
 
         pointController.render(newData, index, PointControllerMode.DEFAULT);
       }

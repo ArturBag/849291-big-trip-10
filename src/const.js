@@ -1,3 +1,4 @@
+
 export const ROUTE_POINTS_TYPES = {
   'ride': {
     'Bus': `img/icons/bus.png`,
@@ -16,23 +17,6 @@ export const ROUTE_POINTS_TYPES = {
   }
 };
 
-// export const ROUTE_POINTS_TYPES = {
-//   'ride': {
-//     'Bus': `bus`,
-//     'Drive': `drive`,
-//     'Flight': `flight`,
-//     'Ship': `ship`,
-//     'Taxi': `taxi`,
-//     'Train': `train`,
-//     'Transport': `transport`
-//   },
-//   'stops': {
-//     'Check-in': `check-in`,
-//     'Restaurant': `restaurant`,
-//     'Sightseeing': `sightseeing`,
-//     'Trip': `trip`
-//   }
-// };
 
 export const CITIES = [
   `Geneva`,

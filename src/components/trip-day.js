@@ -1,6 +1,8 @@
 import AbstractComponent from './abstract-component.js';
 import {getPrefix, getFormattedTime, getTimeDiff} from '../utils/common.js';
 
+const MAX_OFFERS_QTY_TO_SHOW = 3;
+
 export default class TripDay extends AbstractComponent {
   constructor(route, routeIndex) {
 
@@ -14,16 +16,16 @@ export default class TripDay extends AbstractComponent {
   }
 
   setClickHandler(handler) {
-
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
-
     this._setClickHandler = handler;
   }
 
   getTemplate() {
 
-    const {travelType, icon, city, price, date, options, startDate, endDate} = this._route;
+    const {travelType, city, price, date, startDate, endDate, options} = this._route;
 
+    const icon = `img/icons/${travelType.toLowerCase()}.png`;
+    const cityName = city.name;
     const dayCounter = date ? this._routeIndex + 1 : 0;
 
     const prefix = getPrefix(travelType);
@@ -33,18 +35,26 @@ export default class TripDay extends AbstractComponent {
 
     const duration = getTimeDiff(endDate - startDate);
 
+    let offers = ``;
     let optionsInfo = ``;
+    const index = options.findIndex((it)=> it.type === travelType.toLowerCase());
+    if (index === -1) {
+      offers = offers;
+    } else {
 
-    if (options.length) {
+      offers = options[index].offers;
+      offers = offers.length > 3 ?
+        offers.slice(0, MAX_OFFERS_QTY_TO_SHOW) : offers;
 
-      optionsInfo = options.map((it) => {
+      optionsInfo = offers.map((it) => {
 
         return `<li class="event__offer">
           <span class="event__offer-title">${it.title}</span>
           &plus;
           &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
-         </li>`;
-      }).join(``);
+          </li>`;
+
+      }).join(` \n`);
     }
 
     return `<li class="trip-days__item  day">
@@ -61,7 +71,7 @@ export default class TripDay extends AbstractComponent {
             <div class="event__type">
               <img class="event__type-icon" width="42" height="42" src="${icon}" alt="Event type icon">
             </div>
-            <h3 class="event__title">${travelType} ${prefix} ${city}</h3>
+            <h3 class="event__title">${travelType} ${prefix} ${cityName}</h3>
 
             <div class="event__schedule">
               <p class="event__time">

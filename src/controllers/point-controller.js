@@ -13,9 +13,15 @@ export const Mode = {
 
 const PICTURES_QTY = 5;
 const generatePictureURL = () => `http://picsum.photos/300/150?r=${Math.random()}`;
+const generatePictureDescription = () => `some description for picture ${Math.floor(Math.random() * 25)}`;
 const generatePictures = (count) => {
   return new Array(count).fill(``)
-    .map(generatePictureURL);
+    .map(()=>{
+      return {
+        src: generatePictureURL(),
+        description: generatePictureDescription()
+      };
+    });
 };
 
 const startDate = getRandomDate(new Date());
@@ -23,55 +29,60 @@ const endDate = getRandomDate(startDate);
 
 
 export const EmptyPoint = {
-  'id': 0,
-  'travelType': `Flight`,
-  'icon': `img/icons/flight.png`,
-  'city': ``,
-  'pictures': generatePictures(PICTURES_QTY),
-  'description': `some description text`,
-  'price': 0,
-  'options': [
+  'id': Math.floor(Math.random() * 1000),
+  'travelType': {
+    type: `Flight`,
+    icon: `img/icons/flight.png`,
+    // offers: [
 
-    {
-      'title': `Add luggage`,
-      'price': 10,
-      'isChecked': false,
-      'id': `event-offer-luggage-1`,
-      'name': `event-offer-luggage`
-    },
-    {
-      'title': `Switch to comfort class`,
-      'price': 150,
-      'isChecked': false,
-      'id': `event-offer-comfort-1`,
-      'name': `event-offer-comfort`
-    },
-    {
-      'title': `Add meal`,
-      'price': 2,
-      'isChecked': false,
-      'id': `event-offer-meal-1`,
-      'name': `event-offer-meal`
-    },
-    {
-      'title': `Choose seats`,
-      'price': 9,
-      'isChecked': false,
-      'id': `event-offer-seats-1`,
-      'name': `event-offer-seats`
-    },
-    {
-      'title': `Travel by train`,
-      'price': 40,
-      'isChecked': false,
-      'id': `event-offer-train-1`,
-      'name': `event-offer-train`
-    }
-  ],
+    //   {
+    //     'title': `Add luggage`,
+    //     'price': 10,
+    //     'isChecked': false,
+    //     'id': `event-offer-luggage-1`,
+    //     'name': `event-offer-luggage`
+    //   },
+    //   {
+    //     'title': `Switch to comfort class`,
+    //     'price': 150,
+    //     'isChecked': false,
+    //     'id': `event-offer-comfort-1`,
+    //     'name': `event-offer-comfort`
+    //   },
+    //   {
+    //     'title': `Add meal`,
+    //     'price': 2,
+    //     'isChecked': false,
+    //     'id': `event-offer-meal-1`,
+    //     'name': `event-offer-meal`
+    //   },
+    //   {
+    //     'title': `Choose seats`,
+    //     'price': 9,
+    //     'isChecked': false,
+    //     'id': `event-offer-seats-1`,
+    //     'name': `event-offer-seats`
+    //   },
+    //   {
+    //     'title': `Travel by train`,
+    //     'price': 40,
+    //     'isChecked': false,
+    //     'id': `event-offer-train-1`,
+    //     'name': `event-offer-train`
+    //   }
+    // ]
+  },
+  'city': {
+    description: `some description text`,
+    name: ``,
+    pictures: generatePictures(PICTURES_QTY)
+  },
+  'price': 0,
   'isFavorite': false,
   startDate,
   endDate
 };
+
 
 export default class PointController {
   constructor(container, onDataChange, onViewChange) {
@@ -102,18 +113,15 @@ export default class PointController {
     this._eventFormComponent = new EventForm(route, this._mode);
 
     this._tripDaysComponent.setClickHandler(() => {
-      this._mode = Mode.EDIT;
 
       this._replacetripDaysToEventForm();
+      this._eventFormComponent.reset();
       document.addEventListener(`keydown`, this._onEscKeyDown);
 
     });
 
-    this._eventFormComponent.setFavoritesHandler(()=>{
-
-      this._onDataChange(this, route, Object.assign({}, route, {
-        isFavorite: !route.isFavorite
-      }));
+    this._eventFormComponent.setFavoritesHandler((isFavorite)=>{
+      this._onDataChange(this, route, Object.assign({}, route, {isFavorite}), true);
     });
 
 
@@ -124,7 +132,7 @@ export default class PointController {
 
     this._eventFormComponent.setResetButtonClickHandler((formMode)=>{
 
-      if (formMode === `adding`) {
+      if (formMode === Mode.ADDING) {
         this.destroy();
         this._replaceEventFormToTripDays();
       }
@@ -135,7 +143,8 @@ export default class PointController {
     this._eventFormComponent.setSubmitHandler((evt)=>{
       evt.preventDefault();
       const data = this._eventFormComponent.getData();
-      if (this._mode === `adding`) {
+      this._eventFormComponent.removeFlatpickr();
+      if (this._mode === Mode.ADDING) {
         this._formAction = Mode.ADDING;
         this._onDataChange(this, EmptyPoint, data);
       } else {
@@ -177,6 +186,8 @@ export default class PointController {
   setDefaultView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceEventFormToTripDays();
+    } else {
+      remove(this._eventFormComponent);
     }
   }
 
@@ -211,6 +222,7 @@ export default class PointController {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
 
     this._eventFormComponent.reset();
+    this._eventFormComponent.removeFlatpickr();
 
     if (document.contains(this._eventFormComponent.getElement())) {
       replace(this._tripDaysComponent, this._eventFormComponent);
