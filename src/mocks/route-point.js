@@ -1,5 +1,4 @@
-import { ROUTE_POINTS_TYPES, CITIES, ADDITIONAL_OPTIONS } from '../const.js';
-
+import { ROUTE_POINTS_TYPES, CITIES, OFFERS, CITIES } from '../const.js';
 
 const descriptionText = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 Cras aliquet varius magna, non porta ligula feugiat eget.
@@ -13,10 +12,7 @@ const PICTURES_QTY = 5;
 const generatePictureURL = () => `http://picsum.photos/300/150?r=${Math.random()}`;
 const generatePictureDescription = () => `some description for picture ${Math.floor(Math.random() * 25)}`;
 
-// const generatePictures = (count) => {
-//   return new Array(count).fill(``)
-//     .map(generatePictureURL);
-// };
+
 const generatePictures = (count) => {
   return new Array(count).fill(``)
     .map(() => {
@@ -56,36 +52,65 @@ const getRandomDate = (date) => {
 
 };
 
+// const getPicturesData = (destination)=> {
+
+//   const index = CITIES.findIndex((it)=> it.type === travelType.toLowerCase());
+
+//   if (index === -1) {
+//     return {
+//       description: getDescription(descriptionText),
+//       name: destination,
+//       pictures: []
+//     };
+//   } else {
+
+//     return {
+//       description: getDescription(descriptionText),
+//       name: CITIES[getRandomIntegerNumber(0, CITIES.length)],
+//       pictures: generatePictures(PICTURES_QTY)
+//     };
+//   }
+
+
+// };
+
+const getOffers = (travelType)=> {
+
+  const index = OFFERS.findIndex((it)=> it.type === travelType.toLowerCase());
+
+  if (index === -1) {
+    return {
+      type: travelType.toLowerCase(),
+      offers: []
+    };
+  } else {
+
+    return {
+      type: travelType.toLowerCase(),
+      offers: OFFERS[index].offers
+    };
+  }
+
+
+};
+
+const getRandomType = () => {
+  const randomTypeElement = ROUTE_POINTS_TYPES[getRandomIntegerNumber(0, ROUTE_POINTS_TYPES.length)];
+
+  return randomTypeElement;
+};
+
 
 const generateRoutePoint = () => {
 
-  const optionsQty = getRandomIntegerNumber(1, 4);
-  const optionsInfo = [];
-
-  for (let i = 0; i < optionsQty; i++) {
-    optionsInfo.push(ADDITIONAL_OPTIONS[getRandomIntegerNumber(0, ADDITIONAL_OPTIONS.length)]);
-  }
-
-  const getRandomType = () => {
-
-    const randomTypeKey = Math.random() > 0.5 ? `ride` : `stops`;
-    const randomTypeArray = Object.entries(ROUTE_POINTS_TYPES[randomTypeKey]);
-    const randomTypeElement = randomTypeArray[getRandomIntegerNumber(0, randomTypeArray.length)];
-
-
-    return {
-      'travelType': randomTypeElement[0],
-      'icon': randomTypeElement[1],
-    };
-  };
-
-
   const startDate = getRandomDate(new Date());
   const id = Math.floor(Math.random() * 1000);
+  const travelType = getRandomType();
+  // console.log(getOffers(travelType))
 
   return {
     id,
-    'travelType': getRandomType().travelType,
+    travelType,
     'city': {
       description: getDescription(descriptionText),
       name: CITIES[getRandomIntegerNumber(0, CITIES.length)],
@@ -95,238 +120,7 @@ const generateRoutePoint = () => {
     startDate,
     'endDate': getRandomDate(startDate),
     'isFavorite': false,
-    'options': [{
-      'type': `taxi`,
-      'offers': [{
-        'title': `Upgrade to a business class`,
-        'price': 190,
-        'isChecked': false,
-        'id': `event-offer-upgrade-to-business-class-1`,
-        'name': `event-offer-upgrade-to-business-class`
-      }, {
-        'title': `Choose the radio station`,
-        'price': 30,
-        'isChecked': false,
-        'id': `event-offer-choose-radio-station-1`,
-        'name': `event-offer-choose-radio-station`
-      }, {
-        'title': `Choose temperature`,
-        'price': 170,
-        'isChecked': false,
-        'id': `event-offer-choose-temperature-1`,
-        'name': `event-offer-choose-temperature`
-      }, {
-        'title': `Drive quickly, I'm in a hurry`,
-        'price': 100,
-        'isChecked': false,
-        'id': `event-offer-driving-quickly-1`,
-        'name': `event-offer-driving-quickly`
-      }, {
-        'title': `Drive slowly`,
-        'price': 110,
-        'isChecked': false,
-        'id': `event-offer-driving-slowly-1`,
-        'name': `event-offer-driving-slowly`
-      }
-      ]
-    }, {
-      'type': `bus`,
-      'offers': [{
-        'title': `Infotainment system`,
-        'price': 50,
-        'isChecked': false,
-        'id': `event-offer-infotainment-system-1`,
-        'name': `event-offer-infotainment-system`
-      }, {
-        'title': `Order meal`,
-        'price': 100,
-        'isChecked': false,
-        'id': `event-offer-order-meal-1`,
-        'name': `event-offer-order-meal`
-      }, {
-        'title': `Choose seats`,
-        'price': 190,
-        'isChecked': false,
-        'id': `event-offer-choose-seats-1`,
-        'name': `event-offer-choose-seats`
-      }
-      ]
-    }, {
-      'type': `train`,
-      'offers': [{
-        'title': `Book a taxi at the arrival point`,
-        'price': 110,
-        'isChecked': false,
-        'id': `event-offer-book-taxi-at-arrival-point-1`,
-        'name': `event-offer-book-taxi-at-arrival-point`
-      }, {
-        'title': `Order a breakfast`,
-        'price': 80,
-        'isChecked': false,
-        'id': `event-offer-breakfast-1`,
-        'name': `event-offer-breakfast`
-      }, {
-        'title': `Wake up at a certain time`,
-        'price': 140,
-        'isChecked': false,
-        'id': `event-offer-wake-up-1`,
-        'name': `event-offer-wake-up`
-      }
-      ]
-    }, {
-      'type': `flight`,
-      'offers': [{
-        'title': `Choose meal`,
-        'price': 120,
-        'isChecked': false,
-        'id': `event-offer-choose-meal-1`,
-        'name': `event-offer-choose-meal`
-      }, {
-        'title': `Choose seats`,
-        'price': 90,
-        'isChecked': false,
-        'id': `event-offer-choose-seats-1`,
-        'name': `event-offer-choose-seats`
-      }, {
-        'title': `Upgrade to comfort class`,
-        'price': 120,
-        'isChecked': false,
-        'id': `event-offer-upgrade-to-comfort-class-1`,
-        'name': `event-offer-upgrade-to-comfort-class`
-      }, {
-        'title': `Upgrade to business class`,
-        'price': 120,
-        'isChecked': false,
-        'id': `event-offer-upgrade-to-business-class-1`,
-        'name': `event-offer-upgrade-to-business-class`
-      }, {
-        'title': `Add luggage`,
-        'price': 170,
-        'isChecked': false,
-        'id': `event-offer-luggage-1`,
-        'name': `event-offer-luggage`
-      }, {
-        'title': `Business lounge`,
-        'price': 160,
-        'isChecked': false,
-        'id': `event-offer-business-lounge-1`,
-        'name': `event-offer-business-lounge`
-      }
-      ]
-    }, {
-      'type': `check-in`,
-      'offers': [{
-        'title': `Choose the time of check-in`,
-        'price': 70,
-        'isChecked': false,
-        'id': `event-offer-time-of-check-in-1`,
-        'name': `event-offer-time-of-check-in`
-      }, {
-        'title': `Choose the time of check-out`,
-        'price': 190,
-        'isChecked': false,
-        'id': `event-offer-time-of-check-out-1`,
-        'name': `event-offer-time-of-check-out`
-      }, {
-        'title': `Add breakfast`,
-        'price': 110,
-        'isChecked': false,
-        'id': `event-offer-breakfast-1`,
-        'name': `event-offer-breakfast`
-      }, {
-        'title': `Laundry`,
-        'price': 140,
-        'isChecked': false,
-        'id': `event-offer-laundry-1`,
-        'name': `event-offer-laundry`
-      }, {
-        'title': `Order a meal from the restaurant`,
-        'price': 30,
-        'isChecked': false,
-        'id': `event-offer-meal-from-restaurant-1`,
-        'name': `event-offer-meal-from-restaurant`
-      }
-      ]
-    }, {
-      'type': `sightseeing`,
-      'offers': []
-    }, {
-      'type': `ship`,
-      'offers': [{
-        'title': `Choose meal`,
-        'price': 130,
-        'isChecked': false,
-        'id': `event-offer-choose-meal-1`,
-        'name': `event-offer-choose-meal`
-      }, {
-        'title': `Choose seats`,
-        'price': 160,
-        'isChecked': false,
-        'id': `event-offer-choose-seats-1`,
-        'name': `event-offer-choose-seats`
-      }, {
-        'title': `Upgrade to comfort class`,
-        'price': 170,
-        'isChecked': false,
-        'id': `event-offer-upgrade-to-comfort-class-1`,
-        'name': `event-offer-upgrade-to-comfort-class`
-      }, {
-        'title': `Upgrade to business class`,
-        'price': 150,
-        'isChecked': false,
-        'id': `event-offer-upgrade-to-business-class-1`,
-        'name': `event-offer-upgrade-to-business-class`
-      }, {
-        'title': `Add luggage`,
-        'price': 100,
-        'isChecked': false,
-        'id': `event-offer-luggage-1`,
-        'name': `event-offer-luggage`
-      }, {
-        'title': `Business lounge`,
-        'price': 40,
-        'isChecked': false,
-        'id': `event-offer-lounge-1`,
-        'name': `event-offer-lounge`
-      }
-      ]
-    }, {
-      'type': `transport`,
-      'offers': []
-    }, {
-      'type': `drive`,
-      'offers': [{
-        'title': `Choose comfort class`,
-        'price': 110,
-        'isChecked': false,
-        'id': `event-offer-choose-comfort-class-1`,
-        'name': `event-offer-choose-comfort-class`
-      }, {
-        'title': `Choose business class`,
-        'price': 180,
-        'isChecked': false,
-        'id': `event-offer-choose-business-class-1`,
-        'name': `event-offer-choose-business-class`
-      }
-      ]
-    }, {
-      'type': `restaurant`,
-      'offers': [{
-        'title': `Choose live music`,
-        'price': 150,
-        'isChecked': false,
-        'id': `event-offer-choose-live-music-1`,
-        'name': `event-offer-choose-live-music`
-      }, {
-        'title': `Choose VIP area`,
-        'price': 70,
-        'isChecked': false,
-        'id': `event-offer-choose-vip-area-1`,
-        'name': `event-offer-choose-vip-area`
-      }
-      ]
-    }
-    ]
+    'options': getOffers(travelType)
 
   };
 };

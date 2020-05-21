@@ -15,30 +15,24 @@ export default class PriceController {
 
     const container = this._container;
     const pointsData = this._pointsModel.getPoints().slice();
+    // console.log(pointsData)
 
     let totalPrice = 0;
     pointsData.forEach((point) => {
-      // console.log(point.options)
+
+      // console.log(point.options.offers)
       let offersTotalPrice = 0;
-      point.options.forEach((routeType) => {
-        // console.log(routeType.offers.length, `routeType`)
-        if (routeType.offers.length < 1) {
-          return false;
-        }
-        return routeType.offers.forEach((offersType)=>{
-          // console.log(offersType)
-          const offerPrcie = offersType.isChecked ? offersType.price : 0;
+      if (point.options.offers.length < 1) {
+        offersTotalPrice += 0;
+      } else {
+        point.options.offers.forEach((it)=> {
+          const offerPrcie = it.isChecked ? it.price : 0;
           offersTotalPrice += offerPrcie;
         });
-        // const offerPrcie = offer.isChecked ? offer.price : 0;
-        // offersTotalPrice += offerPrcie;
-        //   const offerPrcie = offersType.price;
-        // offersTotalPrice += offerPrcie;
-      });
+      }
 
       totalPrice += (point.price + offersTotalPrice);
     });
-
 
     const oldComponent = this._priceComponent;
 

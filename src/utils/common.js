@@ -1,28 +1,16 @@
 import moment from "moment";
 import {ROUTE_POINTS_TYPES} from '../const.js';
 
+
+const STOP_EVENTS = [`Check-in`, `Sightseeing`, `Restaurant`];
+
 export const getPrefix = (travelType)=> {
 
-  let prefix = ``;
-  const transportEvents = Array.from(Object.keys(ROUTE_POINTS_TYPES.ride)).slice();
-  const stopEvents = Array.from(Object.keys(ROUTE_POINTS_TYPES.stops)).slice();
-
-  const chooseEventType = (eventsData, tripType) => {
-    return eventsData.some((item) => item === tripType);
-  };
-
-  const isRideTypeChosed = chooseEventType(transportEvents, travelType);
-  const isStopTypeChosed = chooseEventType(stopEvents, travelType);
-
-  if (isRideTypeChosed) {
-    prefix = `to`;
-
-  } else if (isStopTypeChosed) {
-    prefix = `in`;
-  }
-
+  let prefix = STOP_EVENTS.some((it)=> it === travelType) ? `in`: `to`;
+   
   return prefix;
 };
+
 
 export const getFormattedTime = (date, withDay = false) => {
   return withDay ? moment(date).format(`D/M/YY`) : moment(date).format(`HH:mm`);

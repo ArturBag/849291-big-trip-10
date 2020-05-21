@@ -1,7 +1,8 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import {ROUTE_POINTS_TYPES} from '../const.js';
 import {getPrefix} from '../utils/common.js';
 import {Mode as PointControllerMode} from '../controllers/point-controller.js';
+import {OFFERS} from '../const.js';
+
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import 'flatpickr/dist/themes/light.css';
@@ -57,42 +58,17 @@ export default class EventForm extends AbstractSmartComponent {
     this._mode = mode;
 
     this._travelType = route.travelType;
-    console.log(this._travelType.toLowerCase())
     this._prefix = getPrefix(this._travelType);
     this._icon = `img/icons/${this._travelType.toLowerCase()}.png`;
     this._city = route.city.name;
     this._description = route.city.description;
     this._isFavorite = route.isFavorite;
     this._price = route.price;
-    this._options = route.options;
+    this._options = route.options.offers;
     this._pictures = route.city.pictures;
 
-    this._iconForReset = this._icon;
+    this._iconForReset = `img/icons/${route.travelType.toLowerCase()}.png`;
     this._prefixForReset = getPrefix(route.travelType);
-
-    // this._travelType = route.travelType.type;
-    // this._prefix = getPrefix(this._travelType);
-    // this._icon = route.travelType.icon;
-    // this._city = route.city.name;
-    // this._description = route.city.description;
-    // this._isFavorite = route.isFavorite;
-    // this._price = route.price;
-    // this._options = route.travelType.offers;
-    // this._pictures = route.city.pictures;
-
-    // this._prefixForReset = getPrefix(route.travelType.type);
-
-    // this._travelType = route.travelType;
-    // this._prefix = getPrefix(route.travelType);
-    // this._icon = route.icon;
-    // this._city = route.city;
-    // this._isFavorite = route.isFavorite;
-    // this._price = route.price;
-    // this._options = route.options;
-    // this._pictures = route.pictures;
-    // // this._indexOfChosedOption = -1;
-
-    // this._prefixForReset = getPrefix(route.travelType);
 
     this._isDestinationCityChosed = true;
 
@@ -231,35 +207,21 @@ export default class EventForm extends AbstractSmartComponent {
     const offers = this.getElement().querySelectorAll(`.event__offer-checkbox`);
     const price = this.getElement().querySelector(`#event-price-1`);
 
-
-    const transportEvents = ROUTE_POINTS_TYPES.ride;
-    const stopEvents = ROUTE_POINTS_TYPES.stops;
-    let chosedEventType = ``;
-
     eventTypes.forEach((it) => {
       it.addEventListener(`click`, () => {
-        chosedEventType = it.querySelector(`input`).value;
+        const chosedEventTypeValue = it.querySelector(`input`).value;
+        const iconName = chosedEventTypeValue;
+        const chosedEventTypeName = chosedEventTypeValue.charAt(0).toUpperCase() + chosedEventTypeValue.substr(1);
 
-        chosedEventType = chosedEventType.charAt(0).toUpperCase() + chosedEventType.substr(1);
+        this._prefix = getPrefix(chosedEventTypeName);
+        this._icon = `img/icons/${iconName}.png`;
+        this._travelType = chosedEventTypeName;
 
-        this._prefix = getPrefix(chosedEventType);
+        const index = OFFERS.findIndex((elem)=> elem.type === chosedEventTypeValue);
+        const newOffer = OFFERS[index];
+        this._options = newOffer.offers;
 
-        const isChosedEventTypeRide = Object.keys(transportEvents).find((type) => type === chosedEventType);
-        const isChosedEventTypeStop = Object.keys(stopEvents).find((type) => type === chosedEventType);
-        if (isChosedEventTypeRide) {
-
-          this._icon = transportEvents[chosedEventType];
-          this._travelType = chosedEventType;
-
-        } else if (isChosedEventTypeStop) {
-
-          this._icon = stopEvents[chosedEventType];
-          this._travelType = chosedEventType;
-
-
-        }
         this.rerender();
-
 
       });
 
@@ -276,13 +238,10 @@ export default class EventForm extends AbstractSmartComponent {
     offers.forEach((it)=>{
       it.addEventListener(`change`, (evt)=>{
 
-        const chosedOffer = evt.target.value;
+        const chosedOffer = evt.target.name;
 
-        const index = this._routeData.options.offers.findIndex((offer)=> offer.name === chosedOffer);
-
-        this._routeData.options.offers[index] = Object.assign({}, this._routeData.travelType.offers[index], {
-          isChecked: !this._routeData.travelType.offers[index].isChecked
-        });
+        const index = this._options.findIndex((offer)=> offer.name === chosedOffer);
+        this._options[index].isChecked = !this._options[index].isChecked;
 
         this.rerender();
 
@@ -290,21 +249,6 @@ export default class EventForm extends AbstractSmartComponent {
 
     });
 
-    // offers.forEach((it)=>{
-    //   it.addEventListener(`change`, (evt)=>{
-
-    //     const chosedOffer = evt.target.name;
-    //     const index = this._routeData.travelType.offers.findIndex((offer)=> offer.name === chosedOffer);
-
-    //     this._routeData.travelType.offers[index] = Object.assign({}, this._routeData.travelType.offers[index], {
-    //       isChecked: !this._routeData.travelType.offers[index].isChecked
-    //     });
-
-    //     this.rerender();
-
-    //   });
-
-    // });
 
     price.addEventListener(`change`, (evt)=>{
       this._price = parseInt(evt.target.value, 10);
@@ -330,36 +274,25 @@ export default class EventForm extends AbstractSmartComponent {
     const isFavoriteButtonDisplayed = this._mode === PointControllerMode.ADDING ? false : true;
     const dataTravelTypeName = this._travelType;
 
-    const additionalOptionsData = this._options;
-
-    const travelType = this._travelType.toLowerCase();
-    let offers = ``;
     let eventOffers = ``;
 
-    const indexOfTravelType = additionalOptionsData.findIndex((it)=> it.type === travelType);
-
-    if (indexOfTravelType === -1) {
-      offers = offers;
+    if (this._options.length < 1) {
+      eventOffers = ``;
     } else {
 
-      offers = additionalOptionsData[indexOfTravelType].offers;
-
-      eventOffers = offers.map((it) => {
-        const isOptionChecked = it.isChecked ? `checked` : ``;
-
+      eventOffers = this._options.map((it) => {
+        const isChecked = it.isChecked ? `checked` : ``;
 
         return `<div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="${it.id}" type="checkbox" name="${it.name}" ${isOptionChecked}>
-          <label class="event__offer-label" for="${it.id}">
-            <span class="event__offer-title">${it.title}</span>
-            &plus;
-            &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
-          </label>
-        </div>`;
+              <input class="event__offer-checkbox  visually-hidden" id="${it.id}" type="checkbox" name="${it.name}" ${isChecked}>
+              <label class="event__offer-label" for="${it.id}">
+                <span class="event__offer-title">${it.title}</span>
+                &plus;
+                &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
+              </label>
+            </div>`;
       }).join(` \n`);
-
     }
-
 
     const imageTemplate = this._pictures.map((it) => {
       return `<img class="event__photo" src="${it.src}" alt="${it.description}">`;

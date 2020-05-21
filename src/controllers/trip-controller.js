@@ -84,7 +84,7 @@ export default class TripController {
   render(routeData) {
 
     const pointsData = getDefaultEvents(routeData);
-    // console.log(pointsData)
+    console.log(pointsData)
 
     const container = this._container;
     const tripDaysListElement = this._tripDaysList.getElement();

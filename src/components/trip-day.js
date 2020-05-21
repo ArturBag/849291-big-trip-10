@@ -35,17 +35,17 @@ export default class TripDay extends AbstractComponent {
 
     const duration = getTimeDiff(endDate - startDate);
 
-    let offers = ``;
+
+    let offers = [];
     let optionsInfo = ``;
-    const index = options.findIndex((it)=> it.type === travelType.toLowerCase());
-    if (index === -1) {
-      offers = offers;
+
+    if (options.offers.length < 1) {
+      offers = [];
     } else {
-
-      offers = options[index].offers;
-      offers = offers.length > 3 ?
-        offers.slice(0, MAX_OFFERS_QTY_TO_SHOW) : offers;
-
+ 
+      offers = options.offers.length > 3 ?
+      options.offers.slice(0, MAX_OFFERS_QTY_TO_SHOW) : options.offers;
+ 
       optionsInfo = offers.map((it) => {
 
         return `<li class="event__offer">
