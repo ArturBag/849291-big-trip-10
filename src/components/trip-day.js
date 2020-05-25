@@ -1,5 +1,5 @@
 import AbstractComponent from './abstract-component.js';
-import {getPrefix, getFormattedTime, getTimeDiff} from '../utils/common.js';
+import {getPrefix, getFormattedTime, getTimeDiff, getOffers} from '../utils/common.js';
 
 const MAX_OFFERS_QTY_TO_SHOW = 3;
 
@@ -22,10 +22,10 @@ export default class TripDay extends AbstractComponent {
 
   getTemplate() {
 
-    const {travelType, city, price, date, startDate, endDate, options} = this._route;
+    const {travelType, city, price, date, startDate, endDate} = this._route;
 
     const icon = `img/icons/${travelType.toLowerCase()}.png`;
-    const cityName = city.name;
+    // const cityName = city.name;
     const dayCounter = date ? this._routeIndex + 1 : 0;
 
     const prefix = getPrefix(travelType);
@@ -35,6 +35,8 @@ export default class TripDay extends AbstractComponent {
 
     const duration = getTimeDiff(endDate - startDate);
 
+    const options = getOffers(travelType)
+
 
     let offers = [];
     let optionsInfo = ``;
@@ -42,10 +44,10 @@ export default class TripDay extends AbstractComponent {
     if (options.offers.length < 1) {
       offers = [];
     } else {
- 
+
       offers = options.offers.length > 3 ?
-      options.offers.slice(0, MAX_OFFERS_QTY_TO_SHOW) : options.offers;
- 
+        options.offers.slice(0, MAX_OFFERS_QTY_TO_SHOW) : options.offers;
+
       optionsInfo = offers.map((it) => {
 
         return `<li class="event__offer">
@@ -56,6 +58,24 @@ export default class TripDay extends AbstractComponent {
 
       }).join(` \n`);
     }
+
+    // if (options.offers.length < 1) {
+    //   offers = [];
+    // } else {
+
+    //   offers = options.offers.length > 3 ?
+    //   options.offers.slice(0, MAX_OFFERS_QTY_TO_SHOW) : options.offers;
+
+    //   optionsInfo = offers.map((it) => {
+
+    //     return `<li class="event__offer">
+    //       <span class="event__offer-title">${it.title}</span>
+    //       &plus;
+    //       &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
+    //       </li>`;
+
+    //   }).join(` \n`);
+    // }
 
     return `<li class="trip-days__item  day">
      <div class="day__info">
@@ -71,7 +91,7 @@ export default class TripDay extends AbstractComponent {
             <div class="event__type">
               <img class="event__type-icon" width="42" height="42" src="${icon}" alt="Event type icon">
             </div>
-            <h3 class="event__title">${travelType} ${prefix} ${cityName}</h3>
+            <h3 class="event__title">${travelType} ${prefix} ${city}</h3>
 
             <div class="event__schedule">
               <p class="event__time">

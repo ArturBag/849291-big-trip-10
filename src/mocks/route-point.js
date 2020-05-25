@@ -1,4 +1,4 @@
-import { ROUTE_POINTS_TYPES, CITIES, OFFERS, CITIES } from '../const.js';
+import { ROUTE_POINTS_TYPES, CITIES, OFFERS, DESTINATION_INFO } from '../const.js';
 
 const descriptionText = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 Cras aliquet varius magna, non porta ligula feugiat eget.
@@ -8,20 +8,6 @@ condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliqu
 purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis.
 Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.`;
 
-const PICTURES_QTY = 5;
-const generatePictureURL = () => `http://picsum.photos/300/150?r=${Math.random()}`;
-const generatePictureDescription = () => `some description for picture ${Math.floor(Math.random() * 25)}`;
-
-
-const generatePictures = (count) => {
-  return new Array(count).fill(``)
-    .map(() => {
-      return {
-        src: generatePictureURL(),
-        description: generatePictureDescription()
-      };
-    });
-};
 
 const getRandomIntegerNumber = (min, max) => {
   return Math.floor(Math.random() * (max - min) + min);
@@ -52,46 +38,50 @@ const getRandomDate = (date) => {
 
 };
 
-// const getPicturesData = (destination)=> {
+const getDestinationData = (city)=> {
 
-//   const index = CITIES.findIndex((it)=> it.type === travelType.toLowerCase());
-
-//   if (index === -1) {
-//     return {
-//       description: getDescription(descriptionText),
-//       name: destination,
-//       pictures: []
-//     };
-//   } else {
-
-//     return {
-//       description: getDescription(descriptionText),
-//       name: CITIES[getRandomIntegerNumber(0, CITIES.length)],
-//       pictures: generatePictures(PICTURES_QTY)
-//     };
-//   }
-
-
-// };
-
-const getOffers = (travelType)=> {
-
-  const index = OFFERS.findIndex((it)=> it.type === travelType.toLowerCase());
+  const index = DESTINATION_INFO.findIndex((it)=> it.name === city);
 
   if (index === -1) {
     return {
-      type: travelType.toLowerCase(),
-      offers: []
+      description: getDescription(descriptionText),
+      name: city,
+      pictures: []
     };
   } else {
 
     return {
-      type: travelType.toLowerCase(),
-      offers: OFFERS[index].offers
+      name: DESTINATION_INFO[index].name,
+      description: DESTINATION_INFO[index].description,
+      pictures: DESTINATION_INFO[index].pictures
     };
   }
 
 
+};
+
+
+// генерирует массив чекнутых офферов рандомно
+
+const getIncludedOffers = (routeType) => {
+  const indexOfAllOffersByType = OFFERS.findIndex((offer) => offer.type === routeType);
+
+  const allOffersByType = OFFERS[indexOfAllOffersByType].offers;
+  let includedOffersResult = [];
+  if (allOffersByType.length < 1) {
+    return [];
+  } else {
+    const offersQty = getRandomIntegerNumber(1, allOffersByType.length);
+    includedOffersResult = OFFERS[indexOfAllOffersByType].offers.slice(0, offersQty);
+
+    return includedOffersResult;
+
+  }
+
+};
+
+const getRandomCity = () => {
+  return CITIES[getRandomIntegerNumber(0, CITIES.length)];
 };
 
 const getRandomType = () => {
@@ -106,21 +96,20 @@ const generateRoutePoint = () => {
   const startDate = getRandomDate(new Date());
   const id = Math.floor(Math.random() * 1000);
   const travelType = getRandomType();
-  // console.log(getOffers(travelType))
+  const city = getRandomCity();
+  const destinationInfo = getDestinationData(city);
+
 
   return {
     id,
     travelType,
-    'city': {
-      description: getDescription(descriptionText),
-      name: CITIES[getRandomIntegerNumber(0, CITIES.length)],
-      pictures: generatePictures(PICTURES_QTY)
-    },
+    city,
+    'destination': destinationInfo,
     'price': getRandomIntegerNumber(10, 1000),
     startDate,
     'endDate': getRandomDate(startDate),
     'isFavorite': false,
-    'options': getOffers(travelType)
+    'includedOffers': getIncludedOffers(travelType.toLowerCase())
 
   };
 };
@@ -133,40 +122,3 @@ const generateRoutePoints = (count) => {
 
 export { generateRoutePoint, generateRoutePoints, getRandomDate };
 
-
-// {
-//   `id`: `4`,
-//   'type': `train`,
-//   `date_from`: `2020-05-16T21:54:00.000Z`,
-//   `date_to`: `2020-05-17T17:06:00.000Z`,
-//   `destination`: {
-//       `name`: `Madrid`,
-//       `description`: `Madrid, is a beautiful city, with crowded streets, in a middle of Europe, with a beautiful old town, with an embankment of a mighty river as a centre of attraction, full of of cozy canteens where you can try the best coffee in the Middle East.`,
-//       `pictures`: [{
-//               `src`: `http://picsum.photos/300/200?r=0.5179819098494176`,
-//               `description`: `Madrid central station`
-//           }, {
-//               `src`: `http://picsum.photos/300/200?r=0.7377934937908623`,
-//               `description`: `Madrid city centre`
-//           }, {
-//               `src`: `http://picsum.photos/300/200?r=0.7609717173767792`,
-//               `description`: `Madrid central station`
-//           }, {
-//               `src`: `http://picsum.photos/300/200?r=0.7595745000022156`,
-//               `description`: `Madrid city centre`
-//           }, {
-//               `src`: `http://picsum.photos/300/200?r=0.4462736718078635`,
-//               `description`: `Madrid central station`
-//           }, {
-//               `src`: `http://picsum.photos/300/200?r=0.2112403774698668`,
-//               `description`: `Madrid embankment`
-//           }, {
-//               `src`: `http://picsum.photos/300/200?r=0.7748161356160432`,
-//               `description`: `Madrid city centre`
-//           }
-//       ]
-//   },
-//   `base_price`: 500,
-//   `is_favorite`: false,
-//   `offers`: []
-// },

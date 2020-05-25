@@ -1,7 +1,7 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
 import {getPrefix} from '../utils/common.js';
 import {Mode as PointControllerMode} from '../controllers/point-controller.js';
-import {OFFERS} from '../const.js';
+import {OFFERS, DESTINATION_INFO, CITIES} from '../const.js';
 
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
@@ -60,12 +60,10 @@ export default class EventForm extends AbstractSmartComponent {
     this._travelType = route.travelType;
     this._prefix = getPrefix(this._travelType);
     this._icon = `img/icons/${this._travelType.toLowerCase()}.png`;
-    this._city = route.city.name;
-    this._description = route.city.description;
+    this._city = route.city;
     this._isFavorite = route.isFavorite;
     this._price = route.price;
-    this._options = route.options.offers;
-    this._pictures = route.city.pictures;
+    this._includedOffers = route.includedOffers;
 
     this._iconForReset = `img/icons/${route.travelType.toLowerCase()}.png`;
     this._prefixForReset = getPrefix(route.travelType);
@@ -123,11 +121,9 @@ export default class EventForm extends AbstractSmartComponent {
     this._travelType = this._routeData.travelType;
     this._prefix = this._prefixForReset;
     this._icon = this._iconForReset;
-    this._city = this._routeData.city.name;
+    this._city = this._routeData.city;
     this._price = this._routeData.price;
     this._isFavorite = this._routeData.isFavorite;
-    this._options = this._routeData.options.offers;
-    this._pictures = this._routeData.city.pictures;
 
     this.rerender();
   }
@@ -204,22 +200,13 @@ export default class EventForm extends AbstractSmartComponent {
   _subscribeOnEvents() {
     const eventTypes = this.getElement().querySelectorAll(`.event__type-item`);
     const cityInput = this.getElement().querySelector(`.event__input--destination`);
-    const offers = this.getElement().querySelectorAll(`.event__offer-checkbox`);
     const price = this.getElement().querySelector(`#event-price-1`);
 
     eventTypes.forEach((it) => {
-      it.addEventListener(`click`, () => {
+      it.addEventListener(`change`, () => {
         const chosedEventTypeValue = it.querySelector(`input`).value;
-        const iconName = chosedEventTypeValue;
-        const chosedEventTypeName = chosedEventTypeValue.charAt(0).toUpperCase() + chosedEventTypeValue.substr(1);
 
-        this._prefix = getPrefix(chosedEventTypeName);
-        this._icon = `img/icons/${iconName}.png`;
-        this._travelType = chosedEventTypeName;
-
-        const index = OFFERS.findIndex((elem)=> elem.type === chosedEventTypeValue);
-        const newOffer = OFFERS[index];
-        this._options = newOffer.offers;
+        this._travelType = chosedEventTypeValue.charAt(0).toUpperCase() + chosedEventTypeValue.substr(1);
 
         this.rerender();
 
@@ -227,26 +214,13 @@ export default class EventForm extends AbstractSmartComponent {
 
     });
 
-    cityInput.addEventListener(`change`, () => {
-      this._city = cityInput.value;
+    cityInput.addEventListener(`change`, (evt) => {
+
+      this._city = evt.target.value;
       if (this._city) {
         this._isDestinationCityChosed = true;
       }
       this.rerender();
-    });
-
-    offers.forEach((it)=>{
-      it.addEventListener(`change`, (evt)=>{
-
-        const chosedOffer = evt.target.name;
-
-        const index = this._options.findIndex((offer)=> offer.name === chosedOffer);
-        this._options[index].isChecked = !this._options[index].isChecked;
-
-        this.rerender();
-
-      });
-
     });
 
 
@@ -265,27 +239,48 @@ export default class EventForm extends AbstractSmartComponent {
       this._isDestinationCityChosed = false;
     }
 
-    const destinationCity = this._city;
-    const iconName = this._icon;
-    const destinationDescription = this._description;
+    const lowerCaseType = this._travelType.toLowerCase();
+    this._prefix = getPrefix(this._travelType);
+    this._icon = `img/icons/${lowerCaseType}.png`;
+
+    const indexOfOffers = OFFERS.findIndex((elem)=> elem.type === lowerCaseType);
+    const newOffer = OFFERS[indexOfOffers];
+    this._options = newOffer.offers;
+
     const isFavoriteChecked = this._isFavorite ? `checked` : ``;
     const buttonModeText = this._mode === PointControllerMode.ADDING ? `Cancel` : `Delete`;
     const isCloseFormButtonDisplayed = this._mode === PointControllerMode.ADDING ? false : true;
     const isFavoriteButtonDisplayed = this._mode === PointControllerMode.ADDING ? false : true;
+
     const dataTravelTypeName = this._travelType;
 
+    const city = this._city;
+
+    const destinationData = DESTINATION_INFO.filter((it)=>it.name === city);
+
+    const destinationDescription = destinationData[0].description;
+    const destinationPictures = destinationData[0].pictures;
+    let imageTemplate = ``;
     let eventOffers = ``;
+    const dataList = CITIES.map((val)=> `<option value="${val}"></option>`).join(` \n`);
 
     if (this._options.length < 1) {
       eventOffers = ``;
     } else {
 
       eventOffers = this._options.map((it) => {
-        const isChecked = it.isChecked ? `checked` : ``;
+
+        const id = it.title.split(/\s+/).join(`-`);
+        const nameAttr = it.title;
+
+        const isChecked = ()=> this._includedOffers.some((includedOffer)=>
+          it.title === includedOffer.title
+        ) ? `checked` : ``;
+
 
         return `<div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="${it.id}" type="checkbox" name="${it.name}" ${isChecked}>
-              <label class="event__offer-label" for="${it.id}">
+              <input class="event__offer-checkbox  visually-hidden" id="${id}" type="checkbox" name="${nameAttr}" ${isChecked()}>
+              <label class="event__offer-label" for="${id}">
                 <span class="event__offer-title">${it.title}</span>
                 &plus;
                 &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
@@ -294,16 +289,22 @@ export default class EventForm extends AbstractSmartComponent {
       }).join(` \n`);
     }
 
-    const imageTemplate = this._pictures.map((it) => {
-      return `<img class="event__photo" src="${it.src}" alt="${it.description}">`;
-    }).join(` \n`);
+
+    if (destinationPictures.length < 1) {
+      imageTemplate = ``;
+    } else {
+      imageTemplate = destinationPictures.map((it) => {
+
+        return `<img class="event__photo" src="${it.src}" alt="${it.description}">`;
+      }).join(` \n`);
+    }
 
     return `<form class="trip-events__item  event  event--edit" action="#" method="post">
     <header class="event__header">
     <div class="event__type-wrapper">
     <label class="event__type  event__type-btn" for="event-type-toggle-1">
       <span class="visually-hidden">Choose event type</span>
-      <img class="event__type-icon" width="17" height="17" src="${iconName}" alt="Event type icon">
+      <img class="event__type-icon" width="17" height="17" src="${this._icon}" alt="Event type icon">
     </label>
     <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" data-travel-type="${dataTravelTypeName}" name="type-toggle" type="checkbox">
 
@@ -372,12 +373,9 @@ export default class EventForm extends AbstractSmartComponent {
     <label class="event__label  event__type-output" for="event-destination-1">
     ${this._travelType} ${this._prefix}
     </label>
-    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationCity}" list="destination-list-1">
+    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
     <datalist id="destination-list-1">
-      <option value="Amsterdam"></option>
-      <option value="Geneva"></option>
-      <option value="Chamonix"></option>
-      <option value="Saint Petersburg"></option>
+      ${dataList}
     </datalist>
     </div>
 
