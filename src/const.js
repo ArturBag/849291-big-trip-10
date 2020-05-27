@@ -877,17 +877,6 @@ export const DESTINATION_INFO = [{
 
 export const CITIES = DESTINATION_INFO.map((it)=> it.name);
 
-
-// export const CITIES = [
-//   `Geneva`,
-//   `Chamonix`,
-//   `Amsterdam`,
-//   `New York`,
-//   `London`,
-//   `Toronto`
-// ];
-
-
 export const MONTH_NAMES = [
   `January`,
   `February`,

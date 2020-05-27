@@ -1,5 +1,6 @@
 import AbstractComponent from './abstract-component.js';
 
+
 export default class Price extends AbstractComponent {
   constructor(prcieData) {
     super();

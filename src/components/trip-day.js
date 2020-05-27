@@ -1,5 +1,7 @@
 import AbstractComponent from './abstract-component.js';
-import {getPrefix, getFormattedTime, getTimeDiff, getOffers} from '../utils/common.js';
+import {getPrefix, getFormattedTime, getTimeDiff} from '../utils/common.js';
+// import {getIncludedOffers} from '../mock/route-point.js';
+import {OFFERS} from '../const.js';
 
 const MAX_OFFERS_QTY_TO_SHOW = 3;
 
@@ -35,7 +37,7 @@ export default class TripDay extends AbstractComponent {
 
     const duration = getTimeDiff(endDate - startDate);
 
-    const options = getOffers(travelType)
+    const options = OFFERS.filter((it)=> it.type === travelType.toLowerCase())[0];
 
 
     let offers = [];
@@ -58,24 +60,6 @@ export default class TripDay extends AbstractComponent {
 
       }).join(` \n`);
     }
-
-    // if (options.offers.length < 1) {
-    //   offers = [];
-    // } else {
-
-    //   offers = options.offers.length > 3 ?
-    //   options.offers.slice(0, MAX_OFFERS_QTY_TO_SHOW) : options.offers;
-
-    //   optionsInfo = offers.map((it) => {
-
-    //     return `<li class="event__offer">
-    //       <span class="event__offer-title">${it.title}</span>
-    //       &plus;
-    //       &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
-    //       </li>`;
-
-    //   }).join(` \n`);
-    // }
 
     return `<li class="trip-days__item  day">
      <div class="day__info">

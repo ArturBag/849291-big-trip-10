@@ -1,8 +1,7 @@
 import EventForm from '../components/event-form.js';
 import TripDay from '../components/trip-day.js';
 import {render, replace, remove, RenderPosition} from '../utils/render.js';
-import {getRandomDate} from '../mocks/route-point.js';
-// import {ROUTE_POINTS_TYPES, ADDITIONAL_OPTIONS} from '../const.js';
+import {getRandomDate, getIncludedOffers} from '../mocks/route-point.js';
 
 
 export const Mode = {
@@ -11,76 +10,27 @@ export const Mode = {
   EDIT: `edit`,
 };
 
-const PICTURES_QTY = 5;
-const generatePictureURL = () => `http://picsum.photos/300/150?r=${Math.random()}`;
-const generatePictureDescription = () => `some description for picture ${Math.floor(Math.random() * 25)}`;
-const generatePictures = (count) => {
-  return new Array(count).fill(``)
-    .map(()=>{
-      return {
-        src: generatePictureURL(),
-        description: generatePictureDescription()
-      };
-    });
-};
-
+const travelType = `Flight`;
+const city = ``;
+const includedOffers = getIncludedOffers(travelType.toLowerCase());
 const startDate = getRandomDate(new Date());
 const endDate = getRandomDate(startDate);
 
 
 export const EmptyPoint = {
-  'id': Math.floor(Math.random() * 1000),
-  'travelType': {
-    type: `Flight`,
-    icon: `img/icons/flight.png`,
-    // offers: [
-
-    //   {
-    //     'title': `Add luggage`,
-    //     'price': 10,
-    //     'isChecked': false,
-    //     'id': `event-offer-luggage-1`,
-    //     'name': `event-offer-luggage`
-    //   },
-    //   {
-    //     'title': `Switch to comfort class`,
-    //     'price': 150,
-    //     'isChecked': false,
-    //     'id': `event-offer-comfort-1`,
-    //     'name': `event-offer-comfort`
-    //   },
-    //   {
-    //     'title': `Add meal`,
-    //     'price': 2,
-    //     'isChecked': false,
-    //     'id': `event-offer-meal-1`,
-    //     'name': `event-offer-meal`
-    //   },
-    //   {
-    //     'title': `Choose seats`,
-    //     'price': 9,
-    //     'isChecked': false,
-    //     'id': `event-offer-seats-1`,
-    //     'name': `event-offer-seats`
-    //   },
-    //   {
-    //     'title': `Travel by train`,
-    //     'price': 40,
-    //     'isChecked': false,
-    //     'id': `event-offer-train-1`,
-    //     'name': `event-offer-train`
-    //   }
-    // ]
-  },
-  'city': {
-    description: `some description text`,
+  id: Math.floor(Math.random() * 1000),
+  travelType,
+  city,
+  destination: {
     name: ``,
-    pictures: generatePictures(PICTURES_QTY)
+    description: ``,
+    pictures: []
   },
-  'price': 0,
-  'isFavorite': false,
+  price: 0,
   startDate,
-  endDate
+  endDate,
+  isFavorite: false,
+  includedOffers
 };
 
 

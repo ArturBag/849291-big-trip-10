@@ -151,7 +151,7 @@ export default class TripController {
   }
 
   _onDataChange(pointController, oldData, newData, isFavorite) {
-
+console.log(newData)
     if (oldData === EmptyPoint) {
       this._creatingPoint = null;
       if (newData === null) {

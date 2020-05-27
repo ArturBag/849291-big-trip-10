@@ -13,17 +13,6 @@ const getRandomIntegerNumber = (min, max) => {
   return Math.floor(Math.random() * (max - min) + min);
 };
 
-const getDescription = (text) => {
-  let textArray = text.split(`. `);
-  let sentenceQty = getRandomIntegerNumber(1, 3);
-  let description = ``;
-  for (let i = 0; i < sentenceQty; i++) {
-    description += textArray[getRandomIntegerNumber(0, textArray.length)] + `. `;
-  }
-
-  return description;
-};
-
 
 const getRandomDate = (date) => {
 
@@ -44,8 +33,8 @@ const getDestinationData = (city)=> {
 
   if (index === -1) {
     return {
-      description: getDescription(descriptionText),
-      name: city,
+      description: [],
+      name: ``,
       pictures: []
     };
   } else {
@@ -63,7 +52,8 @@ const getDestinationData = (city)=> {
 
 // генерирует массив чекнутых офферов рандомно
 
-const getIncludedOffers = (routeType) => {
+export const getIncludedOffers = (routeType) => {
+
   const indexOfAllOffersByType = OFFERS.findIndex((offer) => offer.type === routeType);
 
   const allOffersByType = OFFERS[indexOfAllOffersByType].offers;

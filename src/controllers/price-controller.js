@@ -1,7 +1,7 @@
 import PriceComponent from '../components/price.js';
 import {render, replace, RenderPosition} from '../utils/render.js';
-import {getOffers} from '../utils/common.js';
-import {OFFERS} from '../const.js';
+// import {getOffers} from '../utils/common.js';
+// import {OFFERS} from '../const.js';
 
 
 export default class PriceController {
@@ -10,35 +10,34 @@ export default class PriceController {
     this._pointsModel = pointsModel;
 
     this._priceComponent = null;
+    this._onDataChange = this._onDataChange.bind(this);
 
+    this._pointsModel.setDataChangeHandler(this._onDataChange);
   }
 
   render() {
 
     const container = this._container;
     const pointsData = this._pointsModel.getPoints().slice();
-    // console.log(pointsData)
-    
 
     let totalPrice = 0;
+    let totalOffersPrice = 0;
     pointsData.forEach((point) => {
 
-      // const currentOffers = getOffers(point.travelType);
-      // console.log(point.options.offers)
-      
-      // let offersTotalPrice = 0;
-      // if (point.offers.length < 1) {
-      //   offersTotalPrice += 0;
-      // } else {
-      //   point.offers.forEach((it)=> {
-      //     const offerPrcie =  it.price;
-      //     offersTotalPrice += offerPrcie;
-      //   });
-      // }
+      const checkedOffers = point.includedOffers;
 
-      // totalPrice += (point.price + offersTotalPrice);
-      totalPrice += point.price;
+
+      if (checkedOffers.length === 0) {
+        totalOffersPrice += 0;
+      } else {
+        checkedOffers.forEach((offer)=> {
+          totalOffersPrice += offer.price;
+        });
+      }
+
+      totalPrice = parseInt(totalPrice + point.price + totalOffersPrice, 10);
     });
+
 
     const oldComponent = this._priceComponent;
 
@@ -49,31 +48,12 @@ export default class PriceController {
     } else {
       render(container, this._priceComponent.getElement(), RenderPosition.BEFOREEND);
     }
-    // const container = this._container;
-    // const pointsData = this._pointsModel.getPoints().slice();
-
-    // let totalPrice = 0;
-    // pointsData.forEach((point) => {
-    //   let offersTotalPrice = 0;
-    //   point.options.forEach((offer)=> {
-    //     const offerPrcie = offer.isChecked ? offer.price : 0;
-    //     offersTotalPrice += offerPrcie;
-    //   });
-
-    //   totalPrice += (point.price + offersTotalPrice);
-    // });
 
 
-    // const oldComponent = this._priceComponent;
+  }
 
-    // this._priceComponent = new PriceComponent(totalPrice);
-
-    // if (oldComponent) {
-    //   replace(this._priceComponent, oldComponent);
-    // } else {
-    //   render(container, this._priceComponent.getElement(), RenderPosition.BEFOREEND);
-    // }
-
+  _onDataChange() {
+    this.render();
   }
 
 

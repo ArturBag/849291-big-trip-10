@@ -7,7 +7,30 @@ import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import 'flatpickr/dist/themes/light.css';
 
-const parseFormData = (formData, form, mode) => {
+const parseFormData = (formData, form, mode, id) => {
+
+  const travelType = form.querySelector(`.event__type-toggle`).dataset.travelType;
+  const city = formData.get(`event-destination`);
+  const destinationName = city;
+  const destinationDescription = form.querySelector(`.event__destination-description`).innerText;
+  const destinationPicturesData = form.querySelectorAll(`.event__photo`);
+  const pictures = Array.from(destinationPicturesData).map((it)=> {
+    return {
+      'src': it.src,
+      'description': it.alt
+    };
+  });
+
+  const price = parseInt(formData.get(`event-price`), 10);
+  const startDate = flatpickr.parseDate(formData.get(`event-start-time`), `d/m/y H:i`);
+  const endDate = flatpickr.parseDate(formData.get(`event-end-time`), `d/m/y H:i`);
+  const chosedOffers = [...form.querySelectorAll(`.event__offer-checkbox:checked`)];
+  const includedOffers = chosedOffers.map((offer)=>{
+    return {
+      title: offer.name,
+      price: 100,
+    };
+  });
 
   let isFavorite = false;
   if (mode === PointControllerMode.ADDING) {
@@ -16,37 +39,20 @@ const parseFormData = (formData, form, mode) => {
     isFavorite = form.querySelector(`.event__favorite-checkbox`).checked;
   }
 
-  const travelType = form.querySelector(`.event__type-toggle`).dataset.travelType;
-  const pictures = Array.from(form.querySelectorAll(`.event__photo`));
-  const icon = ROUTE_POINTS_TYPES.ride[travelType] ? ROUTE_POINTS_TYPES.ride[travelType] : ROUTE_POINTS_TYPES.stops[travelType];
-  const description = form.querySelector(`.event__destination-description`).innerText;
-  const startDate = flatpickr.parseDate(formData.get(`event-start-time`), `d/m/y H:i`);
-  const endDate = flatpickr.parseDate(formData.get(`event-end-time`), `d/m/y H:i`);
-// console.log(pictures)
-
-  const chosedOptions = [...form.querySelectorAll(`.event__offer-checkbox:checked`)];
-  const optionsData = chosedOptions.map((it) => {
-    return {
-      id: it.id,
-      name: it.name,
-      isChecked: true,
-      price: parseInt(it.parentElement.querySelector(`.event__offer-price`).textContent, 10),
-      title: it.parentElement.querySelector(`.event__offer-title`).textContent,
-    };
-  });
-
   return {
-    id: new Date().getUTCMilliseconds(),
+    id,
     travelType,
-    city: formData.get(`event-destination`),
-    pictures,
-    icon,
-    price: formData.get(`event-price`),
-    options: optionsData,
-    isFavorite,
-    description,
+    city,
+    destination: {
+      name: destinationName,
+      description: destinationDescription,
+      pictures
+    },
+    price,
     startDate,
     endDate,
+    isFavorite,
+    includedOffers
   };
 };
 
@@ -57,6 +63,7 @@ export default class EventForm extends AbstractSmartComponent {
     this._routeData = route;
     this._mode = mode;
 
+    this._id = route.id;
     this._travelType = route.travelType;
     this._prefix = getPrefix(this._travelType);
     this._icon = `img/icons/${this._travelType.toLowerCase()}.png`;
@@ -114,7 +121,7 @@ export default class EventForm extends AbstractSmartComponent {
     const form = this.getElement();
     const formData = new FormData(form);
 
-    return parseFormData(formData, form, this._mode);
+    return parseFormData(formData, form, this._mode, this._id);
   }
 
   reset() {
@@ -221,8 +228,8 @@ export default class EventForm extends AbstractSmartComponent {
         this._isDestinationCityChosed = true;
       }
       this.rerender();
-    });
 
+    });
 
     price.addEventListener(`change`, (evt)=>{
       this._price = parseInt(evt.target.value, 10);
@@ -258,11 +265,27 @@ export default class EventForm extends AbstractSmartComponent {
 
     const destinationData = DESTINATION_INFO.filter((it)=>it.name === city);
 
-    const destinationDescription = destinationData[0].description;
-    const destinationPictures = destinationData[0].pictures;
+    let destinationDescription = ``;
+    let destinationPictures = [];
+
+    if (destinationData.length === 0) {
+      destinationDescription = ``;
+      destinationPictures = [];
+    } else {
+      destinationDescription = destinationData[0].description;
+      destinationPictures = destinationData[0].pictures;
+
+    }
+
     let imageTemplate = ``;
     let eventOffers = ``;
-    const dataList = CITIES.map((val)=> `<option value="${val}"></option>`).join(` \n`);
+
+    const cityOptionsMarkup = CITIES.map((cityName)=> {
+      const isSelected = city === cityName ? `selected` : ``;
+
+      return `<option value="${cityName}" ${isSelected}>${cityName}</option>`;
+    });
+
 
     if (this._options.length < 1) {
       eventOffers = ``;
@@ -373,10 +396,12 @@ export default class EventForm extends AbstractSmartComponent {
     <label class="event__label  event__type-output" for="event-destination-1">
     ${this._travelType} ${this._prefix}
     </label>
-    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
-    <datalist id="destination-list-1">
-      ${dataList}
-    </datalist>
+
+    <select class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
+      <datalist id="destination-list-1">
+        ${cityOptionsMarkup}
+      </datalist>
+    </select>
     </div>
 
     <div class="event__field-group  event__field-group--time">
