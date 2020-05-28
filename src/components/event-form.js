@@ -24,13 +24,17 @@ const parseFormData = (formData, form, mode, id) => {
   const price = parseInt(formData.get(`event-price`), 10);
   const startDate = flatpickr.parseDate(formData.get(`event-start-time`), `d/m/y H:i`);
   const endDate = flatpickr.parseDate(formData.get(`event-end-time`), `d/m/y H:i`);
-  const chosedOffers = [...form.querySelectorAll(`.event__offer-checkbox:checked`)];
-  const includedOffers = chosedOffers.map((offer)=>{
-    return {
-      title: offer.name,
-      price: 100,
-    };
-  });
+
+  const chosedOffersForm = [...form.querySelectorAll(`.event__offer-checkbox:checked`)];
+  const offersByType = OFFERS.filter((it)=> it.type === travelType.toLowerCase())[0][`offers`];
+  let checkedOffers = [];
+
+
+  if (chosedOffersForm.length === 0) {
+    checkedOffers = [];
+  } else {
+    checkedOffers = offersByType.filter((offer) => chosedOffersForm.some((formOffer) => offer.title === formOffer.name))
+  }
 
   let isFavorite = false;
   if (mode === PointControllerMode.ADDING) {
@@ -52,7 +56,7 @@ const parseFormData = (formData, form, mode, id) => {
     startDate,
     endDate,
     isFavorite,
-    includedOffers
+    includedOffers: checkedOffers
   };
 };
 
@@ -208,6 +212,12 @@ export default class EventForm extends AbstractSmartComponent {
     const eventTypes = this.getElement().querySelectorAll(`.event__type-item`);
     const cityInput = this.getElement().querySelector(`.event__input--destination`);
     const price = this.getElement().querySelector(`#event-price-1`);
+    const submitBtn = this.getElement().querySelector(`.event__save-btn`);
+    if (this._isDestinationCityChosed && this._price) {
+      submitBtn.removeAttribute(`disabled`);
+    } else {
+      submitBtn.setAttribute(`disabled`, ``);
+    }
 
     eventTypes.forEach((it) => {
       it.addEventListener(`change`, () => {
@@ -249,6 +259,7 @@ export default class EventForm extends AbstractSmartComponent {
     const lowerCaseType = this._travelType.toLowerCase();
     this._prefix = getPrefix(this._travelType);
     this._icon = `img/icons/${lowerCaseType}.png`;
+    const price = isNaN(this._price) ? 0 : this._price;
 
     const indexOfOffers = OFFERS.findIndex((elem)=> elem.type === lowerCaseType);
     const newOffer = OFFERS[indexOfOffers];
@@ -421,7 +432,7 @@ export default class EventForm extends AbstractSmartComponent {
       <span class="visually-hidden">Price</span>
       &euro;
     </label>
-    <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${this._price}">
+    <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
     </div>
 
     <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>

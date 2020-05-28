@@ -1,7 +1,5 @@
 import PriceComponent from '../components/price.js';
 import {render, replace, RenderPosition} from '../utils/render.js';
-// import {getOffers} from '../utils/common.js';
-// import {OFFERS} from '../const.js';
 
 
 export default class PriceController {
@@ -18,24 +16,25 @@ export default class PriceController {
   render() {
 
     const container = this._container;
-    const pointsData = this._pointsModel.getPoints().slice();
+    const pointsData = this._pointsModel.getPoints();
 
     let totalPrice = 0;
-    let totalOffersPrice = 0;
+
     pointsData.forEach((point) => {
-
       const checkedOffers = point.includedOffers;
-
+      let totalOffersPrice = 0;
 
       if (checkedOffers.length === 0) {
         totalOffersPrice += 0;
       } else {
         checkedOffers.forEach((offer)=> {
+
           totalOffersPrice += offer.price;
+
         });
       }
 
-      totalPrice = parseInt(totalPrice + point.price + totalOffersPrice, 10);
+      totalPrice += parseInt(point.price, 10) + parseInt(totalOffersPrice, 10);
     });
 
 
