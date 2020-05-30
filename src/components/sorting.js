@@ -13,6 +13,28 @@ export default class Sorting extends AbstractComponent {
     this._currenSortType = SortType.EVENT;
   }
 
+  sortTypeChangeHandler(handler) {
+    this.getElement().addEventListener(`change`, (evt) => {
+      evt.preventDefault();
+
+      if (evt.target.tagName !== `INPUT`) {
+        return;
+      }
+
+      const sortType = evt.target.dataset.sortType;
+
+      if (this._currenSortType === sortType) {
+        return;
+      }
+
+      this._currenSortType = sortType;
+
+      handler(this._currenSortType);
+
+    });
+
+  }
+
   getTemplate() {
 
     return `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
@@ -45,28 +67,6 @@ export default class Sorting extends AbstractComponent {
 
         <span class="trip-sort__item  trip-sort__item--offers">Offers</span>
       </form>`;
-  }
-
-  sortTypeChangeHandler(handler) {
-    this.getElement().addEventListener(`change`, (evt) => {
-      evt.preventDefault();
-
-      if (evt.target.tagName !== `INPUT`) {
-        return;
-      }
-
-      const sortType = evt.target.dataset.sortType;
-
-      if (this._currenSortType === sortType) {
-        return;
-      }
-
-      this._currenSortType = sortType;
-
-      handler(this._currenSortType);
-
-    });
-
   }
 
 }

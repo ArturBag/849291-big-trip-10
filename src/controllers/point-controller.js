@@ -46,13 +46,12 @@ export default class PointController {
     this._tripDaysComponent = null;
     this._eventFormComponent = null;
 
-    this._formAction = Mode.ADDING;
+    this._formAction = Mode.DEFAULT;
 
   }
 
 
   render(route, routeIndex, mode) {
-
     this._routeData = route;
 
     const oldPointComponent = this._tripDaysComponent;
@@ -64,6 +63,7 @@ export default class PointController {
 
     this._tripDaysComponent.setClickHandler(() => {
 
+      console.log(this._mode)
       this._replacetripDaysToEventForm();
       this._eventFormComponent.reset();
       document.addEventListener(`keydown`, this._onEscKeyDown);
@@ -71,7 +71,9 @@ export default class PointController {
     });
 
     this._eventFormComponent.setFavoritesHandler((isFavorite)=>{
-      this._onDataChange(this, route, Object.assign({}, route, {isFavorite}), true);
+
+      const shouldRender = false;
+      this._onDataChange(this, route, Object.assign({}, route, {isFavorite}), shouldRender);
     });
 
 
@@ -94,22 +96,25 @@ export default class PointController {
       evt.preventDefault();
       const data = this._eventFormComponent.getData();
       this._eventFormComponent.removeFlatpickr();
+      const shouldRender = true;
       if (this._mode === Mode.ADDING) {
         this._formAction = Mode.ADDING;
         this._onDataChange(this, EmptyPoint, data);
       } else {
         this._formAction = Mode.EDIT;
-        this._onDataChange(this, route, data);
+        this._onDataChange(this, route, data, shouldRender);
       }
     });
 
     switch (this._mode) {
+
       case Mode.DEFAULT:
         if (oldPointComponent && oldPointEditComponent) {
           replace(this._tripDaysComponent, oldPointComponent);
           replace(this._eventFormComponent, oldPointEditComponent);
 
           if (this._formAction === Mode.ADDING) {
+
             render(this._container, this._tripDaysComponent.getElement(), RenderPosition.BEFOREEND);
             remove(this._eventFormComponent);
           } else {
@@ -165,6 +170,10 @@ export default class PointController {
 
     replace(this._eventFormComponent, this._tripDaysComponent);
     this._mode = Mode.EDIT;
+  }
+
+  _replaceAddingFormToEditForm () {
+
   }
 
 

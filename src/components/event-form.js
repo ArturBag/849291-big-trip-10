@@ -176,6 +176,9 @@ export default class EventForm extends AbstractSmartComponent {
       return;
     }
 
+    // this.getElement().querySelector(`.event__favorite-btn`)
+    // .addEventListener(`click`, handler);
+
     this.getElement().querySelector(`.event__favorite-btn`)
       .addEventListener(`click`, () => {
         this._isFavorite = !this._isFavorite;
@@ -264,6 +267,7 @@ export default class EventForm extends AbstractSmartComponent {
     const indexOfOffers = OFFERS.findIndex((elem)=> elem.type === lowerCaseType);
     const newOffer = OFFERS[indexOfOffers];
     this._options = newOffer.offers;
+    const firstEmptyOption = `<option value="" "selected">.    .     .</option>`;
 
     const isFavoriteChecked = this._isFavorite ? `checked` : ``;
     const buttonModeText = this._mode === PointControllerMode.ADDING ? `Cancel` : `Delete`;
@@ -410,6 +414,7 @@ export default class EventForm extends AbstractSmartComponent {
 
     <select class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
       <datalist id="destination-list-1">
+        ${firstEmptyOption}
         ${cityOptionsMarkup}
       </datalist>
     </select>

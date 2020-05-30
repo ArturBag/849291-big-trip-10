@@ -109,7 +109,9 @@ export default class TripController {
 
   createPoint() {
 
+
     if (this._creatingPoint) {
+      console.log(`create point`)
       return;
     }
 
@@ -125,6 +127,12 @@ export default class TripController {
     this._creatingPoint.render(EmptyPoint, index, PointControllerMode.ADDING);
 
   }
+
+  _destroyCreatingPoint() {
+    this._creatingPoint.destroy();
+    this._creatingPoint = null;
+  }
+
 
   _removePoints() {
     this._showedPointControllers.forEach((pointController) => pointController.destroy());
@@ -147,11 +155,17 @@ export default class TripController {
   }
 
   _onViewChange() {
+    if (this._creatingPoint) {
+
+      this._destroyCreatingPoint();
+    }
+
     this._showedPointControllers.forEach((it) => it.setDefaultView());
+
   }
 
-  _onDataChange(pointController, oldData, newData, isFavorite) {
-console.log(newData)
+  _onDataChange(pointController, oldData, newData, shouldRender) {
+
     if (oldData === EmptyPoint) {
       this._creatingPoint = null;
       if (newData === null) {
@@ -177,17 +191,16 @@ console.log(newData)
       const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
       const index = this._showedPointControllers.findIndex((it)=> it === pointController);
 
-      if (isSuccess && !isFavorite) {
+
+      if (isSuccess && shouldRender) {
 
         pointController.render(newData, index, PointControllerMode.DEFAULT);
       }
+
     }
 
   }
 
-  _onViewChange() {
-    this._showedPointControllers.forEach((it) => it.setDefaultView());
-  }
 
   _onSortTypeChange(sortType) {
 
@@ -213,9 +226,14 @@ console.log(newData)
         break;
     }
 
+    if (this._creatingPoint) {
+      this._destroyCreatingPoint();
+    }
+
     tripDaysListElement.innerHTML = ``;
     const newTripPoints = renderTripPoints(tripDaysListElement, pointsData, this._onDataChange, this._onViewChange);
     this._showedPointControllers = newTripPoints;
+
   }
 
   _onFilterChange() {
