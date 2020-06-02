@@ -33,7 +33,7 @@ const parseFormData = (formData, form, mode, id) => {
   if (chosedOffersForm.length === 0) {
     checkedOffers = [];
   } else {
-    checkedOffers = offersByType.filter((offer) => chosedOffersForm.some((formOffer) => offer.title === formOffer.name))
+    checkedOffers = offersByType.filter((offer) => chosedOffersForm.some((formOffer) => offer.title === formOffer.name));
   }
 
   let isFavorite = false;
@@ -175,9 +175,6 @@ export default class EventForm extends AbstractSmartComponent {
     if (this._mode === PointControllerMode.ADDING) {
       return;
     }
-
-    // this.getElement().querySelector(`.event__favorite-btn`)
-    // .addEventListener(`click`, handler);
 
     this.getElement().querySelector(`.event__favorite-btn`)
       .addEventListener(`click`, () => {

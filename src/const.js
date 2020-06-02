@@ -873,7 +873,7 @@ export const DESTINATION_INFO = [{
   ]
 }
 
-]
+];
 
 export const CITIES = DESTINATION_INFO.map((it)=> it.name);
 

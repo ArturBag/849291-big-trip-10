@@ -1,6 +1,5 @@
 import AbstractComponent from './abstract-component.js';
 import {getPrefix, getFormattedTime, getTimeDiff} from '../utils/common.js';
-// import {getIncludedOffers} from '../mock/route-point.js';
 import {OFFERS} from '../const.js';
 
 const MAX_OFFERS_QTY_TO_SHOW = 3;
@@ -27,9 +26,7 @@ export default class TripDay extends AbstractComponent {
     const {travelType, city, price, date, startDate, endDate} = this._route;
 
     const icon = `img/icons/${travelType.toLowerCase()}.png`;
-    // const cityName = city.name;
     const dayCounter = date ? this._routeIndex + 1 : 0;
-
     const prefix = getPrefix(travelType);
 
     const startTime = getFormattedTime(startDate);

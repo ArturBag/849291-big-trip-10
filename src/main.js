@@ -25,7 +25,6 @@ render(tripControlHeaders[0], menuComponent.getElement(), RenderPosition.AFTEREN
 
 header.querySelector(`.trip-main__event-add-btn`)
   .addEventListener(`click`, () => {
-    console.log(`click`)
     tripControllerComponent.createPoint();
   });
 
@@ -43,7 +42,6 @@ const tripEventsContainer = document.querySelector(`.trip-events`);
 
 
 const tripControllerComponent = new TripController(tripEventsContainer, pointsModel);
-
-tripControllerComponent.render(routeData);
+tripControllerComponent.render();
 
 

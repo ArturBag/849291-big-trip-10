@@ -63,7 +63,6 @@ export default class PointController {
 
     this._tripDaysComponent.setClickHandler(() => {
 
-      console.log(this._mode)
       this._replacetripDaysToEventForm();
       this._eventFormComponent.reset();
       document.addEventListener(`keydown`, this._onEscKeyDown);
@@ -171,11 +170,6 @@ export default class PointController {
     replace(this._eventFormComponent, this._tripDaysComponent);
     this._mode = Mode.EDIT;
   }
-
-  _replaceAddingFormToEditForm () {
-
-  }
-
 
   _replaceEventFormToTripDays() {
     document.removeEventListener(`keydown`, this._onEscKeyDown);

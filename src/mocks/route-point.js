@@ -1,4 +1,4 @@
-import { ROUTE_POINTS_TYPES, CITIES, OFFERS, DESTINATION_INFO } from '../const.js';
+import {ROUTE_POINTS_TYPES, CITIES, OFFERS, DESTINATION_INFO} from '../const.js';
 
 const getRandomIntegerNumber = (min, max) => {
   return Math.floor(Math.random() * (max - min) + min);
@@ -40,8 +40,6 @@ const getDestinationData = (city)=> {
 
 };
 
-
-// генерирует массив чекнутых офферов рандомно
 
 export const getIncludedOffers = (routeType) => {
 
@@ -101,5 +99,5 @@ const generateRoutePoints = (count) => {
     .map(generateRoutePoint);
 };
 
-export { generateRoutePoint, generateRoutePoints, getRandomDate };
+export {generateRoutePoint, generateRoutePoints, getRandomDate};
 

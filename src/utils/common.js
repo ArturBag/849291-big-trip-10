@@ -4,7 +4,7 @@ const STOP_EVENTS = [`Check-in`, `Sightseeing`, `Restaurant`];
 
 export const getPrefix = (travelType)=> {
 
-  let prefix = STOP_EVENTS.some((it)=> it === travelType) ? `in`: `to`;
+  let prefix = STOP_EVENTS.some((it)=> it === travelType) ? `in` : `to`;
 
   return prefix;
 };

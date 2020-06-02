@@ -20,7 +20,7 @@ const getDates = (events)=> {
 export const getDefaultEvents = (data) => {
   let newData = [];
   const routeData = data.map((it) => Object.assign({}, it));
-  const dates = getDates(routeData);
+  const dates = getDates(routeData).sort((a, b) => a.day - b.day);
 
   dates.forEach((date) => {
     const dayEvents = routeData
@@ -77,14 +77,13 @@ export default class TripController {
 
     this._sorting.sortTypeChangeHandler(this._onSortTypeChange);
     this._pointsModel.setFilterChangeHandler(this._onFilterChange);
-    // this._pointsModel.setDataChangeHandler(this._onDataChange);
 
   }
 
-  render(routeData) {
+  render() {
 
-    const pointsData = getDefaultEvents(routeData);
-    console.log(pointsData)
+
+    const pointsData = getDefaultEvents(this._pointsModel.getPoints());
 
     const container = this._container;
     const tripDaysListElement = this._tripDaysList.getElement();
@@ -111,7 +110,6 @@ export default class TripController {
 
 
     if (this._creatingPoint) {
-      console.log(`create point`)
       return;
     }
 
@@ -181,6 +179,8 @@ export default class TripController {
         pointController.render(newData, index, PointControllerMode.DEFAULT);
 
         this._showedPointControllers = [].concat(pointController, this._showedPointControllers);
+
+        this._onSortTypeChange(this._sorting._currenSortType);
       }
     } else if (newData === null) {
       this._pointsModel.removePoint(oldData.id);
@@ -195,6 +195,7 @@ export default class TripController {
       if (isSuccess && shouldRender) {
 
         pointController.render(newData, index, PointControllerMode.DEFAULT);
+        this._onSortTypeChange(this._sorting._currenSortType);
       }
 
     }
