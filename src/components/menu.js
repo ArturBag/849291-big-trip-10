@@ -1,17 +1,47 @@
-import {MENU_ITEMS} from '../const.js';
 import AbstractComponent from './abstract-component.js';
+// import AbstractSmartComponent from './abstract-smart-component.js';
+
+export const MenuItem = {
+  TABLE: `trip-tabs__table`,
+  STATS: `trip-tabs__stats`
+};
+
 export default class Menu extends AbstractComponent {
 
-  getTemplate() {
 
-    const menuItemsData = MENU_ITEMS;
+  setActiveItem(menuItem) {
+    const item = this.getElement().querySelector(`#${menuItem}`);
+    if (item) {
+      item.checked = true;
+    }
+  }
 
-    const tripTabs = menuItemsData.map((it) => {
-      const isActive = it.isActive ? `trip-tabs__btn--active` : ``;
-      return `<a class="trip-tabs__btn ${isActive}" href="#">${it.itemName}</a>`;
-    }).join(``);
+  setOnChange(handler) {
+    const menuTabs = this.getElement().querySelectorAll(`.trip-tabs__btn`);
 
-    return `<nav class="trip-controls__trip-tabs  trip-tabs">${tripTabs}</nav>`;
+    menuTabs.forEach((tab)=>{
+
+      tab.addEventListener(`click`, (evt) => {
+        if (evt.target.tagName !== `A`) {
+          return;
+        }
+
+        const menuItem = evt.target.id;
+
+        handler(menuItem);
+        this._setOnChangeHandler = handler;
+      });
+
+    });
 
   }
+
+  getTemplate() {
+    return `<nav class="trip-controls__trip-tabs  trip-tabs">
+              <a class="trip-tabs__btn trip-tabs__btn--active" id="trip-tabs__table" href="#">Table</a>
+              <a class="trip-tabs__btn" id="trip-tabs__stats" href="#">Stats</a>
+            </nav>`;
+  }
+
+
 }

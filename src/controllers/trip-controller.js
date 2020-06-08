@@ -4,6 +4,7 @@ import TripDaysList from '../components/trip-days-list.js';
 import PointController, {Mode as PointControllerMode, EmptyPoint} from './point-controller.js';
 import {render, RenderPosition} from '../utils/render.js';
 
+const HIDDEN_CLASS = `visually-hidden`;
 
 const getDates = (events)=> {
   const set = new Set();
@@ -57,6 +58,7 @@ export default class TripController {
     this._pointsModel = pointsModel;
 
     this._container = container;
+    // console.log(this._container)
 
     this._showedPointControllers = [];
     this._showingPointsCount = null;
@@ -78,6 +80,14 @@ export default class TripController {
     this._sorting.sortTypeChangeHandler(this._onSortTypeChange);
     this._pointsModel.setFilterChangeHandler(this._onFilterChange);
 
+  }
+
+  hide() {
+    this._container.classList.add(HIDDEN_CLASS);
+  }
+
+  show() {
+    this._container.classList.remove(HIDDEN_CLASS);
   }
 
   render() {

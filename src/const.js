@@ -893,16 +893,16 @@ export const MONTH_NAMES = [
 ];
 
 
-export const MENU_ITEMS = [
-  {
-    'itemName': `Table`,
-    'isActive': true
-  },
-  {
-    'itemName': `Stats`,
-    'isActive': false
-  }
-];
+// export const MENU_ITEMS = [
+//   {
+//     'itemName': `Table`,
+//     'isActive': true
+//   },
+//   {
+//     'itemName': `Stats`,
+//     'isActive': false
+//   }
+// ];
 
 export const filterTypes = {
 

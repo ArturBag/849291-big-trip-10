@@ -1,5 +1,6 @@
 import Route from './components/route.js';
-import Menu from './components/menu.js';
+import Menu, {MenuItem} from './components/menu.js';
+import Statistics from './components/statistics.js';
 import PriceController from './controllers/price-controller.js';
 import FilterController from './controllers/filter-controller.js';
 import TripController from './controllers/trip-controller.js';
@@ -44,4 +45,29 @@ const tripEventsContainer = document.querySelector(`.trip-events`);
 const tripControllerComponent = new TripController(tripEventsContainer, pointsModel);
 tripControllerComponent.render();
 
+const statisticsComponent = new Statistics(pointsModel.getPointsAll());
+render(tripEventsContainer, statisticsComponent.getElement(), RenderPosition.AFTEREND)
 
+statisticsComponent.hide();
+
+
+menuComponent.setOnChange((menuItem) => {
+
+  switch (menuItem) {
+    case MenuItem.TABLE:
+      menuComponent.setActiveItem(MenuItem.TABLE);
+      statisticsComponent.hide();
+      tripControllerComponent.show();
+      // tripControllerComponent.createPoint();
+      break;
+    case MenuItem.STATS:
+      menuComponent.setActiveItem(MenuItem.STATS);
+      tripControllerComponent.hide();
+      statisticsComponent.show();
+      break;
+    // case MenuItem.TASKS:
+    //   statisticsComponent.hide();
+    //   boardController.show();
+    //   break;
+  }
+});
