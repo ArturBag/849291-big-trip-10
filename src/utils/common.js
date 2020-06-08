@@ -22,3 +22,14 @@ export const getTimeDiff = (time) => {
   return `${days > 0 ? days + `D` : ``} ${hours > 0 ? hours + `H` : ``} ${minutes > 0 ? minutes + `M` : ``}`;
 };
 
+export const getTimeDiffinHours = (time) => {
+  const duration = moment.duration(time);
+
+  const days = duration.days();
+  const hours = duration.hours();
+  const minutes = duration.minutes();
+
+  const timeInHoursFormat = days * 24 + hours + (minutes > 30 ? 1 : 0.5);
+
+  return timeInHoursFormat;
+};
