@@ -45,8 +45,13 @@ const tripEventsContainer = document.querySelector(`.trip-events`);
 const tripControllerComponent = new TripController(tripEventsContainer, pointsModel);
 tripControllerComponent.render();
 
-const statisticsComponent = new Statistics(pointsModel.getPointsAll());
-render(tripEventsContainer, statisticsComponent.getElement(), RenderPosition.AFTEREND)
+let statisticsComponent = new Statistics(pointsModel, pointsModel.getPointsAll());
+
+const redrawStatistics = () => {
+
+  statisticsComponent = new Statistics(pointsModel, pointsModel.getPointsAll());
+  render(tripEventsContainer, statisticsComponent.getElement(), RenderPosition.AFTEREND);
+};
 
 statisticsComponent.hide();
 
@@ -58,16 +63,13 @@ menuComponent.setOnChange((menuItem) => {
       menuComponent.setActiveItem(MenuItem.TABLE);
       statisticsComponent.hide();
       tripControllerComponent.show();
-      // tripControllerComponent.createPoint();
       break;
     case MenuItem.STATS:
       menuComponent.setActiveItem(MenuItem.STATS);
       tripControllerComponent.hide();
+      redrawStatistics();
       statisticsComponent.show();
       break;
-    // case MenuItem.TASKS:
-    //   statisticsComponent.hide();
-    //   boardController.show();
-    //   break;
+
   }
 });

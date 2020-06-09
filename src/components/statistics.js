@@ -3,10 +3,25 @@ import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {getTimeDiffinHours} from '../utils/common.js';
 
+const typeSymbols = new Map([
+  [`taxi`, `🚕`],
+  [`bus`, `🚌`],
+  [`train`, `🚂`],
+  [`ship`, `🛳`],
+  [`transport`, `🚊`],
+  [`drive`, `🚗`],
+  [`flight`, `✈️`],
+  [`check-in`, `🏨`],
+  [`sightseeing`, `🏛`],
+  [`restaurant`, `🍴`]
+]);
+
 
 export default class Statistics extends AbstractSmartComponent {
-  constructor(pointsData) {
+  constructor(pointsModel, pointsData) {
     super();
+
+    this._pointsModel = pointsModel;
     this._pointsData = pointsData;
 
     this._showMoneyStatistics();
@@ -18,10 +33,12 @@ export default class Statistics extends AbstractSmartComponent {
     const moneyCtx = this.getElement().querySelector(`.statistics__chart--money`);
     const moneyFormatter = (val) => `€ ${val}`;
     const moneyTitle = `money`;
-    const moneyData = this._getData(this._pointsData);
 
-    const pointTypes = moneyData.map((it) => it.type.toUpperCase());
+    const moneyData = this._getData(this._pointsData);
     const moneyPrices = moneyData.map((it) => it.price);
+
+
+    const pointTypes = moneyData.map((it) => typeSymbols.get(it.type.toLowerCase()) + ` ` + it.type.toUpperCase());
 
     const moneyChartData = [moneyCtx, moneyFormatter, moneyTitle, pointTypes, moneyPrices];
 
@@ -35,7 +52,7 @@ export default class Statistics extends AbstractSmartComponent {
     const transportTitle = `transport`;
     const transportData = this._getData(this._pointsData);
 
-    const pointTypes = transportData.map((it) => it.type.toUpperCase());
+    const pointTypes = transportData.map((it) => typeSymbols.get(it.type.toLowerCase()) + ` ` + it.type.toUpperCase());
     const transportQty = transportData.map((it) => it.quantity);
 
     const transportChartData = [transportCtx, transportFormatter, transportTitle, pointTypes, transportQty];
@@ -50,7 +67,7 @@ export default class Statistics extends AbstractSmartComponent {
     const timeTitle = `time spent`;
     const timeData = this._getData(this._pointsData);
 
-    const pointTypes = timeData.map((it) => it.type.toUpperCase());
+    const pointTypes = timeData.map((it) => typeSymbols.get(it.type.toLowerCase()) + ` ` + it.type.toUpperCase());
     const hours = timeData.map((it) => it.hours);
 
     const timeChartData = [timeCtx, timeFormatter, timeTitle, pointTypes, hours];
@@ -60,7 +77,7 @@ export default class Statistics extends AbstractSmartComponent {
   }
 
   _getData(points) {
-    console.log(points)
+
     const typesSet = new Set();
     points.forEach((it) => typesSet.add(it.travelType));
 
@@ -102,11 +119,6 @@ export default class Statistics extends AbstractSmartComponent {
   _displatStatistics(chartData) {
 
     const [ctx, formatter, titleText, pointTypes, typesData] = chartData;
-
-    // const moneyData = this._getData(this._pointsData);
-
-    // const pointTypes = moneyData.map((it) => it.type.toUpperCase());
-    // const moneyPrices = moneyData.map((it) => it.price);
 
     const moneyDataSets = {
       data: typesData,
@@ -179,88 +191,6 @@ export default class Statistics extends AbstractSmartComponent {
 
 
   }
-
-  // _displatStatistics() {
-  //   const moneyCtx = this.getElement().querySelector(`.statistics__chart--money`);
-
-  //   const moneyData = this._getData(this._pointsData);
-  //   const pointTypes = moneyData.map((it) => it.type.toUpperCase());
-  //   const moneyPrices = moneyData.map((it) => it.price);
-
-  //   const moneyDataSets = {
-
-  //     data: moneyPrices,
-  //     backgroundColor: `rgb(255, 255, 255)`,
-  //     borderWidth: 0,
-  //     anchor: `start`
-
-  //   };
-
-  //   const formatter = (val) => `€ ${val}`;
-
-  //   const moneyOptions = {
-  //     legend: {
-  //       display: false,
-  //     },
-  //     tooltips: {
-  //       enabled: false,
-  //     },
-  //     plugins: {
-  //       datalabels: {
-  //         font: {size: 13},
-  //         color: `#000000`,
-  //         anchor: `end`,
-  //         align: `start`,
-  //         formatter
-  //       },
-
-  //     },
-  //     title: {
-  //       display: true,
-  //       text: `money`.toUpperCase(),
-  //       fontColor: `#000000`,
-  //       fontSize: 23,
-  //       position: `left`
-  //     },
-  //     scales: {
-  //       yAxes: [{
-  //         ticks: {
-  //           fontColor: `#000000`,
-  //           padding: 5,
-  //           fontSize: 13,
-  //         },
-  //         gridLines: {
-  //           display: false,
-  //           drawBorder: false
-  //         },
-  //         barThickness: 44,
-  //       }],
-  //       xAxes: [{
-  //         ticks: {
-  //           display: false,
-  //           beginAtZero: true,
-  //         },
-  //         gridLines: {
-  //           display: false,
-  //           drawBorder: false
-  //         },
-  //         minBarLength: 50
-  //       }]
-  //     }
-  //   };
-
-  //   const moneyBarChart = new Chart(moneyCtx, {
-  //     type: `horizontalBar`,
-  //     data: {
-  //       labels: pointTypes,
-  //       datasets: [moneyDataSets]
-  //     },
-  //     plugins: [ChartDataLabels],
-  //     options: moneyOptions
-  //   });
-
-
-  // }
 
   getTemplate() {
 
