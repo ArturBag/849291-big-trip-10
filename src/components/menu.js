@@ -1,5 +1,4 @@
 import AbstractComponent from './abstract-component.js';
-// import AbstractSmartComponent from './abstract-smart-component.js';
 
 export const MenuItem = {
   TABLE: `trip-tabs__table`,
@@ -10,9 +9,10 @@ export default class Menu extends AbstractComponent {
 
 
   setActiveItem(menuItem) {
+    document.querySelector(`.trip-tabs__btn--active`).classList.remove(`trip-tabs__btn--active`);
     const item = this.getElement().querySelector(`#${menuItem}`);
     if (item) {
-      item.checked = true;
+      item.classList.add(`trip-tabs__btn--active`);
     }
   }
 
