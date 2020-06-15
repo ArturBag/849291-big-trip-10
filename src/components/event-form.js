@@ -1,5 +1,5 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import {getPrefix} from '../utils/common.js';
+import {getPrefix, turnFirstLetterToCapital} from '../utils/common.js';
 import {Mode as PointControllerMode} from '../controllers/point-controller.js';
 import {OFFERS, DESTINATION_INFO, CITIES} from '../const.js';
 
@@ -223,7 +223,7 @@ export default class EventForm extends AbstractSmartComponent {
       it.addEventListener(`change`, () => {
         const chosedEventTypeValue = it.querySelector(`input`).value;
 
-        this._travelType = chosedEventTypeValue.charAt(0).toUpperCase() + chosedEventTypeValue.substr(1);
+        this._travelType = turnFirstLetterToCapital(chosedEventTypeValue);
 
         this.rerender();
 
@@ -262,8 +262,15 @@ export default class EventForm extends AbstractSmartComponent {
     const price = isNaN(this._price) ? 0 : this._price;
 
     const indexOfOffers = OFFERS.findIndex((elem)=> elem.type === lowerCaseType);
-    const newOffer = OFFERS[indexOfOffers];
-    this._options = newOffer.offers;
+    // console.log(OFFERS)
+
+    if (indexOfOffers === -1) {
+      this._options = [];
+    } else {
+      const newOffer = OFFERS[indexOfOffers];
+      this._options = newOffer.offers;
+
+    }
     const firstEmptyOption = `<option value="" "selected">.    .     .</option>`;
 
     const isFavoriteChecked = this._isFavorite ? `checked` : ``;
@@ -406,7 +413,7 @@ export default class EventForm extends AbstractSmartComponent {
 
     <div class="event__field-group  event__field-group--destination">
     <label class="event__label  event__type-output" for="event-destination-1">
-    ${this._travelType} ${this._prefix}
+    ${turnFirstLetterToCapital(this._travelType)} ${this._prefix}
     </label>
 
     <select class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">

@@ -1,5 +1,5 @@
 import AbstractComponent from './abstract-component.js';
-import {getPrefix, getFormattedTime, getTimeDiff} from '../utils/common.js';
+import {getPrefix, getFormattedTime, getTimeDiff, turnFirstLetterToCapital} from '../utils/common.js';
 import {OFFERS} from '../const.js';
 
 const MAX_OFFERS_QTY_TO_SHOW = 3;
@@ -25,6 +25,8 @@ export default class TripDay extends AbstractComponent {
 
     const {travelType, city, price, date, startDate, endDate} = this._route;
 
+    const type = turnFirstLetterToCapital(travelType);
+
     const icon = `img/icons/${travelType.toLowerCase()}.png`;
     const dayCounter = date ? this._routeIndex + 1 : 0;
     const prefix = getPrefix(travelType);
@@ -34,7 +36,7 @@ export default class TripDay extends AbstractComponent {
 
     const duration = getTimeDiff(endDate - startDate);
 
-    const options = OFFERS.filter((it)=> it.type === travelType.toLowerCase())[0];
+    const options = OFFERS.filter((it)=> it.type === travelType)[0];
 
 
     let offers = [];
@@ -72,7 +74,7 @@ export default class TripDay extends AbstractComponent {
             <div class="event__type">
               <img class="event__type-icon" width="42" height="42" src="${icon}" alt="Event type icon">
             </div>
-            <h3 class="event__title">${travelType} ${prefix} ${city}</h3>
+            <h3 class="event__title">${type} ${prefix} ${city}</h3>
 
             <div class="event__schedule">
               <p class="event__time">

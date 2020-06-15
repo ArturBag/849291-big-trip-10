@@ -53,12 +53,12 @@ const renderTripPoints = (tripDaysListComponent, routeData, onDataChange, onView
 
 
 export default class TripController {
-  constructor(container, pointsModel) {
+  constructor(container, pointsModel, api) {
 
     this._pointsModel = pointsModel;
-
     this._container = container;
-    // console.log(this._container)
+    this._api = api;
+
 
     this._showedPointControllers = [];
     this._showingPointsCount = null;
@@ -198,17 +198,32 @@ export default class TripController {
       this._updatePoints();
     } else {
 
-      const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
-      const index = this._showedPointControllers.findIndex((it)=> it === pointController);
+      this._api.updateTask(oldData.id, newData)
+      .then((pointModel)=> {
+        console.log(pointModel)
+        const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
+        const index = this._showedPointControllers.findIndex((it)=> it === pointController);
 
+        if (isSuccess && shouldRender) {
 
-      if (isSuccess && shouldRender) {
-
-        pointController.render(newData, index, PointControllerMode.DEFAULT);
-        this._onSortTypeChange(this._sorting._currenSortType);
-      }
+          pointController.render(pointModel, index, PointControllerMode.DEFAULT);
+          this._onSortTypeChange(this._sorting._currenSortType);
+        }
+      });
 
     }
+
+      // const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
+      // const index = this._showedPointControllers.findIndex((it)=> it === pointController);
+
+
+      // if (isSuccess && shouldRender) {
+
+      //   pointController.render(newData, index, PointControllerMode.DEFAULT);
+      //   this._onSortTypeChange(this._sorting._currenSortType);
+      // }
+
+    // }
 
   }
 
