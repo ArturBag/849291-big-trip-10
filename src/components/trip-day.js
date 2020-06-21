@@ -36,8 +36,7 @@ export default class TripDay extends AbstractComponent {
 
     const duration = getTimeDiff(endDate - startDate);
 
-    const options = OFFERS.filter((it)=> it.type === travelType)[0];
-
+    const options = OFFERS.filter((it)=> it.type === travelType.toLowerCase())[0];
 
     let offers = [];
     let optionsInfo = ``;
@@ -59,6 +58,28 @@ export default class TripDay extends AbstractComponent {
 
       }).join(` \n`);
     }
+
+
+    // let offers = [];
+    // let optionsInfo = ``;
+
+    // if (options.offers.length < 1) {
+    //   offers = [];
+    // } else {
+
+    //   offers = options.offers.length > 3 ?
+    //     options.offers.slice(0, MAX_OFFERS_QTY_TO_SHOW) : options.offers;
+
+    //   optionsInfo = offers.map((it) => {
+
+    //     return `<li class="event__offer">
+    //       <span class="event__offer-title">${it.title}</span>
+    //       &plus;
+    //       &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
+    //       </li>`;
+
+    //   }).join(` \n`);
+    // }
 
     return `<li class="trip-days__item  day">
      <div class="day__info">

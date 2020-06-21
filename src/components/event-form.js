@@ -2,6 +2,7 @@ import AbstractSmartComponent from './abstract-smart-component.js';
 import {getPrefix, turnFirstLetterToCapital} from '../utils/common.js';
 import {Mode as PointControllerMode} from '../controllers/point-controller.js';
 import {OFFERS, DESTINATION_INFO, CITIES} from '../const.js';
+// console.log(INCLUDED_OFFERS)
 
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
@@ -60,6 +61,15 @@ const parseFormData = (formData, form, mode, id) => {
   };
 };
 
+// "id": this.id,
+//       "type": this.travelType,
+//       "destination": this.destination,
+//       "base_price": this.price,
+//       "date_from": new Date(this.startDate).toISOString(),
+//       "date_to": new Date(this.endDate).toISOString(),
+//       "is_favorite": this.isFavorite,
+//       "offers": this.includedOffers
+
 export default class EventForm extends AbstractSmartComponent {
   constructor(route, mode) {
     super();
@@ -74,6 +84,7 @@ export default class EventForm extends AbstractSmartComponent {
     this._city = route.city;
     this._isFavorite = route.isFavorite;
     this._price = route.price;
+    // this._includedOffers = route.includedOffers || [];
     this._includedOffers = route.includedOffers;
 
     this._iconForReset = `img/icons/${route.travelType.toLowerCase()}.png`;
@@ -257,20 +268,13 @@ export default class EventForm extends AbstractSmartComponent {
     }
 
     const lowerCaseType = this._travelType.toLowerCase();
+
     this._prefix = getPrefix(this._travelType);
     this._icon = `img/icons/${lowerCaseType}.png`;
     const price = isNaN(this._price) ? 0 : this._price;
 
-    const indexOfOffers = OFFERS.findIndex((elem)=> elem.type === lowerCaseType);
-    // console.log(OFFERS)
+    const allOffersByChosedType = OFFERS.filter((elem)=> elem.type === lowerCaseType)[0].offers;
 
-    if (indexOfOffers === -1) {
-      this._options = [];
-    } else {
-      const newOffer = OFFERS[indexOfOffers];
-      this._options = newOffer.offers;
-
-    }
     const firstEmptyOption = `<option value="" "selected">.    .     .</option>`;
 
     const isFavoriteChecked = this._isFavorite ? `checked` : ``;
@@ -305,20 +309,21 @@ export default class EventForm extends AbstractSmartComponent {
       return `<option value="${cityName}" ${isSelected}>${cityName}</option>`;
     });
 
+    // console.log(this._includedOffers, `includedOffers`, OFFERS,  `OFFERS`)
 
-    if (this._options.length < 1) {
+    if (allOffersByChosedType.length < 1) {
       eventOffers = ``;
     } else {
 
-      eventOffers = this._options.map((it) => {
+      eventOffers = allOffersByChosedType.map((it) => {
 
         const id = it.title.split(/\s+/).join(`-`);
         const nameAttr = it.title;
 
-        const isChecked = ()=> this._includedOffers.some((includedOffer)=>
-          it.title === includedOffer.title
-        ) ? `checked` : ``;
+        const isChecked = ()=> this._includedOffers.some((includedOffer)=> {
 
+          return it.title === includedOffer.title ? `checked` : ``;
+        });
 
         return `<div class="event__offer-selector">
               <input class="event__offer-checkbox  visually-hidden" id="${id}" type="checkbox" name="${nameAttr}" ${isChecked()}>
@@ -330,6 +335,27 @@ export default class EventForm extends AbstractSmartComponent {
             </div>`;
       }).join(` \n`);
     }
+
+      // eventOffers = this._options.map((it) => {
+
+      //   const id = it.title.split(/\s+/).join(`-`);
+      //   const nameAttr = it.title;
+
+      //   const isChecked = ()=> this._includedOffers.some((includedOffer)=>
+      //     it.title === includedOffer.title
+      //   ) ? `checked` : ``;
+
+
+      //   return `<div class="event__offer-selector">
+      //         <input class="event__offer-checkbox  visually-hidden" id="${id}" type="checkbox" name="${nameAttr}" ${isChecked()}>
+      //         <label class="event__offer-label" for="${id}">
+      //           <span class="event__offer-title">${it.title}</span>
+      //           &plus;
+      //           &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
+      //         </label>
+      //       </div>`;
+      // }).join(` \n`);
+    // }
 
 
     if (destinationPictures.length < 1) {

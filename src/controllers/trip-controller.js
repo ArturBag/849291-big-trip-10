@@ -200,7 +200,7 @@ export default class TripController {
 
       this._api.updateTask(oldData.id, newData)
       .then((pointModel)=> {
-        console.log(pointModel)
+        // console.log(pointModel)
         const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
         const index = this._showedPointControllers.findIndex((it)=> it === pointController);
 

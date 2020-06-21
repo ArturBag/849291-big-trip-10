@@ -11,18 +11,31 @@ export const Mode = {
   EDIT: `edit`,
 };
 
-let emptyPointId = null;
+console.log(OFFERS.length)
+
+// let emptyPointId = DESTINATION_INFO.length;
 const travelType = `Flight`;
 const city = ``;
 
-const includedOffers = OFFERS.forEach((it)=> {
-  console.log(it)
-  const isTypeMatches = it.type === travelType;
-  if (isTypeMatches) {
-    return it.offers;
-  }
-});
-console.log(OFFERS)
+const getIncludedOffers = () => {
+  return OFFERS.forEach((it)=> {
+console.log(it)
+    const isTypeMatches = it.type === travelType;
+    if (isTypeMatches) {
+      return it.offers;
+    } else {
+      return [];
+    }
+  });
+
+};
+
+let id = -1;
+const createId = (pointsDataLenght) => {
+  id = pointsDataLenght;
+};
+// const includedOffers = OFFERS.map((it)=> it.type === travelType).offers;
+// console.log(includedOffers)
 const startDate = ``;
 const endDate = ``;
 // const includedOffers = getIncludedOffers(travelType.toLowerCase());
@@ -31,7 +44,7 @@ const endDate = ``;
 
 
 export const EmptyPoint = {
-  id: emptyPointId,
+  id,
   travelType,
   city,
   destination: {
@@ -43,7 +56,7 @@ export const EmptyPoint = {
   startDate,
   endDate,
   isFavorite: false,
-  includedOffers
+  includedOffers: []
 };
 
 
@@ -67,7 +80,8 @@ export default class PointController {
   render(route, routeIndex, mode) {
     this._routeData = route;
 
-    emptyPointId = this._routeData.length;
+    createId(this._routeData.length)
+
     const oldPointComponent = this._tripDaysComponent;
     const oldPointEditComponent = this._eventFormComponent;
     this._mode = mode;

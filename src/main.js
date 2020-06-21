@@ -6,19 +6,16 @@ import PriceController from './controllers/price-controller.js';
 import FilterController from './controllers/filter-controller.js';
 import TripController from './controllers/trip-controller.js';
 import PointsModel from './models/points.js';
-// import {generateRoutePoints} from './mocks/route-point.js';
 import {RenderPosition, render} from './utils/render.js';
-import {getDestinationsInfo, getOffersInfo} from './const.js';
+import {getDestinationsInfo, getOffersInfo, getIncludedOffersData, getCitiesList} from './const.js';
 
-// const ROUTES_QTY = 11;
+
 const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=`;
 
 const header = document.querySelector(`.page-header`);
 const tripInfo = header.querySelector(`.trip-main__trip-info`);
 
 const tripControlHeaders = header.querySelectorAll(`.trip-main__trip-controls h2`);
-
-// const routeData = generateRoutePoints(ROUTES_QTY);
 
 const api = new API(AUTHORIZATION);
 
@@ -79,15 +76,41 @@ menuComponent.setOnChange((menuItem) => {
   }
 });
 
-api.getPoints().then((points)=> {
-  pointsModel.setPoints(points);
-  renderBriefRouteProgram(points);
-  tripControllerComponent.render();
+
+const getPoints = new Promise((res) => {
+  api.getPoints().then((points) => {
+    pointsModel.setPoints(points);
+    renderBriefRouteProgram(points);
+    // getIncludedOffersData(points);
+    res();
+  });
 });
 
-api.getDestinations()
-.then((destinations)=> getDestinationsInfo(destinations));
 
-api.getOffers()
-.then((offers)=> getOffersInfo(offers));
+const getDestinations = new Promise((res) => {
+  api.getDestinations().then((destinations) => {
+    getDestinationsInfo(destinations);
+    getCitiesList(destinations);
+    res();
+  });
+});
+
+const getOffers = new Promise((res) => {
+  api.getOffers().then((offers) => {
+    getOffersInfo(offers);
+    res();
+  });
+});
+
+// const getIncludedOffers = new Promise((res) => {
+//   api.getIncludedOffers().then((includedOffers) => {
+//     getIncludedOffersData(includedOffers);
+//     res();
+//   });
+// });
+
+
+Promise.all([getPoints, getDestinations, getOffers])
+  .then(()=> tripControllerComponent.render());
+
 
