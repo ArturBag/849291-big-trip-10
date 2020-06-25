@@ -130,9 +130,10 @@ export default class TripController {
 
 
     const index = this._showedPointControllers.length;
+    const pointsQty = this._showedPointControllers.length;
 
     this._creatingPoint = new PointController(tripDaysListElement, this._onDataChange, this._onViewChange);
-    this._creatingPoint.render(EmptyPoint, index, PointControllerMode.ADDING);
+    this._creatingPoint.render(EmptyPoint, index, PointControllerMode.ADDING, pointsQty);
 
   }
 
@@ -182,48 +183,47 @@ export default class TripController {
         this._updatePoints();
 
       } else {
-        this._pointsModel.addPoint(newData);
 
-        const index = this._showedPointControllers.length;
+        this._api.createPoint(newData)
+        .then((parsedResponseData)=> {
+          this._pointsModel.addPoint(parsedResponseData);
 
-        pointController.render(newData, index, PointControllerMode.DEFAULT);
+          const index = this._showedPointControllers.length;
 
-        this._showedPointControllers = [].concat(pointController, this._showedPointControllers);
+          pointController.render(parsedResponseData, index, PointControllerMode.DEFAULT);
+          this._showedPointControllers = [].concat(pointController, this._showedPointControllers);
+          this._onSortTypeChange(this._sorting._currenSortType);
+        });
 
-        this._onSortTypeChange(this._sorting._currenSortType);
       }
     } else if (newData === null) {
-      this._pointsModel.removePoint(oldData.id);
 
-      this._updatePoints();
+      this._api.deletePoint(oldData.id)
+      .then(()=> {
+        this._pointsModel.removePoint(oldData.id);
+        this._updatePoints();
+      });
+
     } else {
 
-      this._api.updateTask(oldData.id, newData)
-      .then((pointModel)=> {
-        // console.log(pointModel)
-        const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
+      this._api.updatePoint(oldData.id, newData)
+      .then((response)=> {
+
+        return response;
+      })
+      .then((parsedResponseData)=> {
+
+        const isSuccess = this._pointsModel.updatePoint(oldData.id, parsedResponseData);
         const index = this._showedPointControllers.findIndex((it)=> it === pointController);
 
         if (isSuccess && shouldRender) {
 
-          pointController.render(pointModel, index, PointControllerMode.DEFAULT);
+          pointController.render(parsedResponseData, index, PointControllerMode.DEFAULT);
           this._onSortTypeChange(this._sorting._currenSortType);
         }
       });
 
     }
-
-      // const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
-      // const index = this._showedPointControllers.findIndex((it)=> it === pointController);
-
-
-      // if (isSuccess && shouldRender) {
-
-      //   pointController.render(newData, index, PointControllerMode.DEFAULT);
-      //   this._onSortTypeChange(this._sorting._currenSortType);
-      // }
-
-    // }
 
   }
 

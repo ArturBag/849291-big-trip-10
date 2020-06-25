@@ -7,17 +7,18 @@ import FilterController from './controllers/filter-controller.js';
 import TripController from './controllers/trip-controller.js';
 import PointsModel from './models/points.js';
 import {RenderPosition, render} from './utils/render.js';
-import {getDestinationsInfo, getOffersInfo, getIncludedOffersData, getCitiesList} from './const.js';
+import {getDestinationsInfo, getOffersInfo, getCitiesList} from './const.js';
 
 
 const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=`;
+const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
 
 const header = document.querySelector(`.page-header`);
 const tripInfo = header.querySelector(`.trip-main__trip-info`);
 
 const tripControlHeaders = header.querySelectorAll(`.trip-main__trip-controls h2`);
 
-const api = new API(AUTHORIZATION);
+const api = new API(END_POINT, AUTHORIZATION);
 
 
 const menuComponent = new Menu();
@@ -31,11 +32,16 @@ header.querySelector(`.trip-main__event-add-btn`)
 
 const pointsModel = new PointsModel();
 
-const priceController = new PriceController(tripInfo, pointsModel);
-priceController.render();
+const renderPriceData = ()=> {
+  const priceController = new PriceController(tripInfo, pointsModel);
+  priceController.render();
+};
 
-const filterController = new FilterController(tripControlHeaders[1], pointsModel);
-filterController.render();
+const renderFiltesrData = ()=> {
+  const filterController = new FilterController(tripControlHeaders[1], pointsModel);
+  filterController.render();
+};
+
 
 const tripEventsContainer = document.querySelector(`.trip-events`);
 
@@ -81,7 +87,8 @@ const getPoints = new Promise((res) => {
   api.getPoints().then((points) => {
     pointsModel.setPoints(points);
     renderBriefRouteProgram(points);
-    // getIncludedOffersData(points);
+    renderPriceData();
+    renderFiltesrData();
     res();
   });
 });
@@ -101,13 +108,6 @@ const getOffers = new Promise((res) => {
     res();
   });
 });
-
-// const getIncludedOffers = new Promise((res) => {
-//   api.getIncludedOffers().then((includedOffers) => {
-//     getIncludedOffersData(includedOffers);
-//     res();
-//   });
-// });
 
 
 Promise.all([getPoints, getDestinations, getOffers])

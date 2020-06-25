@@ -15,30 +15,18 @@ export default class Point {
     this.includedOffers = data[`offers`];
   }
 
-  toRAW() {
+  static toRAW(clientData) {
 
     return {
-      "id": this.id,
-      "type": this.travelType,
-      "destination": this.destination,
-      "base_price": this.price,
-      "date_from": new Date(this.startDate).toISOString(),
-      "date_to": new Date(this.endDate).toISOString(),
-      "is_favorite": this.isFavorite,
-      "offers": this.includedOffers
+      "id": clientData.id.toString(),
+      "type": clientData.travelType.toLowerCase(),
+      "destination": clientData.destination,
+      "base_price": clientData.price,
+      "date_from": new Date(clientData.startDate).toISOString(),
+      "date_to": new Date(clientData.endDate).toISOString(),
+      "is_favorite": clientData.isFavorite,
+      "offers": clientData.includedOffers
     };
-
-  // toRAW() {
-  //   return {
-  //     "id": this.id,
-  //     "type": this.travelType,
-  //     "destination": this.destination,
-  //     "base_price": this.price,
-  //     "date_from": new Date(this.startDate).toISOString(),
-  //     "date_to": new Date(this.endDate).toISOString(),
-  //     "is_favorite": this.isFavorite,
-  //     "offers": this.includedOffers
-  //   };
 
   }
 
@@ -51,4 +39,5 @@ export default class Point {
     return data.map(Point.parsePoint);
   }
 
-};
+}
+

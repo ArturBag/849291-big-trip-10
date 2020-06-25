@@ -1,5 +1,12 @@
 import Point from "./models/point.js";
 
+const Method = {
+  GET: `GET`,
+  POST: `POST`,
+  PUT: `PUT`,
+  DELETE: `DELETE`
+};
+
 const checkStatus = (response) => {
   if (response.status >= 200 && response.status < 300) {
     return response;
@@ -10,17 +17,16 @@ const checkStatus = (response) => {
 };
 
 const API = class {
-  constructor(authorization) {
+  constructor(endPoint, authorization) {
+    this._endPoint = endPoint;
     this._authorization = authorization;
   }
 
   getDestinations() {
 
-    const headers = new Headers();
-    headers.append(`Authorization`, this._authorization);
-
-    return fetch(`https://htmlacademy-es-10.appspot.com/big-trip/destinations`, {headers})
-    .then(checkStatus)
+    return this._load({
+      url: `destinations`
+    })
     .then((response)=> response.json());
   }
 
@@ -37,34 +43,53 @@ const API = class {
 
   getPoints() {
 
-    const headers = new Headers();
-    headers.append(`Authorization`, this._authorization);
-
-    return fetch(`https://htmlacademy-es-10.appspot.com/big-trip/points`, {headers})
-    .then(checkStatus)
+    return this._load({
+      url: `points`,
+    })
     .then((response)=> response.json())
     .then(Point.parsePoints);
+
   }
 
 
-  updateTask(id, data) {
-    console.log(data)
-    const headers = new Headers();
-    headers.append(`Authorization`, this._authorization);
-    headers.append(`Content-Type`, `application/json`);
-    // let testData = new Date(data.startDate).toISOString()
+  updatePoint(id, data) {
 
-    const point = new Point(data);
-    // console.log(point.toRAW())
-
-    return fetch(`https://htmlacademy-es-10.appspot.com/big-trip/points/${id}`, {
-      method: `PUT`,
-      body: JSON.stringify(point.toRAW()),
-      headers
+    return this._load({
+      url: `points/${id}`,
+      method: Method.PUT,
+      body: JSON.stringify(Point.toRAW(data)),
+      headers: new Headers({"Content-Type": `application/json`})
     })
-    .then(checkStatus)
     .then((response)=> response.json())
     .then(Point.parsePoint);
+
+  }
+
+  deletePoint(id) {
+    return this._load({url: `points/${id}`, method: Method.DELETE});
+  }
+
+  createPoint(point) {
+
+    return this._load({
+      url: `points`,
+      method: Method.POST,
+      body: JSON.stringify(Point.toRAW(point)),
+      headers: new Headers({"Content-Type": `application/json`})
+    })
+    .then((response)=> response.json())
+    .then(Point.parsePoint);
+
+  }
+
+  _load({url, method = Method.GET, body = null, headers = new Headers()}) {
+    headers.append(`Authorization`, this._authorization);
+
+    return fetch(`${this._endPoint}/${url}`, {method, body, headers})
+    .then(checkStatus)
+    .catch((err)=>{
+      throw err;
+    });
   }
 };
 

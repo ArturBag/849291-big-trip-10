@@ -1,7 +1,7 @@
 import EventForm from '../components/event-form.js';
 import TripDay from '../components/trip-day.js';
 import {render, replace, remove, RenderPosition} from '../utils/render.js';
-import {OFFERS, DESTINATION_INFO} from '../const.js';
+// import {OFFERS} from '../const.js';
 // import {getRandomDate, getIncludedOffers} from '../mocks/route-point.js';
 
 
@@ -11,42 +11,13 @@ export const Mode = {
   EDIT: `edit`,
 };
 
-console.log(OFFERS.length)
-
-// let emptyPointId = DESTINATION_INFO.length;
-const travelType = `Flight`;
-const city = ``;
-
-const getIncludedOffers = () => {
-  return OFFERS.forEach((it)=> {
-console.log(it)
-    const isTypeMatches = it.type === travelType;
-    if (isTypeMatches) {
-      return it.offers;
-    } else {
-      return [];
-    }
-  });
-
-};
-
-let id = -1;
-const createId = (pointsDataLenght) => {
-  id = pointsDataLenght;
-};
-// const includedOffers = OFFERS.map((it)=> it.type === travelType).offers;
-// console.log(includedOffers)
 const startDate = ``;
 const endDate = ``;
-// const includedOffers = getIncludedOffers(travelType.toLowerCase());
-// const startDate = getRandomDate(new Date());
-// const endDate = getRandomDate(startDate);
-
 
 export const EmptyPoint = {
-  id,
-  travelType,
-  city,
+  id: -1,
+  travelType: `Flight`,
+  city: ``,
   destination: {
     name: ``,
     description: ``,
@@ -77,10 +48,11 @@ export default class PointController {
   }
 
 
-  render(route, routeIndex, mode) {
+  render(route, routeIndex, mode, pointsQty) {
     this._routeData = route;
 
-    createId(this._routeData.length)
+    EmptyPoint.id = pointsQty;
+
 
     const oldPointComponent = this._tripDaysComponent;
     const oldPointEditComponent = this._eventFormComponent;

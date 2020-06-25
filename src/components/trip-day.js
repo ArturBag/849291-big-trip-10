@@ -1,6 +1,6 @@
 import AbstractComponent from './abstract-component.js';
 import {getPrefix, getFormattedTime, getTimeDiff, turnFirstLetterToCapital} from '../utils/common.js';
-import {OFFERS} from '../const.js';
+import {OFFERS, MONTH_NAMES} from '../const.js';
 
 const MAX_OFFERS_QTY_TO_SHOW = 3;
 
@@ -35,6 +35,7 @@ export default class TripDay extends AbstractComponent {
     const endTime = getFormattedTime(endDate);
 
     const duration = getTimeDiff(endDate - startDate);
+    const monthName = date ? MONTH_NAMES.get(date.month) : ``;
 
     const options = OFFERS.filter((it)=> it.type === travelType.toLowerCase())[0];
 
@@ -59,33 +60,11 @@ export default class TripDay extends AbstractComponent {
       }).join(` \n`);
     }
 
-
-    // let offers = [];
-    // let optionsInfo = ``;
-
-    // if (options.offers.length < 1) {
-    //   offers = [];
-    // } else {
-
-    //   offers = options.offers.length > 3 ?
-    //     options.offers.slice(0, MAX_OFFERS_QTY_TO_SHOW) : options.offers;
-
-    //   optionsInfo = offers.map((it) => {
-
-    //     return `<li class="event__offer">
-    //       <span class="event__offer-title">${it.title}</span>
-    //       &plus;
-    //       &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
-    //       </li>`;
-
-    //   }).join(` \n`);
-    // }
-
     return `<li class="trip-days__item  day">
      <div class="day__info">
      ${date ?
     `<span class="day__counter">${dayCounter}</span>
-      <time class="day__date" datetime="2019-03-18">${date.month} ${date.day}</time>` : ``
+      <time class="day__date" datetime="2019-03-18">${monthName} ${date.day}</time>` : ``
 }
      </div>
 

@@ -2,7 +2,6 @@ import AbstractSmartComponent from './abstract-smart-component.js';
 import {getPrefix, turnFirstLetterToCapital} from '../utils/common.js';
 import {Mode as PointControllerMode} from '../controllers/point-controller.js';
 import {OFFERS, DESTINATION_INFO, CITIES} from '../const.js';
-// console.log(INCLUDED_OFFERS)
 
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
@@ -61,14 +60,6 @@ const parseFormData = (formData, form, mode, id) => {
   };
 };
 
-// "id": this.id,
-//       "type": this.travelType,
-//       "destination": this.destination,
-//       "base_price": this.price,
-//       "date_from": new Date(this.startDate).toISOString(),
-//       "date_to": new Date(this.endDate).toISOString(),
-//       "is_favorite": this.isFavorite,
-//       "offers": this.includedOffers
 
 export default class EventForm extends AbstractSmartComponent {
   constructor(route, mode) {
@@ -84,7 +75,6 @@ export default class EventForm extends AbstractSmartComponent {
     this._city = route.city;
     this._isFavorite = route.isFavorite;
     this._price = route.price;
-    // this._includedOffers = route.includedOffers || [];
     this._includedOffers = route.includedOffers;
 
     this._iconForReset = `img/icons/${route.travelType.toLowerCase()}.png`;
@@ -273,8 +263,6 @@ export default class EventForm extends AbstractSmartComponent {
     this._icon = `img/icons/${lowerCaseType}.png`;
     const price = isNaN(this._price) ? 0 : this._price;
 
-    const allOffersByChosedType = OFFERS.filter((elem)=> elem.type === lowerCaseType)[0].offers;
-
     const firstEmptyOption = `<option value="" "selected">.    .     .</option>`;
 
     const isFavoriteChecked = this._isFavorite ? `checked` : ``;
@@ -303,13 +291,14 @@ export default class EventForm extends AbstractSmartComponent {
     let imageTemplate = ``;
     let eventOffers = ``;
 
-    const cityOptionsMarkup = CITIES.map((cityName)=> {
+    const cityOptionsMarkup = CITIES.sort().map((cityName)=> {
       const isSelected = city === cityName ? `selected` : ``;
 
       return `<option value="${cityName}" ${isSelected}>${cityName}</option>`;
     });
 
-    // console.log(this._includedOffers, `includedOffers`, OFFERS,  `OFFERS`)
+    const allOffersByChosedType = OFFERS.filter((elem)=> elem.type === lowerCaseType)[0].offers;
+
 
     if (allOffersByChosedType.length < 1) {
       eventOffers = ``;
@@ -320,10 +309,10 @@ export default class EventForm extends AbstractSmartComponent {
         const id = it.title.split(/\s+/).join(`-`);
         const nameAttr = it.title;
 
-        const isChecked = ()=> this._includedOffers.some((includedOffer)=> {
+        const isChecked = ()=> this._includedOffers.some((includedOffer)=>
+          it.title === includedOffer.title
+        ) ? `checked` : ``;
 
-          return it.title === includedOffer.title ? `checked` : ``;
-        });
 
         return `<div class="event__offer-selector">
               <input class="event__offer-checkbox  visually-hidden" id="${id}" type="checkbox" name="${nameAttr}" ${isChecked()}>
@@ -336,27 +325,20 @@ export default class EventForm extends AbstractSmartComponent {
       }).join(` \n`);
     }
 
-      // eventOffers = this._options.map((it) => {
+    const typeItemsTransfer = [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`];
+    const typeItemsActivity = [`Check-in`, `Sightseeing`, `Restaurant`];
 
-      //   const id = it.title.split(/\s+/).join(`-`);
-      //   const nameAttr = it.title;
+    const createTypeMarkup = (type, eventType)=> {
+      return (
+        `<div class="event__type-item">
+          <input id="event-type-${type.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.toLowerCase()} ${type === eventType ? `checked` : ``}">
+          <label class="event__type-label  event__type-label--${type.toLowerCase()}" for="event-type-${type.toLowerCase()}-1">${type}</label>
+        </div>`
+      );
+    };
 
-      //   const isChecked = ()=> this._includedOffers.some((includedOffer)=>
-      //     it.title === includedOffer.title
-      //   ) ? `checked` : ``;
-
-
-      //   return `<div class="event__offer-selector">
-      //         <input class="event__offer-checkbox  visually-hidden" id="${id}" type="checkbox" name="${nameAttr}" ${isChecked()}>
-      //         <label class="event__offer-label" for="${id}">
-      //           <span class="event__offer-title">${it.title}</span>
-      //           &plus;
-      //           &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
-      //         </label>
-      //       </div>`;
-      // }).join(` \n`);
-    // }
-
+    const transferMarkup = typeItemsTransfer.map((it)=> createTypeMarkup(it, lowerCaseType)).join(`\n`);
+    const activityMarkup = typeItemsActivity.map((it)=> createTypeMarkup(it, lowerCaseType)).join(`\n`);
 
     if (destinationPictures.length < 1) {
       imageTemplate = ``;
@@ -379,60 +361,12 @@ export default class EventForm extends AbstractSmartComponent {
     <div class="event__type-list">
       <fieldset class="event__type-group">
         <legend class="visually-hidden">Transfer</legend>
-
-        <div class="event__type-item">
-          <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
-          <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
-        </div>
-
-        <div class="event__type-item">
-          <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
-          <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
-        </div>
-
-        <div class="event__type-item">
-          <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
-          <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
-        </div>
-
-        <div class="event__type-item">
-          <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
-          <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
-        </div>
-
-        <div class="event__type-item">
-          <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport">
-          <label class="event__type-label  event__type-label--transport" for="event-type-transport-1">Transport</label>
-        </div>
-
-        <div class="event__type-item">
-          <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
-          <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
-        </div>
-
-        <div class="event__type-item">
-          <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
-          <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
-        </div>
+        ${transferMarkup}
       </fieldset>
 
       <fieldset class="event__type-group">
         <legend class="visually-hidden">Activity</legend>
-
-        <div class="event__type-item">
-          <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
-          <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
-        </div>
-
-        <div class="event__type-item">
-          <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
-          <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
-        </div>
-
-        <div class="event__type-item">
-          <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
-          <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
-        </div>
+        ${activityMarkup}
       </fieldset>
     </div>
     </div>

@@ -13,7 +13,7 @@ export default class Route extends AbstractComponent {
 
     const data = getDefaultEvents(this._routeData);
 
-    const tripDaysItems = data;
+    const tripDaysItems = data.sort((a, b)=> a.startDate - b.startDate);
     let destinationsMarkup = ``;
 
     const firstDayDate = tripDaysItems[0].startDate.getDate();
