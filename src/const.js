@@ -1,3 +1,4 @@
+// export const STOP_EVENTS = [`Check-in`, `Sightseeing`, `Restaurant`];
 
 export const DESTINATION_INFO = [];
 
@@ -49,6 +50,7 @@ export const MONTH_NAMES = new Map([
   [11, `NOV`],
   [12, `DEC`],
 ]);
+
 
 export const filterTypes = {
 

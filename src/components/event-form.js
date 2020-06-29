@@ -7,6 +7,12 @@ import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import 'flatpickr/dist/themes/light.css';
 
+const DefaultData = {
+  deleteButtonText: `Delete`,
+  cancelButtonText: `Cancel`,
+  saveButtonText: `Save`,
+};
+
 const parseFormData = (formData, form, mode, id) => {
 
   const travelType = form.querySelector(`.event__type-toggle`).dataset.travelType;
@@ -77,6 +83,8 @@ export default class EventForm extends AbstractSmartComponent {
     this._price = route.price;
     this._includedOffers = route.includedOffers;
 
+    this._externalData = DefaultData;
+
     this._iconForReset = `img/icons/${route.travelType.toLowerCase()}.png`;
     this._prefixForReset = getPrefix(route.travelType);
 
@@ -125,8 +133,12 @@ export default class EventForm extends AbstractSmartComponent {
   getData() {
     const form = this.getElement();
     const formData = new FormData(form);
-
     return parseFormData(formData, form, this._mode, this._id);
+  }
+
+  disableFormData() {
+    const form = this.getElement();
+    Array.from(form).forEach((it)=> it.setAttribute(`disabled`, `disabled`));
   }
 
   reset() {
@@ -137,6 +149,11 @@ export default class EventForm extends AbstractSmartComponent {
     this._price = this._routeData.price;
     this._isFavorite = this._routeData.isFavorite;
 
+    this.rerender();
+  }
+
+  setData(data) {
+    this._externalData = Object.assign({}, DefaultData, data);
     this.rerender();
   }
 
@@ -224,7 +241,7 @@ export default class EventForm extends AbstractSmartComponent {
       it.addEventListener(`change`, () => {
         const chosedEventTypeValue = it.querySelector(`input`).value;
 
-        this._travelType = turnFirstLetterToCapital(chosedEventTypeValue);
+        this._travelType = turnFirstLetterToCapital(chosedEventTypeValue).trim();
 
         this.rerender();
 
@@ -266,7 +283,10 @@ export default class EventForm extends AbstractSmartComponent {
     const firstEmptyOption = `<option value="" "selected">.    .     .</option>`;
 
     const isFavoriteChecked = this._isFavorite ? `checked` : ``;
-    const buttonModeText = this._mode === PointControllerMode.ADDING ? `Cancel` : `Delete`;
+
+    let submitButtonText = this._externalData.saveButtonText;
+    let resetButtonText = this._mode === PointControllerMode.ADDING ? this._externalData.cancelButtonText
+      : this._externalData.deleteButtonText;
     const isCloseFormButtonDisplayed = this._mode === PointControllerMode.ADDING ? false : true;
     const isFavoriteButtonDisplayed = this._mode === PointControllerMode.ADDING ? false : true;
 
@@ -404,8 +424,8 @@ export default class EventForm extends AbstractSmartComponent {
     <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
     </div>
 
-    <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-    <button class="event__reset-btn" type="reset">${buttonModeText}</button>
+    <button class="event__save-btn  btn  btn--blue" type="submit">${submitButtonText}</button>
+    <button class="event__reset-btn" type="reset">${resetButtonText}</button>
     ${isFavoriteButtonDisplayed ?
     `<input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavoriteChecked}>
     <label class="event__favorite-btn" for="event-favorite-1">

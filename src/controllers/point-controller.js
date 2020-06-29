@@ -5,6 +5,8 @@ import {render, replace, remove, RenderPosition} from '../utils/render.js';
 // import {getRandomDate, getIncludedOffers} from '../mocks/route-point.js';
 
 
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
 export const Mode = {
   ADDING: `adding`,
   DEFAULT: `default`,
@@ -87,14 +89,23 @@ export default class PointController {
         this.destroy();
         this._replaceEventFormToTripDays();
       }
-
+      this._eventFormComponent.setData({
+        deleteButtonText: `Deleting...`
+      });
+      this._eventFormComponent.disableFormData();
       this._onDataChange(this, route, null);
     });
 
     this._eventFormComponent.setSubmitHandler((evt)=>{
       evt.preventDefault();
       const data = this._eventFormComponent.getData();
-      this._eventFormComponent.removeFlatpickr();
+
+      this._eventFormComponent.setData({
+        saveButtonText: `Saving...`
+      });
+
+      this._eventFormComponent.disableFormData();
+      // this._eventFormComponent.removeFlatpickr();
       const shouldRender = true;
       if (this._mode === Mode.ADDING) {
         this._formAction = Mode.ADDING;
@@ -181,6 +192,22 @@ export default class PointController {
       replace(this._tripDaysComponent, this._eventFormComponent);
     }
     this._mode = Mode.DEFAULT;
+  }
+
+  shake() {
+
+    this._eventFormComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(()=>{
+      this._eventFormComponent.getElement().style.animation = ``;
+
+      this._eventFormComponent.setData({
+        deleteButtonText: `Delete`,
+        saveButtonText: `Save`
+      });
+    }, SHAKE_ANIMATION_TIMEOUT);
+
+
   }
 
 }

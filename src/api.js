@@ -88,7 +88,7 @@ const API = class {
     return fetch(`${this._endPoint}/${url}`, {method, body, headers})
     .then(checkStatus)
     .catch((err)=>{
-      throw err;
+      throw new Error(err);
     });
   }
 };

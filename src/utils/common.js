@@ -1,5 +1,6 @@
 import moment from "moment";
 
+
 const STOP_EVENTS = [`Check-in`, `Sightseeing`, `Restaurant`];
 
 export const getPrefix = (travelType)=> {
@@ -37,21 +38,3 @@ export const getTimeDiffinHours = (time) => {
 export const turnFirstLetterToCapital = (word) =>
   word.charAt(0).toUpperCase() + word.substr(1);
 
-// export const getIncludedOffers = (routeType) => {
-//   // console.log(OFFERS)
-
-//   const indexOfAllOffersByType = OFFERS.findIndex((offer) => offer.type === routeType);
-
-//   const allOffersByType = OFFERS[indexOfAllOffersByType].offers;
-//   let includedOffersResult = [];
-//   if (allOffersByType.length < 1) {
-//     return [];
-//   } else {
-//     const offersQty = getRandomIntegerNumber(1, allOffersByType.length);
-//     includedOffersResult = OFFERS[indexOfAllOffersByType].offers.slice(0, offersQty);
-
-//     return includedOffersResult;
-
-//   }
-
-// };
