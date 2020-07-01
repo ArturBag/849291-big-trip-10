@@ -96,7 +96,7 @@ export default class Statistics extends AbstractSmartComponent {
 
           const startDate = it.startDate;
           const endDate = it.endDate;
-          const durationInhours = getTimeDiffinHours(endDate - startDate)
+          const durationInhours = getTimeDiffinHours(endDate - startDate);
 
           hoursForType += durationInhours;
         }

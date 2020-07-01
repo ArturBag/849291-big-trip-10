@@ -1,9 +1,6 @@
 import EventForm from '../components/event-form.js';
 import TripDay from '../components/trip-day.js';
 import {render, replace, remove, RenderPosition} from '../utils/render.js';
-// import {OFFERS} from '../const.js';
-// import {getRandomDate, getIncludedOffers} from '../mocks/route-point.js';
-
 
 const SHAKE_ANIMATION_TIMEOUT = 600;
 
@@ -207,6 +204,17 @@ export default class PointController {
       });
     }, SHAKE_ANIMATION_TIMEOUT);
 
+
+  }
+
+  showStyledServerError() {
+    this.shake();
+
+    this._eventFormComponent.getElement().style.outline = `2px solid red`;
+
+    setTimeout(()=>{
+      this._eventFormComponent.getElement().style.outline = ``;
+    }, SHAKE_ANIMATION_TIMEOUT);
 
   }
 

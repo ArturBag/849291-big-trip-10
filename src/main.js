@@ -6,7 +6,7 @@ import PriceController from './controllers/price-controller.js';
 import FilterController from './controllers/filter-controller.js';
 import TripController from './controllers/trip-controller.js';
 import PointsModel from './models/points.js';
-import {RenderPosition, render, remove, createElement} from './utils/render.js';
+import {RenderPosition, render, createElement} from './utils/render.js';
 import {getDestinationsInfo, getOffersInfo, getCitiesList} from './const.js';
 
 
@@ -125,10 +125,8 @@ const getOffers = new Promise((res) => {
 
 Promise.all([getPoints, getDestinations, getOffers])
   .then(()=> {
-    // tripEventsContainer.prepend(LOADING_LIST_PRELOADER);
     tripControllerComponent.render();
     hideListPreloader();
-    // remove(LOADING_LIST_PRELOADER);
   });
 
 

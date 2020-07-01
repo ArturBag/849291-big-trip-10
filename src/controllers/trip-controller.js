@@ -195,7 +195,7 @@ export default class TripController {
           this._onSortTypeChange(this._sorting._currenSortType);
         })
         .catch(()=>{
-          pointController.shake();
+          pointController.showStyledServerError();
         });
 
       }
@@ -207,7 +207,7 @@ export default class TripController {
         this._updatePoints();
       })
       .catch(()=>{
-        pointController.shake();
+        pointController.showStyledServerError();
       });
 
     } else {
@@ -229,7 +229,7 @@ export default class TripController {
         }
       })
       .catch(()=>{
-        pointController.shake();
+        pointController.showStyledServerError();
       });
 
     }
