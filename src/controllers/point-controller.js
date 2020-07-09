@@ -145,6 +145,10 @@ export default class PointController {
 
   }
 
+  removeFlatpickr() {
+    this._eventFormComponent.removeFlatpickr();
+  }
+
   setDefaultView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceEventFormToTripDays();

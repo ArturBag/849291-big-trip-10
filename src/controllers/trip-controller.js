@@ -193,6 +193,7 @@ export default class TripController {
           pointController.render(parsedResponseData, index, PointControllerMode.DEFAULT);
           this._showedPointControllers = [].concat(pointController, this._showedPointControllers);
           this._onSortTypeChange(this._sorting._currenSortType);
+          pointController.removeFlatpickr();
         })
         .catch(()=>{
           pointController.showStyledServerError();
@@ -205,6 +206,7 @@ export default class TripController {
       .then(()=> {
         this._pointsModel.removePoint(oldData.id);
         this._updatePoints();
+        pointController.removeFlatpickr();
       })
       .catch(()=>{
         pointController.showStyledServerError();
@@ -226,6 +228,7 @@ export default class TripController {
 
           pointController.render(parsedResponseData, index, PointControllerMode.DEFAULT);
           this._onSortTypeChange(this._sorting._currenSortType);
+          pointController.removeFlatpickr();
         }
       })
       .catch(()=>{
