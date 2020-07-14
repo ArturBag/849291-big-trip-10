@@ -179,7 +179,7 @@ export default class Statistics extends AbstractSmartComponent {
       }
     };
 
-    const myChart = new Chart(ctx, {
+    return new Chart(ctx, {
       type: `horizontalBar`,
       data: {
         labels: pointTypes,

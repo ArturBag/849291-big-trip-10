@@ -1,4 +1,6 @@
-import API from './api.js';
+import API from './api/index.js';
+import Provider from './api/provider.js';
+import Store from "./api/store.js";
 import Route from './components/route.js';
 import Menu, {MenuItem} from './components/menu.js';
 import Statistics from './components/statistics.js';
@@ -13,6 +15,9 @@ import {getDestinationsInfo, getOffersInfo, getCitiesList} from './const.js';
 const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=`;
 const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
 const LOADING_LIST_PRELOADER = createElement(`<p class="trip-events__msg">Loading...</p>`);
+const STORE_PREFIX = `big-trip-localstorage`;
+const STORE_VER = `v1`;
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
 const header = document.querySelector(`.page-header`);
 const tripInfo = header.querySelector(`.trip-main__trip-info`);
@@ -35,7 +40,8 @@ showListPreloader();
 tripEventsContainer.prepend(LOADING_LIST_PRELOADER);
 
 const api = new API(END_POINT, AUTHORIZATION);
-
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
 
 const menuComponent = new Menu();
 render(tripControlHeaders[0], menuComponent.getElement(), RenderPosition.AFTEREND);
@@ -58,7 +64,7 @@ const renderFiltesrData = ()=> {
 };
 
 
-const tripControllerComponent = new TripController(tripEventsContainer, pointsModel, api);
+const tripControllerComponent = new TripController(tripEventsContainer, pointsModel, apiWithProvider);
 
 let statisticsComponent = new Statistics(pointsModel, pointsModel.getPointsAll());
 
@@ -97,7 +103,7 @@ menuComponent.setOnChange((menuItem) => {
 
 
 const getPoints = new Promise((res) => {
-  api.getPoints().then((points) => {
+  apiWithProvider.getPoints().then((points) => {
     pointsModel.setPoints(points);
     renderBriefRouteProgram(points);
     renderPriceData();
@@ -108,7 +114,7 @@ const getPoints = new Promise((res) => {
 
 
 const getDestinations = new Promise((res) => {
-  api.getDestinations().then((destinations) => {
+  apiWithProvider.getDestinations().then((destinations) => {
     getDestinationsInfo(destinations);
     getCitiesList(destinations);
     res();
@@ -116,7 +122,7 @@ const getDestinations = new Promise((res) => {
 });
 
 const getOffers = new Promise((res) => {
-  api.getOffers().then((offers) => {
+  apiWithProvider.getOffers().then((offers) => {
     getOffersInfo(offers);
     res();
   });
@@ -130,3 +136,6 @@ Promise.all([getPoints, getDestinations, getOffers])
   });
 
 
+window.addEventListener(`load`, ()=>{
+  navigator.serviceWorker.register(`/sw.js`);
+});
