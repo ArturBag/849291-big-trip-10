@@ -1,7 +1,14 @@
 import Point from "../models/point.js";
+// import {nanoid} from "nanoid";
 
 const isOnline = () => {
   return window.navigator.onLine;
+};
+
+const getSyncedPoints = (items)=> {
+
+  return items.filetr(({success})=> success)
+    .map(({payload})=> payload.point);
 };
 
 
@@ -9,44 +16,62 @@ export default class Provider {
   constructor(api, store) {
     this._api = api;
     this._store = store;
+
   }
 
+
   getDestinations() {
-    if (isOnline) {
+    if (isOnline()) {
       return this._api.getDestinations()
       .then((destinationsData)=> {
-        destinationsData.forEach((destination)=> this._store.setItem(destination.type, Point.toRAW(destination)));
+
+        this._store.setItems(`destinations`, destinationsData);
+
         return destinationsData;
       });
+
     }
 
-    return Promise.reject(`offline logic is not implemented`);
+    const storeDestinationsData = this._store.getItems().destinations;
+
+    return Promise.resolve(storeDestinationsData);
   }
 
 
   getOffers() {
-    if (isOnline) {
+    if (isOnline()) {
+
       return this._api.getOffers()
       .then((offers)=> {
-        offers.forEach((offerData)=> this._store.setItem(offerData.type, Point.toRAW(offerData)));
+        this._store.setItems(`offers`, offers);
+
         return offers;
       });
+
     }
 
-    return Promise.reject(`offline logic is not implemented`);
+    const storeOffersData = this._store.getItems().offers;
+
+    return Promise.resolve(storeOffersData);
   }
 
   getPoints() {
-    if (isOnline) {
+
+    if (isOnline()) {
+
+
       return this._api.getPoints()
       .then((points)=> {
-        points.forEach((pointData)=> this._store.setItem(pointData.id, Point.toRAW(pointData)));
+        const storePointsData = points.map((point)=> Point.toRAW(point));
+        this._store.setItems(`points`, storePointsData);
+
 
         return points;
       });
     }
 
-    const storePointsData = Object.values(this._store.getItems());
+    const storePointsData = this._store.getItems().points;
+
 
     return Promise.resolve(Point.parsePoints(storePointsData));
 
@@ -54,28 +79,44 @@ export default class Provider {
   }
 
   createPoint(data) {
-    if (isOnline) {
-      return this._api.createPoint(data);
+    if (isOnline()) {
+      return this._api.createPoint(data)
+        .then((newPoint)=> {
+          this._store.setItem(newPoint.id, Point.toRAW(newPoint));
+
+          return newPoint;
+        });
     }
 
-    return Promise.reject(`offline logic is not implemented`);
+
+    this._store.setItem(data.id, Point.toRAW(data));
+
+    return Promise.resolve(data);
   }
 
+
   updatePoint(id, data) {
-    if (isOnline) {
-      return this._api.updatePoint(id, data);
+    if (isOnline()) {
+      return this._api.updatePoint(id, data)
+        .then((newPoints)=> newPoints);
     }
 
-    return Promise.reject(`offline logic is not implemented`);
+
+    this._store.setItem(id, Point.toRAW(data));
+
+    return Promise.resolve(data);
   }
 
   deletePoint(id) {
-    if (isOnline) {
-      return this._api.deletePoint(id);
+    if (isOnline()) {
+      return this._api.deletePoint(id)
+        .then((newPoints)=> newPoints);
     }
 
-    return Promise.reject(`offline logic is not implemented`);
+    this._store.removeItem(id);
+    const newStorePoints = this._store.getItems().points;
+
+    return Promise.resolve(newStorePoints);
   }
 
 }
-

@@ -13,7 +13,8 @@ export default class Store {
 
   }
 
-  setItem(key, value) {
+  setItems(key, value) {
+
     const store = this.getItems();
 
     this._storage.setItem(
@@ -24,11 +25,38 @@ export default class Store {
             })
         )
     );
+  }
+
+
+  setItem(key, value) {
+
+    const index = parseInt(key, 10);
+
+    const store = this.getItems();
+    store.points = Object.assign({}, store.points, {
+      [index]: value
+    });
+
+    this._storage.setItem(
+        this._storeKey,
+        JSON.stringify(store)
+
+    );
 
   }
 
+
+  // правильный код. не удалять
   removeItem(key) {
 
+    const store = this.getItems();
+
+    delete store.points[key];
+
+    this._storage.setItem(
+        this._storeKey,
+        JSON.stringify(store)
+    );
   }
 
 }

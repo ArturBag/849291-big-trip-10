@@ -36,20 +36,21 @@ self.addEventListener(`install`, (evt)=>{
 
 });
 
+
 self.addEventListener(`activate`, (evt)=>{
   evt.waitUntil(
       caches.keys()
       .then(
-          (keys)=> Promise.all(
-              keys.map(
-                  (key)=> {
-                    if (key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME) {
-                      return caches.delete(key);
+          (cacheNames)=> Promise.all(
+              cacheNames.map(
+                  (cache)=> {
+                    if (cache.startsWith(CACHE_PREFIX) && cache !== CACHE_NAME) {
+                      return caches.delete(cache);
                     }
 
                     return null;
                   })
-                  .filter((key)=> key !== null)
+                  .filter((cache)=> cache !== null)
           )
       )
 
@@ -58,29 +59,32 @@ self.addEventListener(`activate`, (evt)=>{
 });
 
 self.addEventListener(`fetch`, (evt) => {
-  const {request} = evt;
+  const request = evt.request;
 
   evt.respondWith(
       caches.match(request)
-    .then((cacheResponse) => {
-      if (cacheResponse) {
-        return cacheResponse;
-      }
+      .then((cacheResponse)=> {
+        if (cacheResponse) {
+          return cacheResponse;
+        }
 
-      return fetch(request)
-        .then((response) => {
-          if (!response || response.status !== 200 || response.type !== `basic`) {
-            return response;
-          }
+        return fetch(request).then(
+            (response)=> {
+              if (!response || response.status !== 200 || response.type !== `basic`) {
+                return response;
+              }
 
-          const clonedResponse = response.clone();
-          caches.open(CACHE_NAME)
-            .then((cache) => cache.put(request, clonedResponse));
+              const clonedResponse = response.clone();
 
-          return response;
-        });
+              caches.open(CACHE_NAME)
+                .then((cache) => cache.put(request, clonedResponse));
 
-    })
+              return response;
+            }
+        );
+      })
   );
 
 });
+
+
