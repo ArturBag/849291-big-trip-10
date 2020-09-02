@@ -102,7 +102,6 @@ export default class PointController {
       });
 
       this._eventFormComponent.disableFormData();
-      // this._eventFormComponent.removeFlatpickr();
       const shouldRender = true;
       if (this._mode === Mode.ADDING) {
         this._formAction = Mode.ADDING;

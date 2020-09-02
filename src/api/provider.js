@@ -1,5 +1,4 @@
 import Point from "../models/point.js";
-// import {nanoid} from "nanoid";
 
 const isOnline = () => {
   return window.navigator.onLine;
@@ -7,8 +6,16 @@ const isOnline = () => {
 
 const getSyncedPoints = (items)=> {
 
-  return items.filetr(({success})=> success)
+  return items.filter(({success})=> success)
     .map(({payload})=> payload.point);
+};
+
+const createStoreStructure = (items)=> {
+  return items.reduce((acc, current)=> {
+    return Object.assign({}, acc, {
+      [current.id]: current
+    });
+  }, {});
 };
 
 
@@ -18,7 +25,6 @@ export default class Provider {
     this._store = store;
 
   }
-
 
   getDestinations() {
     if (isOnline()) {
@@ -65,18 +71,19 @@ export default class Provider {
         const storePointsData = points.map((point)=> Point.toRAW(point));
         this._store.setItems(`points`, storePointsData);
 
-
         return points;
       });
     }
 
-    const storePointsData = this._store.getItems().points;
+
+    const storePointsData = Object.values(this._store.getItems().points);
 
 
     return Promise.resolve(Point.parsePoints(storePointsData));
 
 
   }
+
 
   createPoint(data) {
     if (isOnline()) {
@@ -117,6 +124,26 @@ export default class Provider {
     const newStorePoints = this._store.getItems().points;
 
     return Promise.resolve(newStorePoints);
+  }
+
+  sync() {
+    if (isOnline()) {
+
+      const storePoints = this._store.getItems().points;
+
+      return this._api.sync(storePoints)
+        .then((response) => {
+
+          const createdPoits = getSyncedPoints(response.created);
+          const updatedPoits = getSyncedPoints(response.updated);
+
+          const items = createStoreStructure([...createdPoits, ...updatedPoits]);
+
+          this._store.setItems(`points`, items);
+        });
+    }
+
+    return Promise.reject(new Error(`Sync data failed`));
   }
 
 }

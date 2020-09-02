@@ -1,5 +1,3 @@
-// import { filterTypes } from '../const.js';
-// import AbstractSmartComponent from './abstract-smart-component.js';
 import AbstractComponent from './abstract-component.js';
 
 export default class Filters extends AbstractComponent {
@@ -10,18 +8,10 @@ export default class Filters extends AbstractComponent {
     this._setFilterChangeHandler = null;
   }
 
-  // recoveryListeners() {
-  //   this.setFilterChangeHandler(this._closeFormHandler);
-  // }
-
-  // rerender() {
-  //   super.rerender();
-  // }
 
   setFilterChangeHandler(handler) {
     this.getElement().addEventListener(`change`, handler);
     this._setFilterChangeHandler = handler;
-    // this.rerender();
   }
 
   getTemplate() {

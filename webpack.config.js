@@ -1,8 +1,5 @@
 const MomentLocalesPlugin = require(`moment-locales-webpack-plugin`);
 const path = require('path');
-const ghpages = require('gh-pages');
-
-ghpages.publish('dist', function(err) {});
 
 module.exports = {
   mode: 'development',

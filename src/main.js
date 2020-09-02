@@ -139,3 +139,12 @@ Promise.all([getPoints, getDestinations, getOffers])
 window.addEventListener(`load`, ()=>{
   navigator.serviceWorker.register(`/sw.js`);
 });
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+  apiWithProvider.sync();
+});
+
+window.addEventListener(`offline`, () => {
+  document.title += ` [offline]`;
+});

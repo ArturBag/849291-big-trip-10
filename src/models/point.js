@@ -35,13 +35,8 @@ export default class Point {
     return new Point(data);
   }
 
-  // static parsePoints(data) {
-  //   console.log(data.map(Point.parsePoint))
-  //   return data.map(Point.parsePoint);
-  // }
 
   static parsePoints(data) {
-    // console.log(data.map((dataItem)=> Point.parsePoint(dataItem)))
     return data.map((dataItem)=> Point.parsePoint(dataItem));
   }
 

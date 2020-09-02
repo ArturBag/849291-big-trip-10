@@ -1,5 +1,3 @@
-// export const STOP_EVENTS = [`Check-in`, `Sightseeing`, `Restaurant`];
-
 export const DESTINATION_INFO = [];
 
 export const getDestinationsInfo = (data) => {
